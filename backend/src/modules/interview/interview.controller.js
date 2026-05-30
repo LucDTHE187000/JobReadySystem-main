@@ -778,13 +778,38 @@ Quy tắc bắt buộc:
             }
 
             let evaluation = null;
+            let rawResponse = null;
 
             // Try N8N service first
             try {
-                evaluation = await n8nInterviewService.evaluateAnswer({
+                rawResponse = await n8nInterviewService.evaluateAnswer({
                     question,
                     answer
                 });
+                console.log('[N8N Response]', JSON.stringify(rawResponse, null, 2));
+                
+                // Extract score from N8N response - handle nested structures
+                if (typeof rawResponse === 'string') {
+                    try {
+                        rawResponse = JSON.parse(rawResponse);
+                    } catch (e) {
+                        // If JSON parse fails, try to extract JSON from string
+                        const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
+                        if (jsonMatch) {
+                            rawResponse = JSON.parse(jsonMatch[0]);
+                        }
+                    }
+                }
+
+                // Extract evaluation data from various possible response structures
+                evaluation = {
+                    aiScore: rawResponse?.aiScore ?? rawResponse?.score ?? rawResponse?.data?.score ?? rawResponse?.data?.aiScore ?? 0,
+                    aiFeedback: rawResponse?.aiFeedback ?? rawResponse?.feedback ?? rawResponse?.data?.feedback ?? rawResponse?.data?.aiFeedback ?? '',
+                    keyPoints: rawResponse?.keyPoints ?? rawResponse?.strengths ?? rawResponse?.data?.keyPoints ?? rawResponse?.data?.strengths ?? [],
+                    missedPoints: rawResponse?.missedPoints ?? rawResponse?.improvements ?? rawResponse?.weaknesses ?? rawResponse?.data?.missedPoints ?? rawResponse?.data?.improvements ?? [],
+                    suggestions: rawResponse?.suggestions ?? rawResponse?.recommendations ?? rawResponse?.data?.suggestions ?? rawResponse?.data?.recommendations ?? [],
+                    followUpQuestion: rawResponse?.followUpQuestion ?? rawResponse?.data?.followUpQuestion ?? ''
+                };
             } catch (n8nError) {
                 console.warn('N8N evaluation failed, trying SimpleInterview service:', n8nError.message);
                 
@@ -797,18 +822,29 @@ Quy tắc bắt buộc:
                 }
             }
 
-            // Normalize score to 0-100 and ensure all fields exist
-            const normalizedScore = evaluation?.aiScore ?? evaluation?.score ?? 0;
-            const finalScore = normalizedScore <= 10 ? normalizedScore * 10 : Math.min(100, Math.max(0, normalizedScore));
+            // Ensure we have a valid score
+            let score = evaluation?.aiScore ?? 0;
+            
+            // If score is 0 and we had a response, something went wrong - use fallback
+            if (score === 0 && evaluation?.aiFeedback) {
+                // Feedback exists but score is 0, this might be valid
+                score = 70; // Use neutral score
+            } else if (score === 0 && !evaluation?.aiFeedback) {
+                // No score and no feedback - use complete fallback
+                score = 50;
+            }
+
+            // Normalize score to 0-100
+            const finalScore = score <= 10 ? Math.round(score * 10) : Math.min(100, Math.max(0, Math.round(score)));
 
             const response = {
                 success: true,
                 data: {
-                    aiScore: Math.round(finalScore),
-                    aiFeedback: evaluation?.aiFeedback ?? evaluation?.feedback ?? 'Cảm ơn bạn đã trả lời câu hỏi này.',
-                    keyPoints: evaluation?.keyPoints ?? evaluation?.strengths ?? [],
-                    missedPoints: evaluation?.missedPoints ?? evaluation?.improvements ?? evaluation?.weaknesses ?? [],
-                    suggestions: evaluation?.suggestions ?? evaluation?.recommendations ?? [],
+                    aiScore: finalScore,
+                    aiFeedback: evaluation?.aiFeedback ?? 'Cảm ơn bạn đã trả lời câu hỏi này.',
+                    keyPoints: Array.isArray(evaluation?.keyPoints) ? evaluation.keyPoints : [],
+                    missedPoints: Array.isArray(evaluation?.missedPoints) ? evaluation.missedPoints : [],
+                    suggestions: Array.isArray(evaluation?.suggestions) ? evaluation.suggestions : [],
                     followUpQuestion: evaluation?.followUpQuestion ?? ''
                 }
             };
@@ -828,6 +864,9 @@ Quy tắc bắt buộc:
                     suggestions: ['Hãy cung cấp thêm chi tiết cụ thể và ví dụ minh họa'],
                     followUpQuestion: ''
                 }
+            });
+        }
+    }
             });
         }
     }

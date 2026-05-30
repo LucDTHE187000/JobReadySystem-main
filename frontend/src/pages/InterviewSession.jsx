@@ -266,7 +266,7 @@ export default function InterviewSession() {
 
             <div className="flex-1 flex flex-col lg:flex-row gap-0 min-h-0 overflow-hidden">
                 {/* Camera Section - Fixed Height, No Scroll */}
-                <div className="w-full lg:w-1/2 flex flex-col p-4 lg:h-screen lg:overflow-hidden">
+                <div className="w-full lg:w-1/2 flex flex-col p-4 lg:max-h-screen">
                     <div className="flex-1 relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#1A3A7C] to-[#0A2463] border border-white/10 flex items-center justify-center">
                         {cameraError && (
                             <div className="absolute inset-0 flex items-center justify-center bg-[#0A2463]/80 backdrop-blur z-10">
@@ -312,7 +312,7 @@ export default function InterviewSession() {
                 </div>
 
                 {/* Chat Section - Scrollable */}
-                <div className="w-full lg:w-1/2 flex flex-col bg-white border-t lg:border-t-0 lg:border-l border-[#DDE3F0] h-screen lg:h-auto">
+                <div className="w-full lg:w-1/2 flex flex-col bg-white border-t lg:border-t-0 lg:border-l border-[#DDE3F0] lg:max-h-screen">
                     <div className="px-4 py-3 border-b border-[#DDE3F0] flex items-center gap-2 flex-shrink-0">
                         <Bot className="text-[#0A2463]" size={20} />
                         <span className="font-semibold text-[#0A2463] text-sm">Trò chuyện phỏng vấn</span>

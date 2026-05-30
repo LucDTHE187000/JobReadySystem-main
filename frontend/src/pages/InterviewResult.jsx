@@ -132,7 +132,7 @@ export default function InterviewResult() {
                                         const angle = (Math.PI * 2 * i) / radarScores.length - Math.PI / 2;
                                         const rad = (v / 100) * 70;
                                         return `${100 + rad * Math.cos(angle)},${100 + rad * Math.sin(angle)}`;
-                                    }).join(' ')} fill="#0A2463" fillOpacity="0.2" stroke="#0A2463" strokeWidth="2" />
+                                    }).join(' ')} fill="#F5A962" fillOpacity="0.25" stroke="#E97E3F" strokeWidth="2" />
                                     
                                     {/* Vertex labels with scores */}
                                     {['Thái độ', 'Tự tin', 'Chuyên môn', 'Tư duy', 'Mềm'].map((label, i) => {
