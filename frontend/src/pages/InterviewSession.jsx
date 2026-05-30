@@ -252,8 +252,8 @@ export default function InterviewSession() {
     }
 
     return (
-        <div className="min-h-screen bg-[#0A2463] flex flex-col">
-            <header className="flex items-center justify-between px-4 py-3 bg-[#071A4A] text-white border-b border-white/10">
+        <div style={{ height: '100vh', overflow: 'hidden' }} className="bg-[#0A2463] flex flex-col">
+            <header className="flex items-center justify-between px-4 py-3 bg-[#071A4A] text-white border-b border-white/10 flex-shrink-0">
                 <div className="flex items-center gap-2">
                     <span className="font-bold">JOB<span className="text-[#F5C518]">READY</span></span>
                     <span className="text-white/50 text-sm hidden sm:inline">| Phòng phỏng vấn AI</span>
@@ -264,9 +264,9 @@ export default function InterviewSession() {
                 </div>
             </header>
 
-            <div className="flex-1 flex flex-col lg:flex-row gap-0 min-h-0 overflow-hidden h-[calc(100vh-77px)]">
+            <div className="flex-1 flex flex-col lg:flex-row gap-0 overflow-hidden">
                 {/* Camera Section - Fixed Height, No Scroll */}
-                <div className="w-full lg:w-1/2 flex flex-col p-4 overflow-hidden">
+                <div className="w-full lg:w-1/2 h-full lg:h-screen sticky top-0 flex flex-col p-4 overflow-hidden">
                     <div className="flex-1 relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#1A3A7C] to-[#0A2463] border border-white/10 flex items-center justify-center">
                         {cameraError && (
                             <div className="absolute inset-0 flex items-center justify-center bg-[#0A2463]/80 backdrop-blur z-10">
@@ -312,12 +312,12 @@ export default function InterviewSession() {
                 </div>
 
                 {/* Chat Section - Scrollable */}
-                <div className="w-full lg:w-1/2 flex flex-col bg-white border-t lg:border-t-0 lg:border-l border-[#DDE3F0] overflow-hidden">
+                <div className="w-full lg:w-1/2 h-full lg:h-screen flex flex-col bg-white border-t lg:border-t-0 lg:border-l border-[#DDE3F0] overflow-hidden">
                     <div className="px-4 py-3 border-b border-[#DDE3F0] flex items-center gap-2 flex-shrink-0">
                         <Bot className="text-[#0A2463]" size={20} />
                         <span className="font-semibold text-[#0A2463] text-sm">Trò chuyện phỏng vấn</span>
                     </div>
-                    <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-3">
                         {messages.map((m, i) => (
                             <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                 <div

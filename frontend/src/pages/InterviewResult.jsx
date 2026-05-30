@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { BarChart3, ArrowRight, TrendingUp } from 'lucide-react';
+import { Download, RotateCcw, ArrowRight, TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
 import SeekerLayout from '../components/layout/SeekerLayout';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
@@ -14,6 +14,7 @@ export default function InterviewResult() {
     const [session, setSession] = useState(null);
     const [questions, setQuestions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [expandedQuestions, setExpandedQuestions] = useState({});
 
     useEffect(() => {
         fetchSessionDetails();
@@ -38,16 +39,17 @@ export default function InterviewResult() {
         }
     };
 
-    const getScoreBadge = (score) => {
-        if (score >= 80) return 'bg-green-100 text-green-700';
-        if (score >= 60) return 'bg-[#F5C518]/20 text-[#0A2463]';
-        return 'bg-red-100 text-red-600';
+    const toggleQuestion = (id) => {
+        setExpandedQuestions(prev => ({
+            ...prev,
+            [id]: !prev[id]
+        }));
     };
 
     const getRatingLabel = (score) => {
-        if (score >= 80) return { text: 'Xuất sắc', class: 'bg-green-100 text-green-700' };
-        if (score >= 60) return { text: 'Tốt', class: 'bg-[#F5C518]/20 text-[#0A2463]' };
-        return { text: 'Cần cải thiện', class: 'bg-red-100 text-red-600' };
+        if (score >= 80) return { text: 'Xuất sắc', color: 'text-green-600', bg: 'bg-green-100' };
+        if (score >= 60) return { text: 'Tốt', color: 'text-amber-600', bg: 'bg-amber-100' };
+        return { text: 'Cần cải thiện', color: 'text-red-600', bg: 'bg-red-100' };
     };
 
     if (loading || !session) {
@@ -61,251 +63,206 @@ export default function InterviewResult() {
     }
 
     const rating = getRatingLabel(session.averageScore);
-
-    const radarScores = [
-        Math.min(100, session.averageScore + 5),
-        Math.min(100, session.averageScore - 5),
-        session.averageScore,
-        Math.min(100, session.averageScore - 10),
-        Math.min(100, session.averageScore + 2),
+    const performanceMetrics = [
+        { label: 'Năng lực chuyên môn', value: Math.min(100, session.averageScore + 5) },
+        { label: 'Phương pháp STAR', value: Math.min(100, session.averageScore - 5) },
+        { label: 'Lãnh đạo & Hợp tác', value: Math.min(100, session.averageScore + 2) },
+        { label: 'Kỹ năng giao tiếp', value: session.averageScore }
     ];
 
     return (
-        <SeekerLayout title="Kết quả phỏng vấn" breadcrumb={`Activity Hub › ${session.jobTitle || 'PV'}`}>
-            <div className="max-w-6xl mx-auto w-full">
-                {/* Hero result */}
-                <div className="bg-[#0A2463] text-white rounded-3xl p-8 shadow-xl mb-8">
-                    <h1 className="font-heading text-3xl sm:text-4xl mb-6">KẾT QUẢ PHỎNG VẤN</h1>
-                    <div className="flex flex-col sm:flex-row sm:items-end gap-6 mb-8">
-                        <div>
-                            <span className="font-heading text-7xl text-[#F5C518] leading-none">{session.averageScore}</span>
-                            <span className="text-white/60 text-xl ml-1">/100</span>
-                        </div>
-                        <span className={`inline-block px-4 py-1.5 rounded-full text-sm font-bold ${rating.class}`}>
-                            {rating.text}
-                        </span>
+        <SeekerLayout title="Kết quả phỏng vấn" breadcrumb={`Phỏng vấn › ${session.jobTitle || 'Kết quả'}`}>
+            <div className="max-w-5xl mx-auto w-full space-y-8">
+                {/* Header */}
+                <div className="bg-white rounded-3xl shadow-lg border border-[#DDE3F0] overflow-hidden">
+                    <div className="bg-gradient-to-r from-[#0A2463] to-[#071A4A] text-white px-8 py-12">
+                        <h1 className="text-4xl font-bold mb-2">{session.jobTitle} - Kết quả phỏng vấn</h1>
+                        <p className="text-white/70">Phỏng vấn vào {new Date(session.completedAt).toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div className="bg-white/10 rounded-2xl px-6 py-4">
-                            <p className="text-white/60 text-xs mb-1">Thời gian</p>
-                            <p className="font-bold text-white">
-                                {Math.floor(session.duration / 60)}m {session.duration % 60}s
-                            </p>
-                        </div>
-                        <div className="bg-white/10 rounded-2xl px-6 py-4">
-                            <p className="text-white/60 text-xs mb-1">Câu hỏi đã trả lời</p>
-                            <p className="font-bold text-white">
-                                {session.answeredQuestions}/{session.totalQuestions}
-                            </p>
-                        </div>
-                        <div className="bg-white/10 rounded-2xl px-6 py-4">
-                            <p className="text-white/60 text-xs mb-1">Ngày phỏng vấn</p>
-                            <p className="font-bold text-white">
-                                {new Date(session.completedAt).toLocaleDateString('vi-VN')}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="grid lg:grid-cols-2 gap-6 mb-8">
-                    <div className="bg-[#071A4A] rounded-2xl p-6 text-white">
-                        <p className="text-xs text-white/50 uppercase mb-2">Điểm tổng quát</p>
-                        <p className="text-5xl font-bold text-[#F5C518]">{session.averageScore}<span className="text-lg text-white/50">/100</span></p>
-                        <p className="mt-3 text-sm text-white/70">
-                            {session.averageScore >= 80 ? 'Đề xuất: Tiếp tục vòng sau' : session.averageScore >= 60 ? 'Đề xuất: Cần luyện thêm' : 'Đề xuất: Cần đào tạo thêm'}
-                        </p>
-                    </div>
-                    <div className="bg-white rounded-2xl border border-[#DDE3F0] p-6">
-                        <p className="font-bold text-[#0A2463] mb-4">Bản đồ năng lực</p>
-                        <div className="flex justify-center">
-                            <div className="relative w-64 h-64">
-                                <svg viewBox="0 0 200 200" className="w-full h-full">
-                                    {[25, 50, 75, 100].map((pct) => (
-                                        <polygon key={pct} points={radarScores.map((_, i) => {
-                                            const angle = (Math.PI * 2 * i) / radarScores.length - Math.PI / 2;
-                                            const rad = (pct / 100) * 70;
-                                            return `${100 + rad * Math.cos(angle)},${100 + rad * Math.sin(angle)}`;
-                                        }).join(' ')} fill="none" stroke="#DDE3F0" strokeWidth="1" />
-                                    ))}
-                                    <polygon points={radarScores.map((v, i) => {
-                                        const angle = (Math.PI * 2 * i) / radarScores.length - Math.PI / 2;
-                                        const rad = (v / 100) * 70;
-                                        return `${100 + rad * Math.cos(angle)},${100 + rad * Math.sin(angle)}`;
-                                    }).join(' ')} fill="#F5A962" fillOpacity="0.25" stroke="#E97E3F" strokeWidth="2" />
-                                    
-                                    {/* Vertex labels with scores */}
-                                    {['Thái độ', 'Tự tin', 'Chuyên môn', 'Tư duy', 'Mềm'].map((label, i) => {
-                                        const angle = (Math.PI * 2 * i) / radarScores.length - Math.PI / 2;
-                                        const rad = 95;
-                                        const x = 100 + rad * Math.cos(angle);
-                                        const y = 100 + rad * Math.sin(angle);
-                                        return (
-                                            <g key={i}>
-                                                <text
-                                                    x={x}
-                                                    y={y}
-                                                    textAnchor="middle"
-                                                    dominantBaseline="middle"
-                                                    className="text-xs font-bold fill-[#0A2463]"
-                                                    fontSize="12"
-                                                >
-                                                    {label}
-                                                </text>
-                                                <text
-                                                    x={x}
-                                                    y={y + 12}
-                                                    textAnchor="middle"
-                                                    dominantBaseline="middle"
-                                                    className="text-xs font-semibold fill-[#F5C518]"
-                                                    fontSize="11"
-                                                >
-                                                    {radarScores[i]}
-                                                </text>
-                                            </g>
-                                        );
-                                    })}
-                                </svg>
-                            </div>
-                        </div>
-                        <div className="text-center mt-4 text-xs text-[#5A6482]">
-                            <p className="font-semibold">Điểm chi tiết: {radarScores.map(s => s).join(' - ')}</p>
-                        </div>
-                    </div>
-                </div>
-
-                {session.overallFeedback && (
-                    <div className="bg-white rounded-2xl shadow-sm border border-[#DDE3F0] p-8 mb-8">
-                        <h2 className="font-heading text-2xl text-[#0A2463] mb-4">Nhận xét chung</h2>
-                        <p className="text-[#5A6482] leading-relaxed">{session.overallFeedback}</p>
-                    </div>
-                )}
-
-                {session.strengths?.length > 0 && (
-                    <div className="grid md:grid-cols-2 gap-6 mb-8">
+                    {/* Score Summary */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 p-8 bg-[#F4F6FB]">
                         <div className="bg-white rounded-2xl p-6 border border-[#DDE3F0]">
-                            <p className="text-xs font-semibold text-green-700 mb-3">ĐIỂM MẠNH</p>
-                            <ul className="space-y-2">
-                                {session.strengths.map((s, i) => (
-                                    <li key={i} className="text-sm text-[#5A6482] flex gap-2">
-                                        <span className="text-green-600">✓</span>{s}
-                                    </li>
-                                ))}
-                            </ul>
+                            <p className="text-sm text-[#5A6482] font-semibold mb-2">Điểm tổng quát</p>
+                            <p className="text-5xl font-bold text-[#0A2463]">{session.averageScore}</p>
+                            <p className="text-xs text-[#5A6482] mt-2">trên 100 điểm</p>
                         </div>
-                        {session.improvements?.length > 0 && (
-                            <div className="bg-white rounded-2xl p-6 border border-[#DDE3F0]">
-                                <p className="text-xs font-semibold text-[#0A2463] mb-3">CẦN CẢI THIỆN</p>
-                                <ul className="space-y-2">
-                                    {session.improvements.map((imp, i) => (
-                                        <li key={i} className="text-sm text-[#5A6482] flex gap-2">
-                                            <span className="text-[#F5C518]">→</span>{imp}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
+                        <div className="bg-white rounded-2xl p-6 border border-[#DDE3F0]">
+                            <p className="text-sm text-[#5A6482] font-semibold mb-2">Xếp hạng</p>
+                            <p className={`text-3xl font-bold ${rating.color}`}>{rating.text}</p>
+                        </div>
+                        <div className="bg-white rounded-2xl p-6 border border-[#DDE3F0]">
+                            <p className="text-sm text-[#5A6482] font-semibold mb-2">Thời gian</p>
+                            <p className="text-3xl font-bold text-[#0A2463]">{Math.floor(session.duration / 60)}m</p>
+                            <p className="text-xs text-[#5A6482] mt-2">{session.duration % 60}s</p>
+                        </div>
+                        <div className="bg-white rounded-2xl p-6 border border-[#DDE3F0]">
+                            <p className="text-sm text-[#5A6482] font-semibold mb-2">Câu hỏi</p>
+                            <p className="text-3xl font-bold text-[#0A2463]">{session.answeredQuestions}</p>
+                            <p className="text-xs text-[#5A6482] mt-2">trong {session.totalQuestions}</p>
+                        </div>
                     </div>
-                )}
+                </div>
 
-                {session.nextSteps?.length > 0 && (
-                    <div className="bg-[#0A2463]/5 rounded-2xl border border-[#DDE3F0] p-8 mb-8">
-                        <h2 className="font-heading text-2xl text-[#0A2463] mb-4 flex items-center gap-2">
-                            <TrendingUp className="w-6 h-6 text-[#F5C518]" />
-                            Các bước tiếp theo
-                        </h2>
-                        <ol className="space-y-3">
-                            {session.nextSteps.map((step, i) => (
-                                <li key={i} className="flex items-start gap-3">
-                                    <span className="flex-shrink-0 w-8 h-8 bg-[#0A2463] text-[#F5C518] rounded-full flex items-center justify-center font-bold text-sm">
-                                        {i + 1}
-                                    </span>
-                                    <span className="text-[#5A6482] pt-1">{step}</span>
-                                </li>
-                            ))}
-                        </ol>
-                    </div>
-                )}
-
-                <div className="bg-white rounded-2xl shadow-sm border border-[#DDE3F0] p-8 mb-8">
-                    <h2 className="font-heading text-2xl text-[#0A2463] mb-6 flex items-center gap-2">
-                        <BarChart3 className="w-6 h-6 text-[#0A2463]" />
-                        Chi tiết từng câu
+                {/* Performance Metrics Breakdown */}
+                <div className="bg-white rounded-3xl shadow-lg border border-[#DDE3F0] p-8">
+                    <h2 className="text-2xl font-bold text-[#0A2463] mb-6 flex items-center gap-2">
+                        <TrendingUp className="w-6 h-6 text-[#F5C518]" />
+                        Phân tích Hiệu suất
                     </h2>
-
                     <div className="space-y-6">
-                        {questions.map((q, index) => (
-                            <div key={q._id} className="rounded-2xl border border-[#DDE3F0] overflow-hidden">
-                                <div className="flex items-start justify-between p-6 pb-4">
-                                    <div>
-                                        <span className="text-sm font-semibold text-[#5A6482]">Câu {index + 1}</span>
-                                        <p className="font-semibold text-[#0A2463] mt-1">{q.questionText}</p>
-                                    </div>
-                                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${getScoreBadge(q.aiScore)}`}>
-                                        {q.aiScore}
-                                    </span>
+                        {performanceMetrics.map((metric, idx) => (
+                            <div key={idx}>
+                                <div className="flex items-center justify-between mb-2">
+                                    <p className="font-semibold text-[#0A2463]">{metric.label}</p>
+                                    <span className="text-lg font-bold text-[#0A2463]">{metric.value}%</span>
                                 </div>
-
-                                <div className="px-6 pb-4">
-                                    <div className="bg-[#F4F6FB] rounded-xl p-4">
-                                        <p className="text-xs text-[#5A6482] font-semibold mb-2">Câu trả lời của bạn</p>
-                                        <p className="text-[#5A6482] text-sm">{q.userAnswer}</p>
-                                    </div>
-                                </div>
-
-                                <div className="px-6 pb-6 space-y-3">
-                                    {q.keyPoints?.length > 0 && (
-                                        <div className="bg-green-50 border-l-4 border-green-400 rounded-r-xl p-4">
-                                            <p className="text-xs font-semibold text-green-700 mb-2">Điểm đạt ✅</p>
-                                            <ul className="text-sm text-[#5A6482] space-y-1">
-                                                {q.keyPoints.map((p, i) => <li key={i}>• {p}</li>)}
-                                            </ul>
-                                        </div>
-                                    )}
-                                    {q.missedPoints?.length > 0 && (
-                                        <div className="bg-[#F5C518]/10 border-l-4 border-[#F5C518] rounded-r-xl p-4">
-                                            <p className="text-xs font-semibold text-[#0A2463] mb-2">Điểm thiếu ⚠️</p>
-                                            <ul className="text-sm text-[#5A6482] space-y-1">
-                                                {q.missedPoints.map((p, i) => <li key={i}>• {p}</li>)}
-                                            </ul>
-                                        </div>
-                                    )}
-                                    {q.suggestions?.length > 0 && (
-                                        <div className="bg-[#0A2463]/5 border-l-4 border-[#0A2463] rounded-r-xl p-4">
-                                            <p className="text-xs font-semibold text-[#0A2463] mb-2">Gợi ý tối ưu 💡</p>
-                                            <ul className="text-sm text-[#5A6482] space-y-1">
-                                                {q.suggestions.map((s, i) => <li key={i}>• {s}</li>)}
-                                            </ul>
-                                        </div>
-                                    )}
-                                    {q.aiFeedback && (
-                                        <p className="text-sm text-[#5A6482] italic">{q.aiFeedback}</p>
-                                    )}
+                                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                                    <div
+                                        className="bg-gradient-to-r from-[#0A2463] to-[#F5C518] h-full rounded-full transition-all duration-1000"
+                                        style={{ width: `${metric.value}%` }}
+                                    />
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4">
+                {/* Strengths & Improvements */}
+                <div className="grid md:grid-cols-2 gap-6">
+                    {/* Strengths */}
+                    <div className="bg-white rounded-3xl shadow-lg border border-[#DDE3F0] p-8">
+                        <h3 className="text-xl font-bold text-green-700 mb-4 flex items-center gap-2">
+                            <span className="text-2xl">✓</span>
+                            Điểm Mạnh
+                        </h3>
+                        <ul className="space-y-3">
+                            {(session.strengths || []).map((strength, i) => (
+                                <li key={i} className="flex gap-3 items-start">
+                                    <span className="text-green-600 font-bold mt-1">•</span>
+                                    <span className="text-[#5A6482]">{strength}</span>
+                                </li>
+                            ))}
+                            {(!session.strengths || session.strengths.length === 0) && (
+                                <p className="text-[#5A6482] italic">Chưa có dữ liệu</p>
+                            )}
+                        </ul>
+                    </div>
+
+                    {/* Improvements */}
+                    <div className="bg-white rounded-3xl shadow-lg border border-[#DDE3F0] p-8">
+                        <h3 className="text-xl font-bold text-amber-700 mb-4 flex items-center gap-2">
+                            <span className="text-2xl">→</span>
+                            Cần Cải Thiện
+                        </h3>
+                        <ul className="space-y-3">
+                            {(session.improvements || []).map((improvement, i) => (
+                                <li key={i} className="flex gap-3 items-start">
+                                    <span className="text-amber-600 font-bold mt-1">•</span>
+                                    <span className="text-[#5A6482]">{improvement}</span>
+                                </li>
+                            ))}
+                            {(!session.improvements || session.improvements.length === 0) && (
+                                <p className="text-[#5A6482] italic">Chưa có dữ liệu</p>
+                            )}
+                        </ul>
+                    </div>
+                </div>
+
+                {/* Overall Feedback */}
+                {session.overallFeedback && (
+                    <div className="bg-gradient-to-r from-[#0A2463]/5 to-[#F5C518]/5 rounded-3xl border border-[#DDE3F0] p-8">
+                        <h3 className="text-xl font-bold text-[#0A2463] mb-4">Nhận xét Chung</h3>
+                        <p className="text-[#5A6482] leading-relaxed">{session.overallFeedback}</p>
+                    </div>
+                )}
+
+                {/* Complete Transcript */}
+                <div className="bg-white rounded-3xl shadow-lg border border-[#DDE3F0] overflow-hidden">
+                    <div className="bg-[#F4F6FB] px-8 py-6 border-b border-[#DDE3F0]">
+                        <h3 className="text-xl font-bold text-[#0A2463]">Transcript Hoàn Chỉnh</h3>
+                    </div>
+                    <div className="p-8 space-y-4">
+                        {questions.length > 0 ? (
+                            questions.map((q, index) => (
+                                <div key={q._id} className="border border-[#DDE3F0] rounded-2xl overflow-hidden">
+                                    <button
+                                        onClick={() => toggleQuestion(q._id)}
+                                        className="w-full p-6 flex items-center justify-between hover:bg-[#F4F6FB] transition-colors"
+                                    >
+                                        <div className="text-left flex-1">
+                                            <p className="text-sm font-semibold text-[#5A6482] mb-1">Câu {index + 1}</p>
+                                            <p className="font-semibold text-[#0A2463]">{q.questionText}</p>
+                                        </div>
+                                        <div className="flex items-center gap-4 ml-4">
+                                            <span className="text-lg font-bold text-[#0A2463]">{q.aiScore}/100</span>
+                                            {expandedQuestions[q._id] ? <ChevronUp className="w-5 h-5 text-[#0A2463]" /> : <ChevronDown className="w-5 h-5 text-[#0A2463]" />}
+                                        </div>
+                                    </button>
+
+                                    {expandedQuestions[q._id] && (
+                                        <div className="px-6 pb-6 space-y-4 bg-[#F4F6FB]">
+                                            <div>
+                                                <p className="text-xs font-bold text-[#5A6482] mb-2 uppercase">Câu trả lời của bạn</p>
+                                                <p className="text-[#5A6482] bg-white rounded-lg p-4">{q.userAnswer}</p>
+                                            </div>
+
+                                            {q.keyPoints?.length > 0 && (
+                                                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                                                    <p className="text-xs font-bold text-green-700 mb-2">✓ Điểm đạt</p>
+                                                    <ul className="space-y-1 text-sm text-[#5A6482]">
+                                                        {q.keyPoints.map((p, i) => <li key={i}>• {p}</li>)}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {q.missedPoints?.length > 0 && (
+                                                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                                                    <p className="text-xs font-bold text-amber-700 mb-2">→ Điểm thiếu</p>
+                                                    <ul className="space-y-1 text-sm text-[#5A6482]">
+                                                        {q.missedPoints.map((p, i) => <li key={i}>• {p}</li>)}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {q.aiFeedback && (
+                                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                                    <p className="text-xs font-bold text-blue-700 mb-2">💬 Nhận xét AI</p>
+                                                    <p className="text-sm text-[#5A6482]">{q.aiFeedback}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-[#5A6482] text-center py-8">Chưa có dữ liệu câu hỏi</p>
+                        )}
+                    </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <button
                         onClick={() => navigate('/interview')}
-                        className="flex-1 py-3 bg-[#F5C518] text-[#0A2463] font-bold rounded-xl hover:bg-[#D4A800] transition-colors flex items-center justify-center gap-2"
+                        className="py-4 px-6 bg-gradient-to-r from-[#0A2463] to-[#071A4A] text-white font-bold rounded-2xl hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                    >
+                        <RotateCcw className="w-5 h-5" />
+                        Luyện Tập Lại
+                    </button>
+                    <button
+                        onClick={() => {/* Download logic */}}
+                        className="py-4 px-6 bg-white border-2 border-[#0A2463] text-[#0A2463] font-bold rounded-2xl hover:bg-[#F4F6FB] transition-all flex items-center justify-center gap-2"
+                    >
+                        <Download className="w-5 h-5" />
+                        Tải Xuống
+                    </button>
+                    <button
+                        onClick={() => navigate('/dashboard')}
+                        className="py-4 px-6 bg-[#F5C518] text-[#0A2463] font-bold rounded-2xl hover:bg-[#D4A800] transition-all flex items-center justify-center gap-2"
                     >
                         <ArrowRight className="w-5 h-5" />
-                        Luyện tập lại
-                    </button>
-                    <button
-                        onClick={() => navigate('/interview-history')}
-                        className="flex-1 py-3 bg-[#0A2463] text-white font-semibold rounded-xl hover:bg-[#071A4A] transition-colors"
-                    >
-                        Xem lịch sử
-                    </button>
-                    <button
-                        onClick={() => navigate('/interview-analytics')}
-                        className="flex-1 py-3 border-2 border-[#0A2463] text-[#0A2463] font-semibold rounded-xl hover:bg-[#0A2463] hover:text-white transition-colors"
-                    >
-                        Phân tích chi tiết
+                        Quay Lại
                     </button>
                 </div>
             </div>
