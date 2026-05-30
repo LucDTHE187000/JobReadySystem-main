@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Send, Loader2, Mic, MicOff, Video, PhoneOff, Bot, User, AlertCircle } from 'lucide-react';
+import { Send, Loader2, Mic, MicOff, Video, PhoneOff, Bot, User, AlertCircle, Mic2 } from 'lucide-react';
 import SeekerLayout from '../components/layout/SeekerLayout';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
@@ -14,6 +14,7 @@ export default function InterviewSession() {
     const chatEndRef = useRef(null);
     const videoRef = useRef(null);
     const streamRef = useRef(null);
+    const recognitionRef = useRef(null);
 
     const [session, setSession] = useState(null);
     const [messages, setMessages] = useState([]);
@@ -27,6 +28,7 @@ export default function InterviewSession() {
     const [micOn, setMicOn] = useState(true);
     const [camOn, setCamOn] = useState(true);
     const [cameraError, setCameraError] = useState(null);
+    const [isListening, setIsListening] = useState(false);
 
     useEffect(() => {
         const t = setInterval(() => setTimeLeft((s) => Math.max(0, s - 1)), 1000);
@@ -40,6 +42,7 @@ export default function InterviewSession() {
     useEffect(() => {
         initSession();
         setupCamera();
+        setupSpeechRecognition();
         return () => {
             if (streamRef.current) {
                 streamRef.current.getTracks().forEach(track => track.stop());
@@ -61,6 +64,56 @@ export default function InterviewSession() {
         } catch (error) {
             console.error('Camera access error:', error);
             setCameraError('Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập.');
+        }
+    };
+
+    const setupSpeechRecognition = () => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            console.warn('Speech Recognition not supported');
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'vi-VN';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = () => {
+            setIsListening(true);
+        };
+
+        recognition.onresult = (event) => {
+            let transcript = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                transcript += event.results[i][0].transcript;
+            }
+            if (transcript.trim()) {
+                setUserAnswer(prev => prev ? prev + ' ' + transcript : transcript);
+            }
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            setIsListening(false);
+        };
+
+        recognition.onend = () => {
+            setIsListening(false);
+        };
+
+        recognitionRef.current = recognition;
+    };
+
+    const startListening = () => {
+        if (recognitionRef.current) {
+            recognitionRef.current.start();
+        }
+    };
+
+    const stopListening = () => {
+        if (recognitionRef.current) {
+            recognitionRef.current.stop();
         }
     };
 
@@ -211,11 +264,12 @@ export default function InterviewSession() {
                 </div>
             </header>
 
-            <div className="flex-1 flex flex-col lg:flex-row min-h-0">
-                <div className="flex-1 flex flex-col p-4 min-h-[320px] lg:min-h-0">
+            <div className="flex-1 flex flex-col lg:flex-row gap-0 min-h-0 overflow-hidden">
+                {/* Camera Section - Fixed Height, No Scroll */}
+                <div className="w-full lg:w-1/2 flex flex-col p-4 lg:h-screen lg:overflow-hidden">
                     <div className="flex-1 relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#1A3A7C] to-[#0A2463] border border-white/10 flex items-center justify-center">
                         {cameraError && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-[#0A2463]/80 backdrop-blur">
+                            <div className="absolute inset-0 flex items-center justify-center bg-[#0A2463]/80 backdrop-blur z-10">
                                 <div className="text-center text-white max-w-xs">
                                     <AlertCircle className="w-12 h-12 mx-auto mb-3 text-red-400" />
                                     <p className="text-sm">{cameraError}</p>
@@ -244,25 +298,26 @@ export default function InterviewSession() {
                             </div>
                         )}
                         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3">
-                            <button type="button" onClick={toggleMic} className={`p-3 rounded-full ${micOn ? 'bg-white/20 text-white' : 'bg-red-500 text-white'}`}>
+                            <button type="button" onClick={toggleMic} className={`p-3 rounded-full transition-all ${micOn ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-red-500 text-white hover:bg-red-600'}`}>
                                 {micOn ? <Mic size={20} /> : <MicOff size={20} />}
                             </button>
-                            <button type="button" onClick={toggleCamera} className={`p-3 rounded-full ${camOn ? 'bg-white/20 text-white' : 'bg-red-500 text-white'}`}>
+                            <button type="button" onClick={toggleCamera} className={`p-3 rounded-full transition-all ${camOn ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-red-500 text-white hover:bg-red-600'}`}>
                                 <Video size={20} />
                             </button>
-                            <button type="button" onClick={() => navigate('/interview-history')} className="p-3 rounded-full bg-red-600 text-white">
+                            <button type="button" onClick={() => navigate('/interview-history')} className="p-3 rounded-full bg-red-600 text-white hover:bg-red-700">
                                 <PhoneOff size={20} />
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div className="w-full lg:w-[380px] flex flex-col bg-white border-l border-[#DDE3F0] max-h-[50vh] lg:max-h-none">
-                    <div className="px-4 py-3 border-b border-[#DDE3F0] flex items-center gap-2">
+                {/* Chat Section - Scrollable */}
+                <div className="w-full lg:w-1/2 flex flex-col bg-white border-t lg:border-t-0 lg:border-l border-[#DDE3F0] h-screen lg:h-auto">
+                    <div className="px-4 py-3 border-b border-[#DDE3F0] flex items-center gap-2 flex-shrink-0">
                         <Bot className="text-[#0A2463]" size={20} />
                         <span className="font-semibold text-[#0A2463] text-sm">Trò chuyện phỏng vấn</span>
                     </div>
-                    <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
                         {messages.map((m, i) => (
                             <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                 <div
@@ -285,20 +340,30 @@ export default function InterviewSession() {
                         )}
                         <div ref={chatEndRef} />
                     </div>
-                    <div className="p-3 border-t border-[#DDE3F0] flex gap-2">
-                        <input
-                            value={userAnswer}
-                            onChange={(e) => setUserAnswer(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
-                            placeholder="Nhập câu trả lời..."
-                            className="flex-1 px-3 py-2.5 rounded-xl border border-[#DDE3F0] text-sm focus:ring-2 focus:ring-[#0A2463] outline-none"
-                            disabled={submitting}
-                        />
+                    <div className="p-3 border-t border-[#DDE3F0] flex gap-2 flex-shrink-0">
+                        <div className="flex-1 flex gap-1">
+                            <input
+                                value={userAnswer}
+                                onChange={(e) => setUserAnswer(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
+                                placeholder="Nhập hoặc nói câu trả lời..."
+                                className="flex-1 px-3 py-2.5 rounded-xl border border-[#DDE3F0] text-sm focus:ring-2 focus:ring-[#0A2463] outline-none"
+                                disabled={submitting}
+                            />
+                            <button
+                                type="button"
+                                onClick={isListening ? stopListening : startListening}
+                                className={`px-3 py-2.5 rounded-xl transition-all ${isListening ? 'bg-red-500 text-white' : 'bg-[#0A2463] text-white hover:bg-[#071A4A]'}`}
+                                title={isListening ? 'Dừng lắng nghe' : 'Bắt đầu nói'}
+                            >
+                                <Mic2 size={18} />
+                            </button>
+                        </div>
                         <button
                             type="button"
                             onClick={handleSend}
                             disabled={submitting || !userAnswer.trim()}
-                            className="p-2.5 bg-[#0A2463] text-white rounded-xl hover:bg-[#071A4A] disabled:opacity-40"
+                            className="p-2.5 bg-[#0A2463] text-white rounded-xl hover:bg-[#071A4A] disabled:opacity-40 transition-all"
                         >
                             <Send size={20} />
                         </button>

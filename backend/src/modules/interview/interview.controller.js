@@ -777,47 +777,57 @@ Quy tắc bắt buộc:
                 });
             }
 
+            let evaluation = null;
+
+            // Try N8N service first
             try {
-                const evaluation = await n8nInterviewService.evaluateAnswer({
+                evaluation = await n8nInterviewService.evaluateAnswer({
                     question,
                     answer
                 });
-
-                // Ensure response has required fields
-                const response = {
-                    success: true,
-                    data: {
-                        aiScore: evaluation?.aiScore ?? evaluation?.score ?? 70,
-                        aiFeedback: evaluation?.aiFeedback ?? evaluation?.feedback ?? 'Cảm ơn bạn đã trả lời câu hỏi này.',
-                        keyPoints: evaluation?.keyPoints ?? evaluation?.strengths ?? [],
-                        missedPoints: evaluation?.missedPoints ?? evaluation?.improvements ?? [],
-                        suggestions: evaluation?.suggestions ?? evaluation?.recommendations ?? [],
-                        followUpQuestion: evaluation?.followUpQuestion ?? ''
-                    }
-                };
-
-                res.status(200).json(response);
             } catch (n8nError) {
-                console.warn('N8N evaluation error, falling back to default:', n8nError.message);
+                console.warn('N8N evaluation failed, trying SimpleInterview service:', n8nError.message);
                 
-                // Fallback response when AI service is unavailable
-                res.status(200).json({
-                    success: true,
-                    data: {
-                        aiScore: 70,
-                        aiFeedback: 'Hệ thống AI đang được cải thiện. Vui lòng quay lại sau.',
-                        keyPoints: ['Đã trả lời câu hỏi'],
-                        missedPoints: [],
-                        suggestions: ['Hãy cung cấp thêm chi tiết cụ thể'],
-                        followUpQuestion: ''
-                    }
-                });
+                // Fallback to SimpleInterview
+                try {
+                    evaluation = await SimpleInterviewService.evaluateAnswer(question, answer);
+                } catch (simpleErr) {
+                    console.warn('SimpleInterview also failed:', simpleErr.message);
+                    evaluation = null;
+                }
             }
+
+            // Normalize score to 0-100 and ensure all fields exist
+            const normalizedScore = evaluation?.aiScore ?? evaluation?.score ?? 0;
+            const finalScore = normalizedScore <= 10 ? normalizedScore * 10 : Math.min(100, Math.max(0, normalizedScore));
+
+            const response = {
+                success: true,
+                data: {
+                    aiScore: Math.round(finalScore),
+                    aiFeedback: evaluation?.aiFeedback ?? evaluation?.feedback ?? 'Cảm ơn bạn đã trả lời câu hỏi này.',
+                    keyPoints: evaluation?.keyPoints ?? evaluation?.strengths ?? [],
+                    missedPoints: evaluation?.missedPoints ?? evaluation?.improvements ?? evaluation?.weaknesses ?? [],
+                    suggestions: evaluation?.suggestions ?? evaluation?.recommendations ?? [],
+                    followUpQuestion: evaluation?.followUpQuestion ?? ''
+                }
+            };
+
+            res.status(200).json(response);
         } catch (error) {
             console.error('Evaluate answer error:', error);
-            res.status(500).json({
-                success: false,
-                error: error.message || 'Lỗi khi đánh giá câu trả lời'
+            
+            // Return fallback response to prevent interview interruption
+            res.status(200).json({
+                success: true,
+                data: {
+                    aiScore: 70,
+                    aiFeedback: 'Hệ thống AI đang được cải thiện. Câu trả lời của bạn đã được ghi nhận.',
+                    keyPoints: ['Đã cố gắng trả lời đầy đủ'],
+                    missedPoints: [],
+                    suggestions: ['Hãy cung cấp thêm chi tiết cụ thể và ví dụ minh họa'],
+                    followUpQuestion: ''
+                }
             });
         }
     }
