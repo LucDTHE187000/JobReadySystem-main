@@ -1,0 +1,94 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+@theme {
+  --color-navy: #0A2463;
+  --color-navy-light: #1A3A7C;
+  --color-navy-dark: #071A4A;
+  --color-gold: #F5C518;
+  --color-gold-dark: #D4A800;
+  --color-surface: #F4F6FB;
+  --color-text-sub: #5A6482;
+  --color-border: #DDE3F0;
+}
+
+:root {
+  --navy: #0A2463;
+  --gold: #F5C518;
+  --navy-dark: #071A4A;
+  --navy-light: #1A3A7C;
+  --gold-dark: #D4A800;
+  --surface: #F4F6FB;
+  --text-main: #0A2463;
+  --text-sub: #5A6482;
+  --border: #DDE3F0;
+  --primary: #0A2463;
+  --accent: #F5C518;
+}
+
+html { scroll-behavior: smooth; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background-color: var(--surface);
+  color: var(--text-main);
+  font-family: 'Poppins', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root { min-height: 100vh; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+}
+
+.font-heading {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+input[type='range'].difficulty-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--navy), var(--gold));
+  outline: none;
+}
+input[type='range'].difficulty-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 3px solid var(--navy);
+  cursor: pointer;
+}
+
+.btn-gold {
+  background-color: var(--gold);
+  color: var(--navy);
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.btn-gold:hover { background-color: var(--gold-dark); }
+
+.btn-navy {
+  background-color: var(--navy);
+  color: white;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.btn-navy:hover { background-color: var(--navy-dark); }
+
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(10, 36, 99, 0.1);
+}

@@ -1,0 +1,39 @@
+{
+  "name": "jobseeker-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "20.x"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "lint": "eslint .",
+    "seed": "node scripts/seed_users.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@payos/node": "^2.0.5",
+    "axios": "^1.16.1",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "groq-sdk": "^0.4.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.7.0",
+    "multer": "^2.0.2",
+    "nodemailer": "^8.0.7",
+    "pdf-parse": "^2.4.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^8.57.0",
+    "globals": "^15.0.0",
+    "nodemon": "^3.1.0"
+  }
+}

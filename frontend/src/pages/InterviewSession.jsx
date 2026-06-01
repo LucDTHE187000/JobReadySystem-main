@@ -1,7 +1,8 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Send, Loader2, Mic, MicOff, Video, PhoneOff, Bot, User, AlertCircle, Mic2 } from 'lucide-react';
+import { Send, Loader2, Mic, MicOff, Video, PhoneOff, Bot, User, AlertCircle, Mic2} from 'lucide-react';
 import SeekerLayout from '../components/layout/SeekerLayout';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
@@ -15,6 +16,8 @@ export default function InterviewSession() {
     const videoRef = useRef(null);
     const streamRef = useRef(null);
     const recognitionRef = useRef(null);
+    const questionFetchedRef = useRef(false); // Use ref to prevent double fetches
+    const previousSessionIdRef = useRef(null); // Track session changes
 
     const [session, setSession] = useState(null);
     const [messages, setMessages] = useState([]);
@@ -40,10 +43,21 @@ export default function InterviewSession() {
     }, [messages]);
 
     useEffect(() => {
+        // Only reset questionFetched ref when sessionId actually changes
+        if (previousSessionIdRef.current !== sessionId) {
+            console.log(`[SETUP EFFECT] SessionId changed from ${previousSessionIdRef.current} to ${sessionId}, resetting fetch flag`);
+            questionFetchedRef.current = false;
+            previousSessionIdRef.current = sessionId;
+        }
+        
+        console.log('[SETUP EFFECT] Running for sessionId:', sessionId, 'questionFetched:', questionFetchedRef.current);
+        
         initSession();
         setupCamera();
         setupSpeechRecognition();
+        
         return () => {
+            console.log('[SETUP EFFECT CLEANUP] Cleaning up streams for sessionId:', sessionId);
             if (streamRef.current) {
                 streamRef.current.getTracks().forEach(track => track.stop());
             }
@@ -136,30 +150,47 @@ export default function InterviewSession() {
     };
 
     const initSession = async () => {
+        console.log('[INIT SESSION] Called, ref.current =', questionFetchedRef.current);
+        if (!sessionId) { setLoading(false); return; }
+        
+        // Use ref to prevent double fetch - persists across re-renders
+        if (questionFetchedRef.current) {
+            console.log('[INIT SESSION] Already initialized, skipping...');
+            return;
+        }
+        console.log('[INIT SESSION] First time, setting ref to true');
+        questionFetchedRef.current = true;
+        
         try {
             setLoading(true);
             const res = await axios.get(`${API_URL}/api/interview/${sessionId}/details`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             const s = res.data.data?.session || res.data.data;
+            if (!s) throw new Error('Session data empty');
             setSession(s);
             setTotalQuestions(s?.totalQuestions || 5);
-            setMessages([
-                {
-                    role: 'ai',
-                    text: `Xin chào! Tôi là AI phỏng vấn JobReady. Hôm nay chúng ta sẽ luyện tập vị trí **${s?.jobTitle || ''}**. Hãy trả lời tự tin và rõ ràng nhé!`,
-                },
-            ]);
-            await fetchQuestion(s, true);
-        } catch (e) {
-            console.error(e);
-        } finally {
+            setMessages([{ role: 'ai', text: `Xin chào! Tôi là AI phỏng vấn JobReady. Hôm nay chúng ta sẽ luyện tập vị trí **${s?.jobTitle || ''}**. Hãy trả lời tự tin và rõ ràng nhé!` }]);
             setLoading(false);
+            
+            // Schedule first question fetch with delay
+            console.log('[INIT SESSION] Session loaded, scheduling first question fetch in 500ms...');
+            setTimeout(() => {
+                console.log('[FETCH QUESTION] Starting first question fetch (from init)...');
+                fetchQuestion(s, true).catch(err => console.error('[FETCH QUESTION ERROR]', err));
+            }, 500); // 500ms delay to prevent race conditions
+            
+            return;
+        } catch (e) {
+            console.error('[INIT SESSION ERROR]', e?.response?.data || e.message);
+            questionFetchedRef.current = false; // Reset on error so we can retry
         }
+        setLoading(false);
     };
 
     const fetchQuestion = async (activeSession = session, isFirst = false) => {
         try {
+            console.log('[FETCH QUESTION] Requesting question for session:', sessionId);
             const res = await axios.post(
                 `${API_URL}/api/interview/question`,
                 {
@@ -169,18 +200,46 @@ export default function InterviewSession() {
                 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            if (res.data.success) {
-                const q = res.data.data;
-                const text = q.questionText || q.question;
-                if (q._id) setCurrentQuestionId(q._id);
-                setMessages((prev) => [
-                    ...prev,
-                    { role: 'ai', text, meta: q.questionType || 'Mixed' },
-                ]);
-                if (!isFirst) setQuestionIndex((i) => i + 1);
+            
+            if (!res.data.success) {
+                console.warn('[FETCH QUESTION] API returned success=false');
+                return;
             }
+
+            const q = res.data.data;
+            let text = q.questionText || q.question || '';
+            const qId = q._id?.toString();
+
+            console.log('[FETCH QUESTION] Received question:', qId, text.substring(0, 80));
+
+            // Remove duplicate questions if AI accidentally sends 2 questions in one response
+            const multiQuestionMatch = text.match(
+                /^(1\.|Câu 1:|Question 1:|\d+\.)\s*[\s\S]*?(2\.|Câu 2:|Question 2:|\d+\.)/
+            );
+            if (multiQuestionMatch) {
+                console.warn('[FETCH QUESTION] Detected multiple questions in single response. Extracting first question only.');
+                const secondQStart = text.indexOf(multiQuestionMatch[2]);
+                text = text.substring(0, secondQStart).trim();
+                text = text.replace(/\d+\.\s*$/, '').trim();
+            }
+
+            // Check if this question is already displayed (by comparing with last AI message)
+            const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
+            if (lastMessage?.role === 'ai' && lastMessage?.text?.includes(text.substring(0, 50))) {
+                console.log('[FETCH QUESTION] Question already displayed, skipping duplicate');
+                return;
+            }
+
+            // Only update state once - BOTH states together, not in a callback
+            console.log('[FETCH QUESTION] New question - adding to chat');
+            setCurrentQuestionId(qId);
+            setMessages((m) => [
+                ...m,
+                { role: 'ai', text, meta: q.questionType || 'Mixed' },
+            ]);
+
         } catch (e) {
-            console.error(e);
+            console.error('[FETCH QUESTION ERROR]', e?.response?.data || e.message);
         }
     };
 
@@ -192,44 +251,55 @@ export default function InterviewSession() {
         setSubmitting(true);
 
         try {
-            let data = {};
-            if (currentQuestionId) {
-                const evalRes = await axios.post(
-                    `${API_URL}/api/interview/submit-answer`,
-                    { questionId: currentQuestionId, userAnswer: answer, responseTime: 60 },
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-                data = evalRes.data.data || evalRes.data;
-            } else {
-                const evalRes = await axios.post(
-                    `${API_URL}/api/interview/evaluate`,
-                    { question: messages.filter((m) => m.role === 'ai').slice(-1)[0]?.text || '', answer },
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-                data = evalRes.data.data || evalRes.data;
-            }
-            const score = data.aiScore ?? data.score ?? '—';
-            setMessages((prev) => [
-                ...prev,
-                {
-                    role: 'ai',
-                    text: `Điểm: ${score}/100\n\n${data.aiFeedback || data.feedback || 'Cảm ơn bạn đã trả lời.'}`,
-                    isFeedback: true,
-                },
-            ]);
+            if (!currentQuestionId) return;
 
-            if (questionIndex >= totalQuestions - 1) {
-                await axios.post(
-                    `${API_URL}/api/interview/${sessionId}/complete`,
-                    {},
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-                setTimeout(() => navigate(`/interview/${sessionId}/result`), 1500);
+            console.log('[SUBMIT ANSWER] Submitting answer for question:', currentQuestionId);
+            const submitRes = await axios.post(
+                `${API_URL}/api/interview/submit-answer`,
+                { questionId: currentQuestionId, userAnswer: answer, responseTime: 60 },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            const { isLastQuestion } = submitRes.data?.data || {};
+
+            if (isLastQuestion) {
+                // Last question - complete interview and redirect to result
+                console.log('[LAST QUESTION] Completing interview session...');
+                setMessages(prev => [...prev, { role: 'ai', text: '🎉 Bạn đã hoàn thành buổi phỏng vấn! Đang tạo báo cáo...' }]);
+                
+                try {
+                    console.log('[COMPLETE INTERVIEW] Sending complete request for sessionId:', sessionId);
+                    const completeRes = await axios.post(
+                        `${API_URL}/api/interview/${sessionId}/complete`,
+                        {},
+                        { headers: { Authorization: `Bearer ${token}` } }
+                    );
+                    
+                    console.log('[COMPLETE INTERVIEW SUCCESS]', completeRes.data);
+                    setTimeout(() => {
+                        console.log('[REDIRECT] Navigating to result page');
+                        navigate(`/interview/${sessionId}/result`);
+                    }, 1500);
+                } catch (completeErr) {
+                    console.error('[COMPLETE INTERVIEW ERROR]', completeErr?.response?.data || completeErr.message);
+                    setMessages(prev => [...prev, { 
+                        role: 'ai', 
+                        text: '⚠️ Lỗi khi tổng hợp kết quả. Vui lòng liên hệ hỗ trợ hoặc thử lại.' 
+                    }]);
+                    // Still redirect so user doesn't get stuck
+                    setTimeout(() => {
+                        console.log('[FALLBACK REDIRECT] Redirecting to result page despite error');
+                        navigate(`/interview/${sessionId}/result`);
+                    }, 2500);
+                }
             } else {
-                setTimeout(() => fetchQuestion(session), 1200);
+                // Next question
+                console.log('[NEXT QUESTION] Moving to next question');
+                setQuestionIndex(i => i + 1);
+                setTimeout(() => fetchQuestion(session), 1000);
             }
         } catch (e) {
-            console.error(e);
+            console.error('[HANDLE SEND ERROR]', e?.response?.data || e.message);
         } finally {
             setSubmitting(false);
         }

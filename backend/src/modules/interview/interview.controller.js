@@ -1,3 +1,4 @@
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import InterviewService from './interview.service.js';
 import SimpleInterviewService from './simpleInterview.service.js';
 import n8nInterviewService from '../../services/n8nInterview.service.js';
@@ -110,7 +111,7 @@ class InterviewController {
 
     /**
      * POST /api/interview/submit-answer
-     * Ghi nhận câu trả lời, nhận feedback từ AI
+     * Ghi nhận câu trả lời, đánh giá nội bộ, KHÔNG trả về score/feedback
      * Body: { questionId, userAnswer, responseTime }
      */
     async submitAnswer(req, res) {
@@ -126,6 +127,7 @@ class InterviewController {
                 return res.status(500).json({ error: 'AI service không khả dụng. Vui lòng kiểm tra cấu hình GROQ_API_KEY' });
             }
 
+            // Lưu câu trả lời và đánh giá nội bộ (KHÔNG trả về feedback cho frontend)
             const evaluatedQuestion = await InterviewService.submitAnswer(
                 questionId,
                 userAnswer,
@@ -133,17 +135,35 @@ class InterviewController {
                 req.groqClient
             );
 
+            // Kiem tra xem day co phai cau cuoi khong
+            const sessionForCheck = await InterviewSession.findById(evaluatedQuestion.sessionId).populate('questions');
+            const totalQuestionsInSession = sessionForCheck?.totalQuestions || 10;
+            const questionsArray = sessionForCheck?.questions || [];
+            const answeredCount = questionsArray.filter(q => q.userAnswer && q.userAnswer.trim()).length || 0;
+            
+            // Use actual question count as the target, not stored totalQuestions (which may be outdated)
+            const actualQuestionCount = questionsArray.length;
+            const targetCount = Math.max(totalQuestionsInSession, actualQuestionCount);
+            
+            // IMPORTANT: +1 because current answer was just submitted
+            const isLastQuestion = (answeredCount + 1) >= targetCount;
+
+            console.log(`[SUBMIT ANSWER] sessionId=${evaluatedQuestion.sessionId}`);
+            console.log(`  Session.totalQuestions = ${sessionForCheck?.totalQuestions}`);
+            console.log(`  Actual questions created = ${actualQuestionCount}`);
+            console.log(`  Target count (max of both) = ${targetCount}`);
+            console.log(`  Already answered: ${answeredCount}, Current: +1, Total so far: ${answeredCount + 1}`);
+            console.log(`  isLastQuestion = ${isLastQuestion}`);
+            console.log(`  Calculation: (${answeredCount} + 1) >= ${targetCount} = ${isLastQuestion}`);
+
             res.status(200).json({
                 success: true,
-                message: 'Câu trả lời đã được gửi và đánh giá',
+                message: 'Câu trả lời đã được ghi nhận',
                 data: {
                     questionId: evaluatedQuestion._id,
-                    aiScore: evaluatedQuestion.aiScore,
-                    aiFeedback: evaluatedQuestion.aiFeedback,
-                    keyPoints: evaluatedQuestion.keyPoints,
-                    missedPoints: evaluatedQuestion.missedPoints,
-                    suggestions: evaluatedQuestion.suggestions,
-                    followUpQuestion: evaluatedQuestion.followUpQuestion,
+                    isLastQuestion,   // Frontend dung cai nay de quyet dinh next step
+                    answeredCount,
+                    totalQuestions: totalQuestionsInSession,
                 },
             });
         } catch (error) {
@@ -160,27 +180,88 @@ class InterviewController {
         try {
             const { sessionId } = req.params;
 
-            const completedSession = await InterviewService.completeInterview(
-                sessionId,
-                req.groqClient
-            );
+            // Validation: Check sessionId
+            if (!sessionId) {
+                console.error('[COMPLETE INTERVIEW] Missing sessionId');
+                return res.status(400).json({ error: 'sessionId là bắt buộc' });
+            }
 
-            res.status(200).json({
-                success: true,
-                message: 'Interview completed',
-                data: {
-                    sessionId: completedSession._id,
-                    status: completedSession.status,
-                    averageScore: completedSession.averageScore,
-                    totalScore: completedSession.totalScore,
-                    overallFeedback: completedSession.overallFeedback,
-                    strengths: completedSession.strengths,
-                    improvements: completedSession.improvements,
-                    nextSteps: completedSession.nextSteps,
-                    duration: completedSession.duration,
-                },
-            });
+            // Validation: Check Groq client availability
+            if (!req.groqClient) {
+                console.error('[COMPLETE INTERVIEW] Groq client not available');
+                return res.status(500).json({ 
+                    error: 'AI service không khả dụng. Vui lòng kiểm tra cấu hình GROQ_API_KEY' 
+                });
+            }
+
+            // Check if session exists and populate questions
+            const session = await InterviewSession.findById(sessionId).populate('questions');
+            if (!session) {
+                console.error('[COMPLETE INTERVIEW] Session not found:', sessionId);
+                return res.status(404).json({ error: 'Session không tìm thấy' });
+            }
+
+            console.log(`[COMPLETE INTERVIEW] Starting completion for sessionId=${sessionId}, questions=${session.questions?.length || 0}`);
+
+            try {
+                // Attempt to complete interview with full processing
+                const completedSession = await InterviewService.completeInterview(
+                    sessionId,
+                    req.groqClient
+                );
+
+                if (!completedSession) {
+                    console.error('[COMPLETE INTERVIEW] Service returned null');
+                    return res.status(500).json({ error: 'Lỗi xử lý kết quả' });
+                }
+
+                console.log(`[COMPLETE INTERVIEW SUCCESS] sessionId=${sessionId}, status=${completedSession.status}`);
+
+                res.status(200).json({
+                    success: true,
+                    message: 'Interview completed',
+                    data: {
+                        sessionId: completedSession._id,
+                        status: completedSession.status,
+                        averageScore: completedSession.averageScore || 0,
+                        totalScore: completedSession.totalScore || 0,
+                        overallFeedback: completedSession.overallFeedback || '',
+                        strengths: completedSession.strengths || [],
+                        improvements: completedSession.improvements || [],
+                        nextSteps: completedSession.nextSteps || [],
+                        duration: completedSession.duration || 0,
+                    },
+                });
+
+            } catch (serviceErr) {
+                // Fallback: At least mark session as completed so frontend can redirect
+                console.warn(`[COMPLETE INTERVIEW FALLBACK] Service error for sessionId=${sessionId}:`, serviceErr.message);
+                console.log('[COMPLETE INTERVIEW FALLBACK] Marking session as completed and returning success');
+                
+                await InterviewSession.findByIdAndUpdate(
+                    sessionId,
+                    { 
+                        status: 'completed',
+                        completedAt: new Date()
+                    }
+                );
+
+                // Return partial success so frontend can redirect without being stuck
+                res.status(200).json({
+                    success: true,
+                    message: 'Interview marked as completed',
+                    data: {
+                        sessionId: sessionId,
+                        status: 'completed',
+                        warning: 'Kết quả đang được xử lý, vui lòng thử lại trong giây lát',
+                        averageScore: 0,
+                        totalScore: 0,
+                    },
+                });
+            }
+
         } catch (error) {
+            console.error('[COMPLETE INTERVIEW ERROR]', error);
             res.status(500).json({ error: error.message });
         }
     }
@@ -258,6 +339,8 @@ class InterviewController {
      */
     async generateQuestion(req, res) {
         const { sessionId, position, level, cv, answer } = req.body;
+        
+        console.log(`[generateQuestion START] sessionId=${sessionId}, position=${position}, activeGenerations.size=${activeGenerations.size}`);
 
         if (!position || !level || !sessionId) {
             return res.status(400).json({
@@ -268,14 +351,15 @@ class InterviewController {
         // Concurrency Lock: Prevents duplicate requests from initiating parallel AI calls and creating duplicate questions
         if (activeGenerations.has(sessionId)) {
             console.log(`[CONCURRENCY LOCK] Bỏ qua cuộc gọi trùng lặp song song cho sessionId: ${sessionId}`);
-            let retries = 10;
+            let retries = 3;
             while (activeGenerations.has(sessionId) && retries > 0) {
-                await new Promise(r => setTimeout(r, 500));
+                await new Promise(r => setTimeout(r, 200));
                 retries--;
             }
             const updatedSession = await InterviewSession.findById(sessionId).populate('questions');
             if (updatedSession && updatedSession.questions.length > 0) {
                 const lastQ = updatedSession.questions[updatedSession.questions.length - 1];
+                console.log(`[CONCURRENCY RETURN] Trả về câu hỏi cuối từ session, Q${lastQ.questionNumber}, answered=${!!lastQ.userAnswer}`);
                 return res.status(200).json({
                     success: true,
                     data: {
@@ -290,6 +374,7 @@ class InterviewController {
             }
         }
         activeGenerations.add(sessionId);
+        console.log(`[generateQuestion LOCKED] activeGenerations.size=${activeGenerations.size}`);
 
         try {
             console.log('REQUEST BODY:', req.body);
@@ -301,9 +386,16 @@ class InterviewController {
             }
 
             // Nếu đã đủ số lượng câu hỏi và câu hỏi cuối cùng đã được trả lời, báo lỗi/hoàn thành
-            if (session.questions.length >= (session.totalQuestions || 10)) {
+            const totalQLimit = session.totalQuestions || 10;
+            console.log(`[GEN QUESTION] Questions in session: ${session.questions.length}/${totalQLimit}`);
+            
+            if (session.questions.length >= totalQLimit) {
                 const lastQ = session.questions[session.questions.length - 1];
-                if (lastQ && lastQ.userAnswer) {
+                const lastQHasAnswer = lastQ && lastQ.userAnswer && lastQ.userAnswer.trim() !== '';
+                console.log(`[GEN QUESTION] At limit! Last question answered: ${lastQHasAnswer}`);
+                
+                if (lastQHasAnswer) {
+                    console.log(`[GEN QUESTION] ERROR: Session completed with ${session.questions.length} questions`);
                     return res.status(400).json({
                         error: 'Phiên phỏng vấn đã hoàn tất, không thể tạo thêm câu hỏi'
                     });
@@ -315,44 +407,45 @@ class InterviewController {
             // Tự động kiểm tra câu hỏi trước đó có follow-up không
             // Giới hạn max 1 follow-up liên tiếp để tránh lặp vô tận
             // ==========================================
-            if (session.questions.length > 0) {
-                const lastQ = session.questions[session.questions.length - 1];
-                const secondLastQ = session.questions.length > 1 ? session.questions[session.questions.length - 2] : null;
-                const isLastQFollowUp = secondLastQ && secondLastQ.followUpAsked === true;
+            // DISABLED: Follow-up logic causing duplicate questions and totalQuestions mismatch
+            // const ENABLE_FOLLOW_UP = false;
+            // if (ENABLE_FOLLOW_UP && session.questions.length > 0) {
+            //     const lastQ = session.questions[session.questions.length - 1];
+            //     const secondLastQ = session.questions.length > 1 ? session.questions[session.questions.length - 2] : null;
+            //     const isLastQFollowUp = secondLastQ && secondLastQ.followUpAsked === true;
 
-                if (lastQ.followUpQuestion && !lastQ.followUpAsked && !isLastQFollowUp) {
-                    console.log(`[FOLLOW-UP] Kích hoạt câu hỏi follow-up từ Q${lastQ.questionNumber}: ${lastQ.followUpQuestion}`);
-                    
-                    lastQ.followUpAsked = true;
-                    await lastQ.save();
+            //     if (lastQ.followUpQuestion && !lastQ.followUpAsked && !isLastQFollowUp) {
+            //         console.log(`[FOLLOW-UP] Kích hoạt câu hỏi follow-up từ Q${lastQ.questionNumber}: ${lastQ.followUpQuestion}`);
+            //         
+            //         lastQ.followUpAsked = true;
+            //         await lastQ.save();
 
-                    const newQuestion = new InterviewQuestion({
-                        sessionId,
-                        questionNumber: session.questions.length + 1,
-                        questionText: lastQ.followUpQuestion,
-                        questionType: lastQ.questionType || 'Technical',
-                        topic: lastQ.topic || 'General',
-                        aiFeedback: ''
-                    });
+            //         const newQuestion = new InterviewQuestion({
+            //             sessionId,
+            //             questionNumber: session.questions.length + 1,
+            //             questionText: lastQ.followUpQuestion,
+            //             questionType: lastQ.questionType || 'Technical',
+            //             topic: lastQ.topic || 'General',
+            //             aiFeedback: ''
+            //         });
 
-                    await newQuestion.save();
-                    session.questions.push(newQuestion._id);
-                    await session.save();
+            //         await newQuestion.save();
+            //         session.questions.push(newQuestion._id);
+            //         await session.save();
 
-                    // Trả về luôn cho Frontend, tiết kiệm 100% thời gian gọi N8N
-                    return res.status(200).json({
-                        success: true,
-                        data: {
-                            _id: newQuestion._id,
-                            questionText: newQuestion.questionText,
-                            question: newQuestion.questionText,
-                            questionType: newQuestion.questionType,
-                            topic: newQuestion.topic,
-                            questionNumber: newQuestion.questionNumber
-                        }
-                    });
-                }
-            }
+            //         return res.status(200).json({
+            //             success: true,
+            //             data: {
+            //                 _id: newQuestion._id,
+            //                 questionText: newQuestion.questionText,
+            //                 question: newQuestion.questionText,
+            //                 questionType: newQuestion.questionType,
+            //                 topic: newQuestion.topic,
+            //                 questionNumber: newQuestion.questionNumber
+            //             }
+            //         });
+            //     }
+            // }
 
             // ==========================================
             // CHỐNG TRÙNG LẶP CÂU HỎI KHI REFRESH (F5) HOẶC BẤM NHANH
@@ -360,8 +453,11 @@ class InterviewController {
             // ==========================================
             if (session.questions.length > 0) {
                 const lastQ = session.questions[session.questions.length - 1];
-                if (!lastQ.userAnswer && !lastQ.followUpQuestion) {
-                    console.log(`[REFRESH SAFE] Trả về câu hỏi chưa trả lời hiện tại Q${lastQ.questionNumber}: ${lastQ.questionText}`);
+                const questionAge = Date.now() - new Date(lastQ.createdAt || 0).getTime();
+                const isFreshUnanswered = !lastQ.userAnswer && questionAge < 300000; // 5 phút
+                
+                if (isFreshUnanswered) {
+                    console.log(`[REFRESH SAFE] Câu hỏi cuối cùng Q${lastQ.questionNumber} vẫn chưa được trả lời (age=${questionAge}ms). Return luôn thay vì gen mới.`);
                     return res.status(200).json({
                         success: true,
                         data: {
@@ -597,7 +693,16 @@ class InterviewController {
                     }
                 } else if (typeof obj === 'object') {
                     for (let key in obj) {
-                        let res = extractQuestionData(key === 'questions' ? obj[key][0] : obj[key]);
+                        // Nếu key là 'questions' và obj[key] là array, lấy phần tử đầu tiên
+                        let extractValue = obj[key];
+                        if (key === 'questions' && Array.isArray(extractValue) && extractValue.length > 0) {
+                            if (extractValue.length > 1) {
+                                console.warn(`[WARN] Gemini/N8N trả về 'questions' array với ${extractValue.length} items, chỉ lấy phần tử đầu tiên`);
+                            }
+                            extractValue = extractValue[0];
+                        }
+                        
+                        let res = extractQuestionData(extractValue);
                         if (res && (res.questionText || res.question)) return res;
                     }
                 }
@@ -605,58 +710,174 @@ class InterviewController {
             }
 
             let aiResponse = extractQuestionData(result);
+            console.log('[DEBUG] extractQuestionData result:', JSON.stringify(aiResponse).substring(0, 300));
+            
+            // Nếu aiResponse là array thay vì object, lấy phần tử đầu tiên
+            if (Array.isArray(aiResponse)) {
+                console.warn('[BUG DETECTED] extractQuestionData trả về array thay vì object! Lấy phần tử đầu tiên.');
+                aiResponse = aiResponse[0] || {};
+            }
+            
             let questionText = aiResponse.questionText || aiResponse.question || "";
+
+            // ==========================================
+            // ENHANCED DUPLICATE DETECTION
+            // ==========================================
+            function isDuplicateQuestion(newQ, previousQuestions) {
+                if (!newQ || previousQuestions.length === 0) return false;
+                
+                const normalize = (q) => {
+                    return q.toLowerCase().trim()
+                        .replace(/[^\w\s]/g, '') // Remove punctuation
+                        .replace(/\s+/g, ' ')    // Normalize spaces
+                        .trim();
+                };
+                
+                const extractKeywords = (q) => {
+                    // Extract key technical/business terms (5+ chars)
+                    return q.match(/\b[a-z]{5,}/g) || [];
+                };
+                
+                const newQNorm = normalize(newQ);
+                const newQKeywords = new Set(extractKeywords(newQNorm));
+                
+                for (let prevQ of previousQuestions) {
+                    const prevQNorm = normalize(prevQ);
+                    const prevQKeywords = new Set(extractKeywords(prevQNorm));
+                    
+                    // 1. EXACT MATCH - normalized text is identical
+                    if (prevQNorm === newQNorm) {
+                        console.warn(`[DUP CHECK] Exact match detected`);
+                        return true;
+                    }
+                    
+                    // 2. PREFIX MATCH - first 100+ chars match (more generous than 80)
+                    if (newQNorm.substring(0, 100) === prevQNorm.substring(0, 100)) {
+                        console.warn(`[DUP CHECK] Prefix match (first 100 chars)`);
+                        return true;
+                    }
+                    
+                    // 3. KEYWORD MATCH - if 70%+ of keywords match (indicates similar topic)
+                    const commonKeywords = [...newQKeywords].filter(k => prevQKeywords.has(k));
+                    const matchRatio = newQKeywords.size > 0 
+                        ? commonKeywords.length / newQKeywords.size 
+                        : 0;
+                    
+                    if (matchRatio >= 0.7) {
+                        console.warn(`[DUP CHECK] Keyword match: ${matchRatio.toFixed(2)} (${commonKeywords.length}/${newQKeywords.size})`);
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            // Check for duplicate - if found, force regeneration with explicit warning
+            let regenerateAttempts = 0;
+            while (isDuplicateQuestion(questionText, previousQuestions) && regenerateAttempts < 2) {
+                regenerateAttempts++;
+                console.warn(`[DUPLICATE DETECTED - REGEN ATTEMPT ${regenerateAttempts}] Forcing regeneration to get unique question`);
+                questionText = ""; // Clear and force fallback
+                break;
+            }
 
             // Check if N8N returned mock/templated question or failed completely
             if (!questionText || isMockQuestion(questionText, isIT)) {
-                console.log(`[GROQ FALLBACK] Phát hiện câu hỏi N8N trống, chứa template tag hoặc lệch chuyên môn. Tiến hành sinh câu hỏi bằng Groq cục bộ...`);
+                console.log(`[FALLBACK TRIGGER] N8N empty/mock or duplicate detected. Trying Groq...`);
                 try {
-                    const prompt = `Bạn là một nhà tuyển dụng nhân sự chuyên nghiệp và thông minh.
-Hãy tạo 1 câu hỏi phỏng vấn thực tế, tự nhiên và chuyên nghiệp dựa trên các thông tin sau:
-- Vị trí ứng tuyển: ${session.jobTitle || position}
-- Lĩnh vực công việc: ${session.jobCategory}
+                    // Build danh sach cau hoi da hoi
+                    const prevQList = previousQuestions.length > 0
+                        ? previousQuestions.map((q, i) => `${i+1}. ${q}`).join('\n')
+                        : 'Chua co cau hoi nao';
+                    const levelLabels = {
+                        'Intern':'0-1 nam', 'Fresher':'duoi 1 nam',
+                        'Junior':'1-2 nam', 'Mid':'3-5 nam', 'mid':'3-5 nam',
+                        'Senior':'5+ nam, dan dat team',
+                    };
+                    const levelLabel = levelLabels[cvLevel] || cvLevel || '2-3 nam';
+                    const prompt = `Bạn là kỹ sư senior 10+ năm kinh nghiệm, đang phỏng vấn ứng viên vị trí ${session.jobTitle || position}.
+
+THÔNG TIN PHỎNG VẤN:
+- Vị trí: ${session.jobTitle || position}
+- Level: ${cvLevel} (${levelLabel})
 - Loại phỏng vấn: ${session.interviewType || 'Mixed'}
-- Cấp bậc mong muốn: ${cvLevel || 'Junior'}
-- Độ khó mục tiêu: ${targetDifficulty}
-- Chủ đề/Lĩnh vực câu hỏi: ${targetDomain}
+- Độ khó: ${targetDifficulty}
+- Chủ đề: ${targetDomain}
+- Câu số: ${interviewStage}/10 | Điểm trung bình hiện tại: ${averageScore}/100
 
-Thông tin CV của ứng viên:
-- Kỹ năng: ${cvSkills.join(', ') || 'General skills'}
-- Chủ đề đề xuất từ CV: ${cvTopics.join(', ') || 'General topics'}
-- Thế mạnh: ${cvStrengths.join(', ')}
-- Điểm cần cải thiện: ${cvWeaknesses.join(', ')}
-- Tóm tắt CV: ${cvString}
+HỒ SƠ ỨNG VIÊN:
+- Kỹ năng: ${cvSkills.join(', ') || 'Chưa rõ'}
+- Điểm mạnh: ${cvStrengths.join(', ') || 'Chưa rõ'}
+- Điểm yếu (hãy khai thác): ${cvWeaknesses.join(', ') || 'Chưa rõ'}
+- Chủ đề đề xuất: ${cvTopics.join(', ') || 'General'}
 
-Lịch sử phỏng vấn (Tránh lặp lại câu hỏi):
-- Các câu hỏi đã hỏi trước đó: ${JSON.stringify(previousQuestions)}
+★ CÁC CÂU ĐÃ HỎI (TUYỆT ĐỐI KHÔNG LẶP LẠI - PHẢI KHÁC HOÀN TOÀN):
+${prevQList}
 
-Quy tắc bắt buộc:
-1. Câu hỏi phải hoàn toàn bằng tiếng Việt, tự nhiên và chuyên nghiệp.
-2. Tránh các thuật ngữ IT/Lập trình/System Design nếu lĩnh vực tuyển dụng KHÔNG phải là IT (Ví dụ: Sales, Marketing, HR, Finance...). Lĩnh vực tuyển dụng hiện tại là: ${session.jobCategory}.
-3. Tùy theo độ khó mục tiêu (${targetDifficulty}):
-   - Easy: Câu hỏi cơ bản, tìm hiểu kiến thức nền tảng hoặc tình huống giao tiếp cơ bản.
-   - Medium: Câu hỏi tình huống, cách giải quyết vấn đề thực tế hoặc áp dụng kinh nghiệm.
-   - Hard: Câu hỏi tình huống phức tạp, xử lý khủng hoảng, hoặc chuyên sâu áp dụng kỹ năng cao.
-4. Trả về kết quả dưới dạng JSON thuần túy (không kèm markdown, không có text bên ngoài) với định dạng chính xác sau:
-{
-  "questionText": "nội dung câu hỏi phỏng vấn của bạn",
-  "questionType": "Technical" hoặc "Behavioral",
-  "topic": "${targetDomain}"
-}`;
+★ YÊU CẦU CHI TIẾT:
+1. Câu hỏi PHẢI KHÁC HOÀN TOÀN với tất cả câu trên (không cùng chủ đề, không giống công thức)
+2. Dùng tiếng Việt tự nhiên, chuyên nghiệp, không máy móc
+3. Độ khó: ${targetDifficulty}
+   - Hard+Senior/Mid: hỏi system design, trade-off, kiến trúc, xử lý failure production, kinh nghiệm dẫn dắt
+   - Hard+Junior: hỏi debug khó, xử lý lỗi cụ thể, tối ưu code
+   - Medium: hỏi tình huống thực tế, giải quyết vấn đề
+   - Easy: hỏi kiến thức nền tảng, khái niệm cơ bản
+4. Ưu tiên khai thác điểm yếu: ${cvWeaknesses.join(', ')}
+5. Nếu ${interviewStage >= 6 ? "đã hỏi quá nhiều câu Behavioral, ưu tiên Technical" : "số câu <= 3, có thể hỏi cả Behavioral lẫn Technical"}
+
+★ TUYỆT ĐỐI KHÔNG:
+- Hỏi những từ khóa/kỹ năng đã hỏi trong các câu trên
+- Hỏi câu mở hình "hãy kể về một dự án" nếu đã hỏi như vậy rồi
+- Để lại placeholder hoặc template tag ({{...}}, \$json....)
+- Sinh câu hỏi quá ngắn (phải >= 20 từ) hoặc quá dài (< 200 từ)
+
+Trả về JSON THUẦN TUY (không markdown, không text ngoài):
+{"questionText": "<câu hỏi tiếng Việt 20-150 từ>", "questionType": "Technical hoặc Behavioral", "topic": "${targetDomain}"}`;
 
                     const groqRaw = await req.groqClient.generateWithPrompt(prompt);
                     const parsedQuestion = req.groqClient.parseJsonResponse(groqRaw) || JSON.parse(groqRaw);
                     
                     if (parsedQuestion && (parsedQuestion.questionText || parsedQuestion.question)) {
                         questionText = parsedQuestion.questionText || parsedQuestion.question;
-                        aiResponse.questionText = questionText;
-                        aiResponse.question = questionText;
-                        aiResponse.questionType = parsedQuestion.questionType || 'Technical';
-                        aiResponse.topic = parsedQuestion.topic || targetDomain;
-                        console.log(`[GROQ FALLBACK SUCCESS] Generated dynamic question: "${questionText}"`);
+                        
+                        // Re-check for duplicates after Groq generation
+                        if (isDuplicateQuestion(questionText, previousQuestions)) {
+                            console.warn(`[GROQ DUPE CHECK FAILED] Groq still returned duplicate, forcing Gemini fallback`);
+                            questionText = ""; // Force Gemini
+                        } else {
+                            aiResponse.questionText = questionText;
+                            aiResponse.question = questionText;
+                            aiResponse.questionType = parsedQuestion.questionType || 'Technical';
+                            aiResponse.topic = parsedQuestion.topic || targetDomain;
+                            console.log(`[GROQ FALLBACK SUCCESS] Generated unique question: "${questionText.substring(0, 80)}..."`);
+                        }
                     }
                 } catch (groqErr) {
                     console.error("[GROQ FALLBACK ERROR] Lỗi khi gọi Groq để sinh câu hỏi:", groqErr.message);
+                    
+                    // GEMINI FALLBACK - nếu Groq thất bại, thử dùng Gemini (nhanh hơn)
+                    try {
+                        console.log("[GEMINI FALLBACK] Groq thất bại, chuyển sang Gemini...");
+                        const geminiRaw = await req.geminiClient.generateWithPrompt(prompt);
+                        const geminiParsed = req.geminiClient.parseJsonResponse(geminiRaw);
+                        
+                        if (geminiParsed && (geminiParsed.questionText || geminiParsed.question)) {
+                            const geminiQuestion = geminiParsed.questionText || geminiParsed.question;
+                            
+                            // Re-check for duplicates after Gemini generation
+                            if (!isDuplicateQuestion(geminiQuestion, previousQuestions)) {
+                                questionText = geminiQuestion;
+                                aiResponse.questionText = questionText;
+                                aiResponse.question = questionText;
+                                aiResponse.questionType = geminiParsed.questionType || 'Technical';
+                                aiResponse.topic = geminiParsed.topic || targetDomain;
+                                console.log(`[GEMINI FALLBACK SUCCESS] Generated unique question: "${questionText.substring(0, 80)}..."`);
+                            } else {
+                                console.warn(`[GEMINI DUPE CHECK FAILED] Gemini returned duplicate, will use static fallback`);
+                            }
+                        }
+                    } catch (geminiErr) {
+                        console.error("[GEMINI FALLBACK ERROR] Gemini cũng thất bại:", geminiErr.message);
+                    }
                 }
             }
 
@@ -725,19 +946,32 @@ Quy tắc bắt buộc:
             if (session) {
                 const topic = targetDomain;
                 const aiFeedback = aiResponse.aiFeedback || '';
+                const nextQuestionNumber = session.questions.length + 1;
+                
+                console.log(`[SAVE QUESTION] sessionId=${sessionId}, sessionQuestionCount=${session.questions.length}, calculatedQuestionNumber=${nextQuestionNumber}, questionText="${questionText.substring(0, 80)}..."`);
+                
+                // Check xem questionText có chứa 2 câu hỏi không (nếu có "\n1." hoặc "1."  hoặc "2." ở đầu dòng)
+                const questionLines = questionText.split('\n').filter(l => l.trim());
+                if (questionLines.length > 2 && /^\d+\.|Câu \d+:|Question \d+:/.test(questionText)) {
+                    console.warn('[WARNING] questionText có vẻ chứa nhiều câu hỏi được numbered! Log toàn bộ:', questionText);
+                }
 
                 const newQuestion = new InterviewQuestion({
                     sessionId,
-                    questionNumber: session.questions.length + 1, // Dùng thống nhất session.questions.length + 1 để tránh trùng lặp
+                    questionNumber: nextQuestionNumber,
                     questionText: questionText,
                     questionType: questionType,
                     topic: topic,
-                    aiFeedback: aiFeedback
+                    aiFeedback: aiFeedback,
+                    followUpQuestion: aiResponse?.followUpQuestion || ''
                 });
 
                 await newQuestion.save();
+                console.log(`[SAVED QUESTION] _id=${newQuestion._id}, questionNumber=${newQuestion.questionNumber}, sessionId=${sessionId}`);
+                
                 session.questions.push(newQuestion._id);
                 await session.save();
+                console.log(`[SESSION UPDATED] sessionId=${sessionId}, totalQuestions=${session.questions.length}`);
 
                 aiResponse._id = newQuestion._id;
                 aiResponse.questionText = questionText;
@@ -751,6 +985,8 @@ Quy tắc bắt buộc:
                 success: true,
                 data: aiResponse
             });
+            
+            console.log(`[generateQuestion DONE] sessionId=${sessionId}, questionNumber=${aiResponse.questionNumber || 'N/A'}`);
 
         } catch (error) {
             console.error('Generate question error:', error);
@@ -759,6 +995,7 @@ Quy tắc bắt buộc:
             });
         } finally {
             activeGenerations.delete(sessionId);
+            console.log(`[generateQuestion FINALLY] activeGenerations.size=${activeGenerations.size}`);
         }
     }
 
@@ -867,9 +1104,5 @@ Quy tắc bắt buộc:
             });
         }
     }
-            });
-        }
-    }
 }
-
 export default new InterviewController();

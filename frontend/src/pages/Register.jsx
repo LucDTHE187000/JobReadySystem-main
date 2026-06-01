@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Briefcase, User, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
-const REGISTER_IMAGE = 'https://images.pexels.com/photos/3184302/pexels-photo-3184302.jpeg?auto=compress&cs=tinysrgb&w=600';
+const REGISTER_IMAGE = '/images/Register_side.png';
 
 const featurePills = [
     '🎯 CV Gate — Chỉ CV đạt chuẩn',

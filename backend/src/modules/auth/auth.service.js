@@ -140,6 +140,7 @@ export class AuthService {
                 name: user.name,
                 role: user.role,
                 language: user.language,
+                credits: user.credits ?? 14000,
             },
         };
     }
