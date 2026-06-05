@@ -35,6 +35,25 @@ function getStepIndex(status) {
     return 0;
 }
 
+function formatSalary(salary) {
+    if (!salary) return 'Thỏa thuận';
+    let { min, max, currency } = salary;
+    if (!min && !max) return 'Thỏa thuận';
+    
+    const isVND = currency === 'VND' || !currency || currency.toUpperCase() === 'VND';
+    const unit = isVND ? ' triệu VNĐ' : ` ${currency}`;
+    
+    if (isVND) {
+        if (min >= 100000) min = min / 1000000;
+        if (max >= 100000) max = max / 1000000;
+    }
+    
+    if (min && max) return `${min.toLocaleString()} – ${max.toLocaleString()}${unit}`;
+    if (min) return `Từ ${min.toLocaleString()}${unit}`;
+    if (max) return `Đến ${max.toLocaleString()}${unit}`;
+    return 'Thỏa thuận';
+}
+
 function timeAgo(date) {
     const diff = Date.now() - new Date(date).getTime();
     const d = Math.floor(diff / 86400000);
@@ -175,8 +194,14 @@ export default function MyApplications() {
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
 
+    // Saved Jobs states
+    const [activeParentTab, setActiveParentTab] = useState('applications'); // 'applications' | 'saved'
+    const [savedJobs, setSavedJobs] = useState([]);
+    const [savedLoading, setSavedLoading] = useState(false);
+
     useEffect(() => {
         fetchApplications();
+        fetchSavedJobs();
     }, []);
 
     const fetchApplications = async () => {
@@ -190,6 +215,32 @@ export default function MyApplications() {
             console.error(err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchSavedJobs = async () => {
+        try {
+            setSavedLoading(true);
+            const res = await axios.get(`${API_URL}/api/jobs/saved`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setSavedJobs((res.data.data || []).filter(j => j));
+        } catch (err) {
+            console.error("Error fetching saved jobs:", err);
+        } finally {
+            setSavedLoading(false);
+        }
+    };
+
+    const handleUnsaveJob = async (jobId) => {
+        if (!window.confirm("Bạn có chắc muốn bỏ lưu việc làm này?")) return;
+        try {
+            await axios.post(`${API_URL}/api/jobs/${jobId}/save`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setSavedJobs(prev => prev.filter(j => j._id !== jobId));
+        } catch (err) {
+            console.error("Error unsaving job:", err);
         }
     };
 
@@ -220,8 +271,35 @@ export default function MyApplications() {
     const handleTabChange = (key) => { setActiveTab(key); setPage(1); };
 
     return (
-        <SeekerLayout title="Việc đã ứng tuyển" breadcrumb="Ứng tuyển › Danh sách">
+        <SeekerLayout title="Quản lý việc làm" breadcrumb="Công việc › Việc làm của tôi">
             <div className="max-w-4xl mx-auto w-full space-y-5">
+                {/* Parent Tabs Selector */}
+                <div className="flex border-b border-gray-200 mb-6">
+                    <button
+                        onClick={() => setActiveParentTab('applications')}
+                        className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all ${
+                            activeParentTab === 'applications'
+                                ? 'border-[#0A2463] text-[#0A2463]'
+                                : 'border-transparent text-gray-400 hover:text-gray-600'
+                        }`}
+                    >
+                        💼 Đơn ứng tuyển
+                    </button>
+                    <button
+                        onClick={() => setActiveParentTab('saved')}
+                        className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all ${
+                            activeParentTab === 'saved'
+                                ? 'border-[#0A2463] text-[#0A2463]'
+                                : 'border-transparent text-gray-400 hover:text-gray-600'
+                        }`}
+                    >
+                        ⭐ Việc làm đã lưu
+                    </button>
+                </div>
+
+                {/* Sub Tab: Applications */}
+                {activeParentTab === 'applications' && (
+                    <>
                         <p className="text-sm text-[#5A6482] -mt-2">
                             Theo dõi trạng thái từ {applications.length} đơn ứng tuyển.
                         </p>
@@ -314,6 +392,77 @@ export default function MyApplications() {
                                 </button>
                             </div>
                         )}
+                    </>
+                )}
+
+                {/* Sub Tab: Saved Jobs */}
+                {activeParentTab === 'saved' && (
+                    <div className="space-y-4">
+                        <p className="text-sm text-[#5A6482] -mt-2">
+                            Bạn đã lưu {savedJobs.length} công việc quan tâm.
+                        </p>
+                        
+                        {savedLoading ? (
+                            <div className="flex items-center justify-center py-16">
+                                <Loader2 className="w-8 h-8 animate-spin text-[#0A2463]" />
+                            </div>
+                        ) : savedJobs.length === 0 ? (
+                            <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center shadow-sm">
+                                <Heart className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                                <p className="text-gray-500 font-medium">Chưa có việc làm nào được lưu</p>
+                                <p className="text-sm text-gray-400 mt-1">Lưu các việc làm yêu thích khi xem tin tuyển dụng để nộp đơn ứng tuyển sau!</p>
+                                <Link to="/jobs" className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-[#0A2463] text-white rounded-xl text-sm font-semibold hover:bg-[#071A4A] transition-colors">
+                                    <Briefcase className="w-4 h-4" /> Khám phá việc làm
+                                </Link>
+                            </div>
+                        ) : (
+                            <div className="grid gap-4">
+                                {savedJobs.map(job => {
+                                    const companyName = job.recruiterId?.companyName || job.recruiterId?.name || 'Công ty';
+                                    const city = job.location?.city || '';
+                                    return (
+                                        <div key={job._id} className="bg-white rounded-2xl border border-[#DDE3F0] shadow-sm p-5 hover:shadow-md hover:border-[#0A2463]/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                            <div className="flex items-start gap-4">
+                                                <CompanyLogo company={companyName} avatar={job.recruiterId?.avatarUrl || job.recruiterId?.avatar} />
+                                                <div className="min-w-0 text-left">
+                                                    <Link
+                                                        to={`/jobs/${job._id}`}
+                                                        className="text-base font-bold text-gray-900 hover:text-[#0A2463] transition-colors line-clamp-1"
+                                                    >
+                                                        {job.title}
+                                                    </Link>
+                                                    <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1 flex-wrap">
+                                                        <Building2 className="w-3.5 h-3.5 flex-shrink-0" />
+                                                        <span>{companyName}</span>
+                                                        {city && <><span className="text-gray-300">•</span><MapPin className="w-3.5 h-3.5 flex-shrink-0" /><span>{city}</span></>}
+                                                    </p>
+                                                    <div className="flex flex-wrap gap-2 mt-2">
+                                                        <span className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded-lg font-medium">{job.jobType}</span>
+                                                        <span className="text-xs px-2 py-1 bg-amber-50 text-amber-600 rounded-lg font-medium">💰 {formatSalary(job.salary)}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2 self-end sm:self-auto flex-wrap">
+                                                <Link
+                                                    to={`/jobs/${job._id}`}
+                                                    className="px-4 py-2 bg-[#0A2463] hover:bg-[#071A4A] text-white text-xs font-semibold rounded-lg transition flex items-center justify-center"
+                                                >
+                                                    Chi tiết & Apply
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleUnsaveJob(job._id)}
+                                                    className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 text-xs font-semibold rounded-lg transition cursor-pointer"
+                                                >
+                                                    Hủy lưu
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
         </SeekerLayout>
     );

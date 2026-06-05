@@ -59,6 +59,26 @@ function ApplicationsList() {
     fetchJobs();
   }, [user, navigate]);
 
+  const handleDeleteJob = async (jobId) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa tin tuyển dụng này? Tất cả các hồ sơ ứng tuyển liên quan sẽ bị xóa!")) return;
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const res = await fetch(`http://localhost:4000/api/jobs/${jobId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Xóa thất bại");
+      alert("Đã xóa tin tuyển dụng thành công!");
+      setJobs(prev => prev.filter(j => j._id !== jobId));
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    }
+  };
+
   // FILTER + SORT LOGIC
   const filteredJobs = useMemo(() => {
     let filtered = jobs.filter((job) => {
@@ -230,14 +250,28 @@ function ApplicationsList() {
 
 
 
-                <button
-                  className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  onClick={() =>
-                    navigate(`/job-applications/${job._id}`)
-                  }
-                >
-                  View Applications
-                </button>
+                <div className="flex gap-2 justify-end mt-2">
+                  <button
+                    className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-xs font-semibold"
+                    onClick={() =>
+                      navigate(`/job-applications/${job._id}`)
+                    }
+                  >
+                    View Applications
+                  </button>
+                  <button
+                    className="px-3 py-1.5 bg-amber-500 text-white rounded-lg hover:bg-amber-600 text-xs font-semibold"
+                    onClick={() => navigate(`/edit-job/${job._id}`)}
+                  >
+                    Sửa
+                  </button>
+                  <button
+                    className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 text-xs font-semibold"
+                    onClick={() => handleDeleteJob(job._id)}
+                  >
+                    Xóa
+                  </button>
+                </div>
               </div>
             </div>
           ))

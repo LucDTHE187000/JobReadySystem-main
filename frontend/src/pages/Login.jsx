@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, ArrowRight, BrainCircuit, FileText, TrendingUp } from 'lucide-react';
@@ -19,21 +19,47 @@ export default function Login() {
     const [rememberMe, setRememberMe] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { signIn } = useAuth();
+    const { signIn, user } = useAuth();
     const navigate = useNavigate();
+
+    // Redirect already-authenticated users
+    useEffect(() => {
+        if (user) {
+            if (user.role === 'ADMIN') navigate('/admin/dashboard', { replace: true });
+            else if (user.role === 'EMPLOYER') navigate('/dashboard', { replace: true });
+            else navigate('/', { replace: true });
+        }
+    }, [user, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-        setLoading(true);
 
+        if (!email.trim()) {
+            setError('Email không được để trống');
+            return;
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email.trim())) {
+            setError('Email không hợp lệ');
+            return;
+        }
+        if (!password) {
+            setError('Mật khẩu không được để trống');
+            return;
+        }
+
+        setLoading(true);
         const result = await signIn(email, password, rememberMe);
 
         if (result.error) {
             setError(result.error.message);
             setLoading(false);
         } else {
-            navigate('/');
+            const role = result.user?.role;
+            if (role === 'ADMIN') navigate('/admin/dashboard', { replace: true });
+            else if (role === 'EMPLOYER') navigate('/dashboard', { replace: true });
+            else navigate('/', { replace: true });
         }
     };
 

@@ -15,7 +15,7 @@ const createTransporter = () => {
         throw new Error("Email credentials (EMAIL_USER and EMAIL_PASS) are required to send emails. Please configure them in your .env file.");
     }
 
-    return nodemailer.createTransporter(emailConfig);
+    return nodemailer.createTransport(emailConfig);
 };
 
 /**
@@ -220,8 +220,46 @@ export const sendResetPasswordEmail = async (to, otp, name = "User") => {
     }
 };
 
+/**
+ * Send contact email from Recruiter to Candidate
+ * @param {string} to - Candidate email
+ * @param {string} subject - Email subject
+ * @param {string} body - Email body
+ * @param {string} recruiterName - Recruiter name
+ * @returns {Promise<Object>} Send result
+ */
+export const sendContactEmail = async (to, subject, body, recruiterName = "Recruiter") => {
+    const hasEmailConfig = process.env.EMAIL_USER && process.env.EMAIL_PASS;
+    const isDevModeOnly = process.env.EMAIL_DEV_MODE === "true" || !hasEmailConfig;
 
+    if (isDevModeOnly) {
+        console.log("\n" + "=".repeat(60));
+        console.log("📧 [DEV MODE] Recruiter Contact Email (Not sent - Development mode)");
+        console.log("=".repeat(60));
+        console.log(`To: ${to}`);
+        console.log(`From: ${recruiterName}`);
+        console.log(`Subject: ${subject}`);
+        console.log(`Body: ${body}`);
+        console.log("=".repeat(60) + "\n");
+        return { success: true, messageId: "dev-mode", devMode: true };
+    }
 
+    try {
+        const transporter = createTransporter();
 
+        const mailOptions = {
+            from: `"${recruiterName} (via JobReady)" <${process.env.EMAIL_USER}>`,
+            to: to,
+            replyTo: process.env.EMAIL_USER,
+            subject: subject,
+            text: body,
+            html: body.replace(/\n/g, '<br/>')
+        };
 
-
+        const info = await transporter.sendMail(mailOptions);
+        return { success: true, messageId: info.messageId };
+    } catch (error) {
+        console.error("❌ Error sending contact email:", error.message);
+        return { success: false, error: error.message };
+    }
+};

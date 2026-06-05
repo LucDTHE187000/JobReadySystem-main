@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Play } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 const HERO_IMAGE = '/abc.jpg';
 
@@ -11,6 +12,19 @@ const stats = [
 
 export default function Hero() {
     const navigate = useNavigate();
+    const { user } = useAuth();
+
+    const handleCTA = () => {
+        if (user) {
+            // Already logged in — go to relevant dashboard
+            const role = user.role;
+            if (role === 'employer') navigate('/employer/dashboard');
+            else if (role === 'admin') navigate('/admin/dashboard');
+            else navigate('/dashboard');
+        } else {
+            navigate('/register');
+        }
+    };
 
     return (
         <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-[#0A2463]">
@@ -64,7 +78,7 @@ export default function Hero() {
 
                         <div className="flex flex-col sm:flex-row gap-4">
                             <button
-                                onClick={() => navigate('/register')}
+                                onClick={handleCTA}
                                 className="flex items-center justify-center gap-2 px-8 py-3 bg-[#F5C518] text-[#0A2463] font-bold rounded-lg shadow-lg hover:bg-[#D4A800] transition-all"
                             >
                                 Bắt đầu miễn phí

@@ -50,12 +50,20 @@ function timeAgo(dateStr) {
 
 function formatSalary(salary) {
     if (!salary) return 'Thỏa thuận';
-    const { min, max, currency } = salary;
+    let { min, max, currency } = salary;
     if (!min && !max) return 'Thỏa thuận';
-    const unit = currency === 'VND' ? ' triệu' : ' triệu';
-    if (min && max) return `${min} – ${max}${unit}`;
-    if (min) return `Từ ${min}${unit}`;
-    if (max) return `Đến ${max}${unit}`;
+    
+    const isVND = currency === 'VND' || !currency || currency.toUpperCase() === 'VND';
+    const unit = isVND ? ' triệu VNĐ' : ` ${currency}`;
+    
+    if (isVND) {
+        if (min >= 100000) min = min / 1000000;
+        if (max >= 100000) max = max / 1000000;
+    }
+    
+    if (min && max) return `${min.toLocaleString()} – ${max.toLocaleString()}${unit}`;
+    if (min) return `Từ ${min.toLocaleString()}${unit}`;
+    if (max) return `Đến ${max.toLocaleString()}${unit}`;
     return 'Thỏa thuận';
 }
 
@@ -226,6 +234,7 @@ function Pagination({ page, totalPages, onPageChange }) {
 
 export default function JobSearch() {
     const [searchParams, setSearchParams] = useSearchParams();
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
     const [keyword, setKeyword] = useState(searchParams.get('keyword') || '');
     const [location, setLocation] = useState(searchParams.get('location') || '');
@@ -241,9 +250,7 @@ export default function JobSearch() {
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [loading, setLoading] = useState(false);
-    const [savedJobs, setSavedJobs] = useState(() => {
-        try { return JSON.parse(localStorage.getItem('savedJobs') || '[]'); } catch { return []; }
-    });
+    const [savedJobs, setSavedJobs] = useState([]);
 
     const [showLocationDrop, setShowLocationDrop] = useState(false);
     const [showSortDrop, setShowSortDrop] = useState(false);
@@ -299,8 +306,22 @@ export default function JobSearch() {
         }
     }, [buildQuery]);
 
+    const fetchSavedJobsList = useCallback(async () => {
+        if (!token) return;
+        try {
+            const res = await axios.get(`${API_URL}/api/jobs/saved`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const ids = (res.data.data || []).filter(j => j).map(j => j._id);
+            setSavedJobs(ids);
+        } catch (err) {
+            console.error("Error fetching saved jobs ids:", err);
+        }
+    }, [token]);
+
     useEffect(() => {
         fetchJobs();
+        fetchSavedJobsList();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page, sort, selectedTypes, salaryRange]);
 
@@ -324,12 +345,23 @@ export default function JobSearch() {
         );
     };
 
-    const toggleSave = (id) => {
-        setSavedJobs(prev => {
-            const next = prev.includes(id) ? prev.filter(v => v !== id) : [...prev, id];
-            localStorage.setItem('savedJobs', JSON.stringify(next));
-            return next;
-        });
+    const toggleSave = async (id) => {
+        if (!token) {
+            navigate('/login');
+            return;
+        }
+        try {
+            const res = await axios.post(`${API_URL}/api/jobs/${id}/save`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.data.isSaved) {
+                setSavedJobs(prev => [...prev, id]);
+            } else {
+                setSavedJobs(prev => prev.filter(v => v !== id));
+            }
+        } catch (err) {
+            console.error("Error toggling save job:", err);
+        }
     };
 
     const clearFilters = () => {

@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Briefcase, User, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -23,20 +23,50 @@ export default function Register() {
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [loading, setLoading] = useState(false);
-    const { signUp } = useAuth();
+    const { signUp, user } = useAuth();
     const navigate = useNavigate();
+
+    // Redirect already-authenticated users
+    useEffect(() => {
+        if (user) {
+            if (user.role === 'EMPLOYER' || user.role === 'employer') navigate('/employer/dashboard', { replace: true });
+            else if (user.role === 'ADMIN' || user.role === 'admin') navigate('/admin/dashboard', { replace: true });
+            else navigate('/dashboard', { replace: true });
+        }
+    }, [user, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setSuccessMessage('');
 
-        if (password !== confirmPassword) {
-            setError('Mật khẩu xác nhận không khớp');
+        if (!fullName.trim()) {
+            setError('Họ và tên không được để trống');
+            return;
+        }
+        if (fullName.trim().length < 2) {
+            setError('Họ và tên phải có ít nhất 2 ký tự');
+            return;
+        }
+        if (!email.trim()) {
+            setError('Email không được để trống');
+            return;
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email.trim())) {
+            setError('Email không hợp lệ');
+            return;
+        }
+        if (!password) {
+            setError('Mật khẩu không được để trống');
             return;
         }
         if (password.length < 6) {
             setError('Mật khẩu phải có ít nhất 6 ký tự');
+            return;
+        }
+        if (password !== confirmPassword) {
+            setError('Mật khẩu xác nhận không khớp');
             return;
         }
 

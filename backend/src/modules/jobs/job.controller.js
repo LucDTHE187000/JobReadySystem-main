@@ -190,12 +190,143 @@ const toggleJobStatus = async (req, res) => {
   }
 };
 
+const saveJob = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const userId = req.user.userId;
 
+    if (!mongoose.Types.ObjectId.isValid(jobId)) {
+      return res.status(400).json({ message: "Invalid jobId" });
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const index = user.savedJobs.findIndex(id => id && id.toString() === jobId.toString());
+    let isSaved = false;
+
+    if (index === -1) {
+      user.savedJobs.push(jobId);
+      isSaved = true;
+    } else {
+      user.savedJobs.splice(index, 1);
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      message: isSaved ? "Lưu tin tuyển dụng thành công" : "Đã hủy lưu tin tuyển dụng",
+      isSaved
+    });
+
+  } catch (error) {
+    console.error("Save Job Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getSavedJobs = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const user = await UserModel.findById(userId)
+      .populate({
+        path: "savedJobs",
+        populate: { path: "recruiterId", select: "name companyName avatar avatarUrl" }
+      })
+      .lean();
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const cleanSavedJobs = (user.savedJobs || []).filter(job => job !== null);
+
+    res.status(200).json({
+      message: "Lấy danh sách việc làm đã lưu thành công",
+      data: cleanSavedJobs
+    });
+
+  } catch (error) {
+    console.error("Get Saved Jobs Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const updateJob = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const recruiterId = req.user.userId;
+
+    if (!mongoose.Types.ObjectId.isValid(jobId)) {
+      return res.status(400).json({ message: "Invalid jobId" });
+    }
+
+    const job = await Job.findOne({ _id: jobId, recruiterId });
+    if (!job) {
+      return res.status(404).json({ message: "Job not found or unauthorized" });
+    }
+
+    // Update fields
+    const allowedFields = [
+      "title", "description", "requirements", "jobType",
+      "salary", "location", "status", "isPremium"
+    ];
+
+    allowedFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        job[field] = req.body[field];
+      }
+    });
+
+    await job.save();
+
+    res.status(200).json({
+      message: "Cập nhật tin tuyển dụng thành công",
+      data: job
+    });
+  } catch (error) {
+    console.error("Update Job Error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const deleteJob = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const recruiterId = req.user.userId;
+
+    if (!mongoose.Types.ObjectId.isValid(jobId)) {
+      return res.status(400).json({ message: "Invalid jobId" });
+    }
+
+    const job = await Job.findOneAndDelete({ _id: jobId, recruiterId });
+    if (!job) {
+      return res.status(404).json({ message: "Job not found or unauthorized" });
+    }
+
+    // Delete associated applications
+    await JobApplication.deleteMany({ jobId });
+
+    res.status(200).json({
+      message: "Xóa tin tuyển dụng thành công"
+    });
+  } catch (error) {
+    console.error("Delete Job Error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
 
 export default {
   createJob,
   applyJob,
   getJobDetail,
   getMyJobs,
-  toggleJobStatus
+  toggleJobStatus,
+  saveJob,
+  getSavedJobs,
+  updateJob,
+  deleteJob
 };

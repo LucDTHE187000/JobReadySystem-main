@@ -96,4 +96,73 @@ export class UserController {
             return res.status(500).json({ message: error.message || 'Lỗi nạp credit' });
         }
     }
+
+    /** Tìm kiếm ứng viên (dành cho Recruiter) */
+    static async searchCandidates(req, res) {
+        try {
+            const { skills, experience, education, search, page = 1, limit = 12 } = req.query;
+            const filter = { role: 'JOB_SEEKER', isActive: true };
+
+            if (skills) {
+                const skillList = skills.split(',').map(s => s.trim()).filter(Boolean);
+                if (skillList.length > 0) {
+                    filter.skills = { $in: skillList.map(s => new RegExp(s, 'i')) };
+                }
+            }
+            if (experience) filter.experience = { $regex: experience, $options: 'i' };
+            if (education) filter.education = { $regex: education, $options: 'i' };
+            if (search) {
+                filter.$or = [
+                    { name: { $regex: search, $options: 'i' } },
+                    { skills: { $in: [new RegExp(search, 'i')] } },
+                ];
+            }
+
+            const skip = (Number(page) - 1) * Number(limit);
+            const { UserModel } = await import('./user.model.js');
+            const [candidates, total] = await Promise.all([
+                UserModel.find(filter)
+                    .select('name email skills experience education avatarUrl createdAt')
+                    .sort({ createdAt: -1 })
+                    .skip(skip)
+                    .limit(Number(limit))
+                    .lean(),
+                UserModel.countDocuments(filter),
+            ]);
+
+            return res.status(200).json({
+                candidates,
+                total,
+                page: Number(page),
+                totalPages: Math.ceil(total / Number(limit)),
+            });
+        } catch (error) {
+            console.error('Search candidates error:', error);
+            return res.status(500).json({ message: 'Lỗi server' });
+        }
+    }
+
+    static async contactCandidate(req, res) {
+        try {
+            const { candidateEmail, subject, body } = req.body;
+            if (!candidateEmail || !subject || !body) {
+                return res.status(400).json({ message: "Thiếu thông tin người nhận, tiêu đề hoặc nội dung email" });
+            }
+
+            const { sendContactEmail } = await import("../../utils/email.util.js");
+            const { UserModel } = await import("./user.model.js");
+            const recruiter = await UserModel.findById(req.user.userId).select("name companyName").lean();
+            const senderName = recruiter ? (recruiter.companyName || recruiter.name) : "Nhà tuyển dụng";
+
+            const result = await sendContactEmail(candidateEmail, subject, body, senderName);
+            if (result.success) {
+                return res.status(200).json({ message: "Gửi email thành công", devMode: result.devMode });
+            } else {
+                return res.status(500).json({ message: result.error || "Gửi email thất bại" });
+            }
+        } catch (error) {
+            console.error("Contact candidate error:", error);
+            return res.status(500).json({ message: "Lỗi server" });
+        }
+    }
 }

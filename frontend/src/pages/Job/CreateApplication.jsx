@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import SideBar from "../../components/SideBar";
 import { useAuth } from "../../contexts/AuthContext";
 
 function CreateJob() {
   const navigate = useNavigate();
+  const { jobId } = useParams();
   const { user } = useAuth();
+  const isEdit = !!jobId;
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
   const [loading, setLoading] = useState(false);
 
@@ -21,12 +24,42 @@ function CreateJob() {
     isPremium: false,
   });
 
-  // Chỉ redirect khi user === null (đã load xong)
   useEffect(() => {
     if (user === null) {
       navigate("/login");
+      return;
     }
-  }, [user, navigate]);
+
+    if (isEdit && token) {
+      const fetchJobDetails = async () => {
+        try {
+          const res = await fetch(`http://localhost:4000/api/jobs/${jobId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          const data = await res.json();
+          if (res.ok && data.job) {
+            const job = data.job;
+            setForm({
+              title: job.title || "",
+              description: job.description || "",
+              requirements: job.requirements || "",
+              jobType: job.jobType || "full-time",
+              salaryMin: job.salary?.min !== undefined ? job.salary.min : "",
+              salaryMax: job.salary?.max !== undefined ? job.salary.max : "",
+              currency: job.salary?.currency || "VND",
+              city: job.location?.city || "",
+              isPremium: job.isPremium || false,
+            });
+          }
+        } catch (err) {
+          console.error("Fetch job detail error:", err);
+        }
+      };
+      fetchJobDetails();
+    }
+  }, [user, navigate, jobId, isEdit, token]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -39,8 +72,6 @@ function CreateJob() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token"); // lấy token đúng chỗ
 
     if (!token) {
       alert("Bạn cần đăng nhập để đăng tin tuyển dụng");
@@ -69,11 +100,15 @@ function CreateJob() {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:4000/api/jobs", {
-        method: "POST",
+      const url = isEdit
+        ? `http://localhost:4000/api/jobs/${jobId}`
+        : "http://localhost:4000/api/jobs";
+
+      const res = await fetch(url, {
+        method: isEdit ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // 🔥 QUAN TRỌNG
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
@@ -81,12 +116,12 @@ function CreateJob() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || "Create failed");
+        throw new Error(data.message || "Action failed");
       }
 
-      alert("Đăng tin thành công!");
+      alert(isEdit ? "Cập nhật tin thành công!" : "Đăng tin thành công!");
 
-      if (form.isPremium) {
+      if (!isEdit && form.isPremium) {
         navigate(`/payment/${data._id}`);
       } else {
         navigate("/job-application");
@@ -105,11 +140,11 @@ function CreateJob() {
 
       <div className="w-full max-w-5xl ml-10 p-6">
         <h1 className="text-2xl font-semibold mb-1">
-          Đăng Tin Tuyển Dụng
+          {isEdit ? "Cập nhật Tin Tuyển Dụng" : "Đăng Tin Tuyển Dụng"}
         </h1>
 
         <p className="text-gray-500 mb-6">
-          Hoàn thành thông tin bên dưới để đăng tin tuyển dụng
+          {isEdit ? "Chỉnh sửa thông tin bên dưới và lưu lại thay đổi" : "Hoàn thành thông tin bên dưới để đăng tin tuyển dụng"}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -208,7 +243,7 @@ function CreateJob() {
               disabled={loading}
               className="px-6 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
             >
-              {loading ? "Đang đăng..." : "Đăng tin ngay →"}
+              {loading ? (isEdit ? "Đang cập nhật..." : "Đang đăng...") : (isEdit ? "Lưu thay đổi" : "Đăng tin ngay →")}
             </button>
           </div>
         </form>

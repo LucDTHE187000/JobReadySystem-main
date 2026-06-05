@@ -8,7 +8,7 @@ import SeekerLayout from '../components/layout/SeekerLayout';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export default function Profile() {
-    const { user } = useAuth();
+    const { user, refreshUser } = useAuth();
     const credits = user?.credits ?? 0;
     const [activeTab, setActiveTab] = useState('general');
 
@@ -67,19 +67,21 @@ export default function Profile() {
         try {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
             const dataToUpdate = { ...formData };
-            // parse skills string to array
-            if (dataToUpdate.skills) {
-                dataToUpdate.skills = dataToUpdate.skills.split(',').map(s => s.trim()).filter(Boolean);
-            }
+            // parse skills string to array — always produce a proper array
+            dataToUpdate.skills = dataToUpdate.skills
+                ? dataToUpdate.skills.split(',').map(s => s.trim()).filter(Boolean)
+                : [];
 
-            await axios.put(`${API_URL}/api/users/profile`, dataToUpdate, {
+            const response = await axios.put(`${API_URL}/api/users/profile`, dataToUpdate, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
+            // Refresh global user context so header/sidebar update instantly
+            await refreshUser();
             setMessage({ type: 'success', text: 'Cập nhật hồ sơ thành công!' });
-            
 
         } catch (error) {
+            console.error('Profile update error:', error);
             setMessage({ type: 'error', text: error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật.' });
         } finally {
             setLoading(false);
@@ -361,12 +363,57 @@ export default function Profile() {
 
                             {activeTab === 'company' && (
                                 <form onSubmit={handleSaveProfile} className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                    {/* Logo Công ty */}
+                                    <div className="flex items-center gap-6 pb-6 border-b border-gray-100">
+                                        <div
+                                            className="relative group cursor-pointer"
+                                            onClick={() => document.getElementById('company-logo-upload').click()}
+                                        >
+                                            {formData.avatar ? (
+                                                <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-md border border-gray-200">
+                                                    <img src={formData.avatar} alt="Logo công ty" className="w-full h-full object-cover" />
+                                                </div>
+                                            ) : (
+                                                <div className="w-24 h-24 bg-gradient-to-br from-[#0A2463] to-[#247BA0] rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-md">
+                                                    {formData.companyName?.charAt(0) || 'C'}
+                                                </div>
+                                            )}
+                                            <div className="absolute inset-0 bg-black/40 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Camera className="text-white" size={24} />
+                                            </div>
+                                            <input
+                                                id="company-logo-upload"
+                                                type="file"
+                                                accept="image/png, image/jpeg, image/jpg"
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const file = e.target.files[0];
+                                                    if (file) {
+                                                        if (file.size > 2 * 1024 * 1024) {
+                                                            setMessage({ type: 'error', text: 'Kích thước ảnh tối đa 2MB' });
+                                                            return;
+                                                        }
+                                                        const reader = new FileReader();
+                                                        reader.onloadend = () => {
+                                                            setFormData({ ...formData, avatar: reader.result });
+                                                        };
+                                                        reader.readAsDataURL(file);
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-gray-900">Logo công ty</h3>
+                                            <p className="text-sm text-gray-500 mt-1">Chấp nhận JPG, PNG dung lượng tối đa 2MB. Logo hiển thị trên các tin tuyển dụng.</p>
+                                        </div>
+                                    </div>
+
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-gray-700">Tên công ty</label>
                                         <input
                                             type="text" name="companyName" placeholder="Tên doanh nghiệp của bạn"
                                             value={formData.companyName} onChange={handleInputChange}
-                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:bg-white transition-all outline-none"
+                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0A2463] focus:bg-white transition-all outline-none"
                                         />
                                     </div>
                                     <div className="space-y-2">

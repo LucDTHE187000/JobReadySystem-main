@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { isEmployerRole, isLocalDev } from '../../utils/roles';
+import { isEmployerRole, isAdminRole, isLocalDev } from '../../utils/roles';
 
 export function ProtectedRoute({ children }) {
     const { user, loading } = useAuth();
@@ -15,6 +15,21 @@ export function ProtectedRoute({ children }) {
     return children;
 }
 
+/** Chỉ dành cho Admin — redirect về / nếu không phải ADMIN */
+export function AdminRoute({ children }) {
+    const { user, loading } = useAuth();
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-[#F4F6FB]">
+                <p className="text-[#5A6482] font-medium">Đang tải...</p>
+            </div>
+        );
+    }
+    if (!user) return <Navigate to="/login" replace />;
+    if (!isAdminRole(user.role)) return <Navigate to="/" replace />;
+    return children;
+}
+
 /** Chỉ ứng viên — redirect employer về trang chủ (trừ localhost dev có thể vào employer) */
 export function JobSeekerRoute({ children }) {
     const { user, loading } = useAuth();
@@ -26,6 +41,8 @@ export function JobSeekerRoute({ children }) {
         );
     }
     if (!user) return <Navigate to="/login" replace />;
+    // Admin và Employer không được vào route của Job Seeker
+    if (isAdminRole(user.role)) return <Navigate to="/admin/dashboard" replace />;
     if (isEmployerRole(user.role) && !isLocalDev()) {
         return <Navigate to="/" replace />;
     }
@@ -43,6 +60,8 @@ export function EmployerRoute({ children }) {
         );
     }
     if (!user) return <Navigate to="/login" replace />;
+    // Admin không dùng employer routes — redirect về admin dashboard
+    if (isAdminRole(user.role)) return <Navigate to="/admin/dashboard" replace />;
     if (!isLocalDev() && !isEmployerRole(user.role)) {
         return <Navigate to="/" replace />;
     }
@@ -62,6 +81,8 @@ export function NoEmployerRoute({ children }) {
             </div>
         );
     }
+    // Admin có thể xem tất cả các trang công khai
+    if (user && isAdminRole(user.role)) return children;
     if (user && isEmployerRole(user.role) && !isLocalDev()) {
         return <Navigate to="/dashboard" replace />;
     }

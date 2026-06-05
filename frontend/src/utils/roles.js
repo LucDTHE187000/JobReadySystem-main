@@ -5,8 +5,14 @@ export function isLocalDev() {
     return h === 'localhost' || h === '127.0.0.1';
 }
 
+/** Chỉ Employer thuần — KHÔNG bao gồm Admin */
 export function isEmployerRole(role) {
-    return role === 'EMPLOYER' || role === 'ADMIN';
+    return role === 'EMPLOYER';
+}
+
+/** Chỉ Admin */
+export function isAdminRole(role) {
+    return role === 'ADMIN';
 }
 
 export function isJobSeekerRole(role) {

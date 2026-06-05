@@ -110,6 +110,38 @@ export default function ManageCandidates() {
         });
     };
 
+    const handleUpdateStatus = async (appId, newStatus) => {
+        try {
+            const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+            if (!token) {
+                alert("Bạn chưa đăng nhập");
+                return;
+            }
+
+            await axios.put(
+                `http://localhost:4000/api/applications/${appId}/status`,
+                { status: newStatus },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            alert("Cập nhật trạng thái thành công");
+            setCandidates(prev =>
+                prev.map(item =>
+                    item._id === appId
+                        ? { ...item, status: newStatus }
+                        : item
+                )
+            );
+        } catch (err) {
+            console.error("Update status error:", err.response?.data || err);
+            alert("Có lỗi xảy ra khi cập nhật trạng thái");
+        }
+    };
+
 
     return (
         <div className="flex min-h-screen bg-[#F8FAFC]">
@@ -261,6 +293,18 @@ export default function ManageCandidates() {
                                                     <Calendar size={14} />
                                                     Hẹn phỏng vấn
                                                 </button>
+
+                                                {/* CẬP NHẬT TRẠNG THÁI */}
+                                                <select
+                                                    value={c.status}
+                                                    onChange={(e) => handleUpdateStatus(c._id, e.target.value)}
+                                                    className="px-2 py-1 text-xs border rounded-lg bg-white outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer font-medium"
+                                                >
+                                                    <option value="pending">Pending</option>
+                                                    <option value="interview">Interview</option>
+                                                    <option value="accepted">Accepted</option>
+                                                    <option value="rejected">Rejected</option>
+                                                </select>
 
                                             </div>
                                         </td>

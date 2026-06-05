@@ -19,6 +19,9 @@ import ApplicationRouter from "./modules/Application/jobApplication.router.js";
 import interviewRouter from "./modules/interview/interview.router.js";
 import paymentRouter from "./modules/payment/payment.router.js";
 import feedbackRouter from "./modules/feedback/feedback.router.js";
+import { courseRouter } from "./modules/courses/course.router.js";
+import { seedCourses } from "./modules/courses/course.seeder.js";
+import { adminRouter } from "./modules/admin/admin.router.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -80,6 +83,8 @@ app.use("/api/applications", ApplicationRouter);
 app.use("/api/interview", interviewRouter);
 app.use("/api/payment", paymentRouter);
 app.use("/api/feedback", feedbackRouter);
+app.use("/api/courses", courseRouter);
+app.use("/api/admin", adminRouter);
 
 
 // ===== ERROR HANDLER =====
@@ -115,6 +120,7 @@ async function start() {
     console.log("🔄 Connecting to database...");
     await connectDatabase();
     console.log("✅ Database connected successfully");
+    await seedCourses();
 
     const server = app.listen(PORT, HOST, () => {
       const displayHost = HOST === "0.0.0.0" ? "localhost" : HOST;

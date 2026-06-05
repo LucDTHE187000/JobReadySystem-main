@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema(
     avatar: { type: String },
     avatarUrl: { type: String },
     isActive: { type: Boolean, default: true },
+    isApproved: { type: Boolean, default: false }, // Dùng cho Employer: Admin duyệt mới được đăng tin
     language: { type: String, enum: ["EN", "VI"], default: "VI" },
 
     credits: { type: Number, default: 14000, min: 0 },
@@ -44,6 +45,7 @@ const userSchema = new mongoose.Schema(
     skills: [{ type: String }],
     experience: { type: String },
     education: { type: String },
+    savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
 
     // Thông tin cho Employer
     companyName: { type: String },

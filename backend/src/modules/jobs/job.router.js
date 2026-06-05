@@ -38,8 +38,49 @@ router.get("/search", async (req, res) => {
       query.jobType = { $in: types };
     }
 
-    if (salaryMin) query["salary.min"] = { $gte: Number(salaryMin) };
-    if (salaryMax) query["salary.max"] = { $lte: Number(salaryMax) };
+    // Convert salary filtering
+    const hasSalaryMin = salaryMin !== undefined && salaryMin !== "";
+    const hasSalaryMax = salaryMax !== undefined && salaryMax !== "";
+
+    if (hasSalaryMin || hasSalaryMax) {
+      const isNegotiableSearch = (salaryMin === '0' && salaryMax === '0') || (Number(salaryMin) === 0 && Number(salaryMax) === 0 && hasSalaryMin && hasSalaryMax);
+      
+      if (isNegotiableSearch) {
+        query["salary.min"] = 0;
+        query["salary.max"] = 0;
+      } else {
+        const conditions = [];
+
+        if (hasSalaryMin) {
+          let minVal = Number(salaryMin);
+          if (minVal < 1000) minVal = minVal * 1000000;
+          conditions.push({
+            $or: [
+              { "salary.min": { $gte: minVal } },
+              { "salary.max": { $gte: minVal } }
+            ]
+          });
+        }
+
+        if (hasSalaryMax) {
+          let maxVal = Number(salaryMax);
+          if (maxVal < 1000) maxVal = maxVal * 1000000;
+          conditions.push({ "salary.min": { $lte: maxVal, $gt: 0 } });
+        } else if (hasSalaryMin) {
+          conditions.push({
+            $or: [
+              { "salary.min": { $gt: 0 } },
+              { "salary.max": { $gt: 0 } }
+            ]
+          });
+        }
+
+        if (conditions.length > 0) {
+          query.$and = query.$and || [];
+          query.$and.push(...conditions);
+        }
+      }
+    }
 
     const sortOrder = sort === "newest" ? { isPremium: -1, createdAt: -1 } : { isPremium: -1, salary: -1 };
     const skip = (Number(page) - 1) * Number(limit);
@@ -101,6 +142,12 @@ router.get(
 router.get("/job-application", authMiddleware, controller.getMyJobs);
 
 router.patch("/:jobId/toggle-status", authMiddleware, controller.toggleJobStatus);
+router.put("/:jobId", authMiddleware, controller.updateJob);
+router.delete("/:jobId", authMiddleware, controller.deleteJob);
+
+/* ===== SAVED JOBS: Lưu và lấy tin tuyển dụng đã lưu ===== */
+router.get("/saved", authMiddleware, controller.getSavedJobs);
+router.post("/:jobId/save", authMiddleware, controller.saveJob);
 
 /* ===== PUBLIC: Job detail cho job seeker ===== */
 router.get("/:jobId", async (req, res) => {

@@ -115,4 +115,45 @@ export const setInterviewDate = async (req, res) => {
     }
 };
 
+export const updateApplicationStatus = async (req, res) => {
+    try {
+        const recruiterId = req.user?.userId;
+        if (!recruiterId) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const { id } = req.params;
+        const { status } = req.body;
+
+        if (!status || !["pending", "interview", "accepted", "rejected"].includes(status)) {
+            return res.status(400).json({ message: "Trạng thái không hợp lệ" });
+        }
+
+        const application = await JobApplication.findById(id);
+        if (!application) {
+            return res.status(404).json({ message: "Không tìm thấy hồ sơ ứng tuyển" });
+        }
+
+        const job = await Job.findById(application.jobId);
+        if (!job) {
+            return res.status(404).json({ message: "Không tìm thấy tin tuyển dụng" });
+        }
+
+        if (job.recruiterId.toString() !== recruiterId.toString()) {
+            return res.status(403).json({ message: "Forbidden" });
+        }
+
+        application.status = status;
+        await application.save();
+
+        return res.status(200).json({
+            message: "Cập nhật trạng thái thành công",
+            data: application
+        });
+    } catch (error) {
+        console.error("Update Application Status Error:", error);
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 

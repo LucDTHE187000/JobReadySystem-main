@@ -136,11 +136,22 @@ export class AuthService {
             token,
             user: {
                 id: user._id,
+                _id: user._id,
                 email: user.email,
                 name: user.name,
                 role: user.role,
                 language: user.language,
                 credits: user.credits ?? 14000,
+                phone: user.phone || '',
+                address: user.address || '',
+                avatar: user.avatar || '',
+                avatarUrl: user.avatarUrl || '',
+                skills: user.skills || [],
+                experience: user.experience || '',
+                education: user.education || '',
+                companyName: user.companyName || '',
+                companyDescription: user.companyDescription || '',
+                companyWebsite: user.companyWebsite || '',
             },
         };
     }

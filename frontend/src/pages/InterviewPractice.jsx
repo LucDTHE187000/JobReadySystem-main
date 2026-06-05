@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Users, Target, Zap, AlertCircle, FileText } from 'lucide-react';
+import { Users, Target, Zap, AlertCircle, FileText, CheckCircle2 } from 'lucide-react';
 import SeekerLayout from '../components/layout/SeekerLayout';
+import Header from '../components/ui/Header';
+import Footer from '../components/ui/Footer';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -41,6 +43,7 @@ export default function InterviewPractice() {
     const [error, setError] = useState('');
     const [cvScore, setCvScore] = useState(null);
     const [cvLoading, setCvLoading] = useState(true);
+    const [hasCv, setHasCv] = useState(false);
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
     const currentDifficulty = DIFFICULTY_LEVELS.find((d) => d.level === formData.difficultyLevel) || DIFFICULTY_LEVELS[1];
@@ -54,6 +57,7 @@ export default function InterviewPractice() {
                 });
 
                 if (res.data?.cvs && res.data.cvs.length > 0) {
+                    setHasCv(true);
                     const latestCv = res.data.cvs[res.data.cvs.length - 1];
                     if (latestCv?.analysis?.score) {
                         setCvScore(latestCv.analysis.score);
@@ -61,10 +65,12 @@ export default function InterviewPractice() {
                         setCvScore(null);
                     }
                 } else {
+                    setHasCv(false);
                     setCvScore(null);
                 }
             } catch (err) {
                 console.error('Error fetching CV:', err);
+                setHasCv(false);
                 setCvScore(null);
             } finally {
                 setCvLoading(false);
@@ -120,74 +126,79 @@ export default function InterviewPractice() {
         }
     };
 
-    if (!cvLoading && (!cvScore || cvScore < 60)) {
-        return (
-            <div className="min-h-screen bg-[#F4F6FB] flex flex-col">
-                <Header />
-                <div className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex items-center justify-center">
-                    <div className="bg-white rounded-3xl shadow-xl p-8 max-w-2xl border-2 border-[#F5C518] w-full">
-                        <div className="flex items-center gap-4 mb-6">
-                            <AlertCircle className="w-12 h-12 text-[#0A2463] flex-shrink-0" />
-                            <div>
-                                <h2 className="font-heading text-2xl text-[#0A2463]">CV Chưa Đủ Điều Kiện</h2>
-                                <p className="text-[#5A6482] text-sm mt-1">Điểm CV: {cvScore ? `${cvScore}/100` : 'Chưa có CV'}</p>
-                            </div>
-                        </div>
-
-                        <div className="bg-[#F5C518]/10 border border-[#F5C518]/30 rounded-2xl p-6 mb-6">
-                            <p className="text-[#5A6482] leading-relaxed mb-4">
-                                Để bảo đảm chất lượng, bạn cần CV với điểm đánh giá <strong className="text-[#0A2463]">từ 60 điểm trở lên</strong>.
-                            </p>
-                            <p className="text-[#5A6482]">
-                                {!cvScore ? '🚀 Hãy tải lên CV của bạn' : '📈 Hãy cải thiện CV của bạn'} để tiếp tục luyện tập!
-                            </p>
-                        </div>
-
-                        {!cvScore && (
-                            <div className="bg-[#0A2463]/5 border border-[#DDE3F0] rounded-2xl p-6 mb-6">
-                                <h3 className="font-bold text-[#0A2463] mb-3 flex items-center gap-2">
-                                    <FileText className="w-5 h-5" />
-                                    Chưa Có CV?
-                                </h3>
-                                <p className="text-[#5A6482] text-sm">
-                                    Tải lên CV để nhận điểm đánh giá chi tiết từ AI.
-                                </p>
-                            </div>
-                        )}
-
-                        <div className="flex gap-4">
-                            <button
-                                onClick={() => navigate('/cv-upload')}
-                                className="flex-1 px-6 py-3 bg-[#0A2463] text-white font-semibold rounded-lg hover:bg-[#071A4A] transition-all flex items-center justify-center gap-2"
-                            >
-                                <FileText className="w-5 h-5" />
-                                {!cvScore ? 'Tải lên CV ngay' : 'Cải thiện CV'}
-                            </button>
-                            <button
-                                onClick={() => navigate('/')}
-                                className="px-6 py-3 bg-[#F4F6FB] text-[#5A6482] font-semibold rounded-lg hover:bg-[#DDE3F0] transition-colors border border-[#DDE3F0]"
-                            >
-                                Quay lại
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <Footer />
-            </div>
-        );
-    }
-
     return (
         <SeekerLayout title="Luyện phỏng vấn AI" breadcrumb="Phỏng vấn › Cấu hình">
             <div className="max-w-5xl mx-auto w-full">
                 <div className="mb-8">
                     <h1 className="text-2xl sm:text-3xl font-bold text-[#0A2463] mb-2">Luyện tập phỏng vấn cùng AI</h1>
                     <p className="text-lg text-[#5A6482]">Luyện tập phỏng vấn với AI, nhận feedback realtime</p>
-                    {cvScore && (
-                        <div className="mt-4 inline-block px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
-                            <p className="text-sm text-green-700 font-semibold">
-                                ✓ CV của bạn đạt {cvScore}/100 — Sẵn sàng luyện tập!
-                            </p>
+
+                    {/* CV Status Alert Box */}
+                    {!cvLoading && (
+                        <div className="mt-4">
+                            {/* Case A: User has never uploaded or scanned a CV */}
+                            {!hasCv && (
+                                <div className="p-5 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-4 shadow-sm">
+                                    <FileText className="w-6 h-6 text-[#0A2463] flex-shrink-0 mt-0.5" />
+                                    <div className="flex-1">
+                                        <h4 className="font-bold text-[#0A2463] text-sm sm:text-base">🚀 Tối ưu hóa phỏng vấn với CV của bạn</h4>
+                                        <p className="text-xs sm:text-sm text-[#5A6482] mt-1 leading-relaxed">
+                                            Bạn chưa tải lên CV. Bạn có thể <strong>tải lên CV có sẵn</strong> hoặc <strong>tự thiết kế CV online</strong> trực tiếp trên hệ thống để AI có thể chấm điểm, phân tích kỹ năng và đưa ra các câu hỏi phỏng vấn sát thực tế nhất cho bạn.
+                                        </p>
+                                        <div className="mt-3">
+                                            <button
+                                                onClick={() => navigate('/cv-upload')}
+                                                className="px-4 py-2 bg-[#0A2463] hover:bg-[#071A4A] text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
+                                            >
+                                                <FileText className="w-4 h-4" />
+                                                Tải lên hoặc Thiết kế CV ngay
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Case B: User has scanned a CV and score < 60 */}
+                            {hasCv && (cvScore === null || cvScore < 60) && (
+                                <div className="p-5 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-4 shadow-sm">
+                                    <AlertCircle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
+                                    <div className="flex-1">
+                                        <h4 className="font-bold text-amber-800 text-sm sm:text-base">⚠️ CV của bạn cần được cải thiện</h4>
+                                        <p className="text-xs sm:text-sm text-amber-700 mt-1 leading-relaxed">
+                                            Điểm CV của bạn hiện tại dưới mức khuyến nghị (60 điểm) {cvScore ? `(${cvScore}/100)` : ''}.
+                                            Chúng tôi khuyên bạn nên cải thiện CV trước khi ứng tuyển. Tuy nhiên, bạn vẫn có thể tiếp tục luyện tập phỏng vấn.
+                                        </p>
+                                        <p className="text-xs sm:text-sm text-amber-600/90 mt-1.5 font-mono italic bg-amber-100/50 p-2 rounded-lg border border-amber-200/50">
+                                            "Your CV score is below the recommended threshold (60 points). We recommend improving your CV before applying for jobs. However, you may still continue to practice interviews."
+                                        </p>
+                                        <div className="mt-3 flex gap-3">
+                                            <button
+                                                onClick={() => navigate('/cv-upload')}
+                                                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
+                                            >
+                                                <FileText className="w-4 h-4" />
+                                                Cải thiện hoặc Tạo lại CV
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Case C: User has scanned a CV and score >= 60 */}
+                            {hasCv && cvScore >= 60 && (
+                                <div className="p-5 bg-green-50 border border-green-200 rounded-xl flex items-start gap-4 shadow-sm">
+                                    <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                                    <div className="flex-1">
+                                        <h4 className="font-bold text-green-800 text-sm sm:text-base">✓ CV đạt yêu cầu chất lượng</h4>
+                                        <p className="text-xs sm:text-sm text-green-700 mt-1 leading-relaxed">
+                                            CV của bạn đạt chất lượng khuyến nghị ({cvScore}/100). Bạn đã sẵn sàng để phỏng vấn.
+                                        </p>
+                                        <p className="text-xs sm:text-sm text-green-600/90 mt-1.5 font-mono italic bg-green-100/50 p-2 rounded-lg border border-green-200/50">
+                                            "Your CV meets the recommended quality threshold. You are ready to participate in AI Interview."
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

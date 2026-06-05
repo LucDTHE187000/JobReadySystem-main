@@ -4,8 +4,9 @@ import {
   Briefcase,
   ChevronRight,
   MessageSquare,
+  Search,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Sidebar = ({
   sidebarOpen,
@@ -15,6 +16,26 @@ const Sidebar = ({
   profile,
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
+
+  const getActiveMenu = () => {
+    if (activeMenu) return activeMenu;
+    if (currentPath === "/dashboard") return "home";
+    if (
+      currentPath === "/job-application" ||
+      currentPath === "/create" ||
+      currentPath.startsWith("/edit-job") ||
+      currentPath.startsWith("/job-applications")
+    )
+      return "jobs";
+    if (currentPath === "/candidate") return "candidates";
+    if (currentPath === "/candidate-search") return "candidate-search";
+    if (currentPath === "/employer/feedback") return "feedback";
+    return "";
+  };
+
+  const active = getActiveMenu();
 
   return (
     <aside
@@ -47,36 +68,45 @@ const Sidebar = ({
         <MenuItem
           icon={<Home size={20} />}
           label="Tổng quan"
-          active={activeMenu === "home"}
+          active={active === "home"}
           onClick={() => {
-            setActiveMenu("home");
+            setActiveMenu?.("home");
             navigate("/dashboard");
           }}
         />
         <MenuItem
           icon={<Briefcase size={20} />}
           label="Quản lý công việc"
-          active={activeMenu === "jobs"}
+          active={active === "jobs"}
           onClick={() => {
-            setActiveMenu("jobs");
+            setActiveMenu?.("jobs");
             navigate("/job-application");
           }}
         />
         <MenuItem
           icon={<Users size={20} />}
           label="Danh sách ứng viên"
-          active={activeMenu === "candidates"}
+          active={active === "candidates"}
           onClick={() => {
-            setActiveMenu("candidates");
+            setActiveMenu?.("candidates");
             navigate("/candidate");
+          }}
+        />
+        <MenuItem
+          icon={<Search size={20} />}
+          label="Tìm kiếm ứng viên"
+          active={active === "candidate-search"}
+          onClick={() => {
+            setActiveMenu?.("candidate-search");
+            navigate("/candidate-search");
           }}
         />
         <MenuItem
           icon={<MessageSquare size={20} />}
           label="Feedback"
-          active={activeMenu === "feedback"}
+          active={active === "feedback"}
           onClick={() => {
-            setActiveMenu("feedback");
+            setActiveMenu?.("feedback");
             navigate("/employer/feedback");
           }}
         />

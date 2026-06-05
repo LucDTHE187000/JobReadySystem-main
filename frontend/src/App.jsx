@@ -2,7 +2,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
-import { ProtectedRoute, JobSeekerRoute, EmployerRoute, NoEmployerRoute } from './components/guards/RoleGuards';
+import { ProtectedRoute, AdminRoute, JobSeekerRoute, EmployerRoute, NoEmployerRoute } from './components/guards/RoleGuards';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -27,6 +27,9 @@ import InterviewHistory from './pages/InterviewHistory';
 import InterviewAnalytics from './pages/InterviewAnalytics';
 import Feedback from './pages/Feedback';
 import FeedbackReview from './pages/FeedbackReview';
+import Learning from './pages/Learning';
+import CandidateSearch from './pages/Job/CandidateSearch';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
@@ -59,11 +62,22 @@ function App() {
             <Route path="/create" element={
               <EmployerRoute><CreateJob /></EmployerRoute>
             } />
+            <Route path="/edit-job/:jobId" element={
+              <EmployerRoute><CreateJob /></EmployerRoute>
+            } />
             <Route path="/job-applications/:jobId" element={
               <EmployerRoute><JobDetail /></EmployerRoute>
             } />
             <Route path="/candidate" element={
               <EmployerRoute><ManageCandidates /></EmployerRoute>
+            } />
+            <Route path="/candidate-search" element={
+              <EmployerRoute><CandidateSearch /></EmployerRoute>
+            } />
+
+            <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="/admin/dashboard" element={
+              <AdminRoute><AdminDashboard /></AdminRoute>
             } />
 
             <Route path="/profile" element={
@@ -77,6 +91,9 @@ function App() {
             } />
             <Route path="/interview" element={
               <JobSeekerRoute><InterviewPractice /></JobSeekerRoute>
+            } />
+            <Route path="/learning" element={
+              <JobSeekerRoute><Learning /></JobSeekerRoute>
             } />
             <Route path="/employer/feedback" element={
               <EmployerRoute><FeedbackReview /></EmployerRoute>

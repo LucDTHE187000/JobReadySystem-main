@@ -1,5 +1,5 @@
 import express from "express";
-import { getCompanyApplicants, setInterviewDate, getMyApplications } from "./jobApplication.controller.js";
+import { getCompanyApplicants, setInterviewDate, getMyApplications, updateApplicationStatus } from "./jobApplication.controller.js";
 import { authMiddleware } from "../../middleware/auth.middleware.js";
 import jobController from "../jobs/job.controller.js";
 
@@ -21,5 +21,10 @@ router.put(
     "/:id/interview",
     authMiddleware,
     setInterviewDate
+);
+router.put(
+    "/:id/status",
+    authMiddleware,
+    updateApplicationStatus
 );
 export default router;

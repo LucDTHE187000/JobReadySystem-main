@@ -15,3 +15,7 @@ userRouter.post("/change-password", UserController.changePassword);
 
 // Nạp credit
 userRouter.post("/credits/topup", UserController.topupCredits);
+
+// Tìm kiếm ứng viên (dành cho Recruiter)
+userRouter.get("/candidates/search", UserController.searchCandidates);
+userRouter.post("/candidates/contact", UserController.contactCandidate);

@@ -49,13 +49,46 @@ export default function Dashboard() {
         }
     }, [user]);
 
-    // Hardcoded stats for now as no backend endpoints exist
-    const stats = [
-        { label: 'Tổng số hồ sơ', value: '1,240', icon: FileText, change: '+8%' },
-        { label: 'Lượt xem hồ sơ', value: '5,820', icon: Eye, change: '+12%' },
-        { label: 'Phỏng vấn', value: '45', icon: Calendar, change: '+5%' },
-        { label: 'Tỷ lệ thuyết đi', value: '3.2%', icon: TrendingUp, change: '+2%' },
-    ];
+    const [stats, setStats] = useState([
+        { label: 'Tin tuyển dụng', value: '—', icon: FileText, change: '' },
+        { label: 'Ứng viên', value: '—', icon: Eye, change: '' },
+        { label: 'Chờ phỏng vấn', value: '—', icon: Calendar, change: '' },
+        { label: 'Tỷ lệ chấp nhận', value: '—', icon: TrendingUp, change: '' },
+    ]);
+
+    useEffect(() => {
+        const loadStats = async () => {
+            try {
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                if (!token) return;
+                const headers = { Authorization: `Bearer ${token}` };
+
+                const [jobsRes, appsRes] = await Promise.all([
+                    fetch('http://localhost:4000/api/jobs/my', { headers }),
+                    fetch('http://localhost:4000/api/applications/company/applicants', { headers }),
+                ]);
+                const jobsData = jobsRes.ok ? await jobsRes.json() : null;
+                const appsData = appsRes.ok ? await appsRes.json() : null;
+
+                const totalJobs = jobsData?.count ?? 0;
+                const applicants = appsData?.applicants ?? [];
+                const totalApplicants = applicants.length;
+                const interviewCount = applicants.filter(a => a.status === 'interview').length;
+                const acceptedCount = applicants.filter(a => a.status === 'accepted').length;
+                const acceptRate = totalApplicants > 0 ? ((acceptedCount / totalApplicants) * 100).toFixed(1) + '%' : '0%';
+
+                setStats([
+                    { label: 'Tin tuyển dụng', value: totalJobs.toString(), icon: FileText, change: '' },
+                    { label: 'Tổng ứng viên', value: totalApplicants.toString(), icon: Users, change: '' },
+                    { label: 'Chờ phỏng vấn', value: interviewCount.toString(), icon: Calendar, change: '' },
+                    { label: 'Tỷ lệ chấp nhận', value: acceptRate, icon: TrendingUp, change: '' },
+                ]);
+            } catch (err) {
+                console.error('Load stats error:', err);
+            }
+        };
+        loadStats();
+    }, []);
 
     const notifications = [
         {

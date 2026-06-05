@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     Home, FileText, BrainCircuit, History, BarChart3, User, LogOut,
-    Briefcase, ClipboardList, CreditCard, Plus, MessageSquare,
+    Briefcase, ClipboardList, CreditCard, Plus, MessageSquare, BookOpen
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -10,6 +10,7 @@ const NAV = [
     { to: '/jobs', label: 'Tìm việc', icon: Briefcase },
     { to: '/cv-upload', label: 'Chấm CV', icon: FileText },
     { to: '/interview', label: 'Phỏng vấn AI', icon: BrainCircuit },
+    { to: '/learning', label: 'Học tập', icon: BookOpen },
     { to: '/interview-history', label: 'Lịch sử PV', icon: History },
     { to: '/interview-analytics', label: 'Phân tích', icon: BarChart3 },
     { to: '/my-applications', label: 'Ứng tuyển', icon: ClipboardList },

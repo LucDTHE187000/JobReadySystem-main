@@ -25,9 +25,17 @@ function timeAgo(dateStr) {
 
 function formatSalary(salary) {
     if (!salary) return 'Thỏa thuận';
-    const { min, max, currency } = salary;
-    const unit = currency === 'VND' ? ' triệu VNĐ' : (currency || '');
+    let { min, max, currency } = salary;
     if (!min && !max) return 'Thỏa thuận';
+    
+    const isVND = currency === 'VND' || !currency || currency.toUpperCase() === 'VND';
+    const unit = isVND ? ' triệu VNĐ' : ` ${currency}`;
+    
+    if (isVND) {
+        if (min >= 100000) min = min / 1000000;
+        if (max >= 100000) max = max / 1000000;
+    }
+    
     if (min && max) return `${min.toLocaleString()} - ${max.toLocaleString()}${unit}`;
     if (min) return `Từ ${min.toLocaleString()}${unit}`;
     if (max) return `Đến ${max.toLocaleString()}${unit}`;
@@ -343,8 +351,24 @@ export default function PublicJobDetail() {
     const [copied, setCopied] = useState(false);
 
     useEffect(() => {
-        const saved = JSON.parse(localStorage.getItem('savedJobs') || '[]');
-        setSaved(saved.includes(jobId));
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (token) {
+            axios.get(`${API_URL}/api/jobs/saved`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            .then(res => {
+                const list = res.data.data || [];
+                setSaved(list.some(j => j._id === jobId));
+            })
+            .catch(err => {
+                console.error("Error checking saved job:", err);
+                const localSaved = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+                setSaved(localSaved.includes(jobId));
+            });
+        } else {
+            const saved = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+            setSaved(saved.includes(jobId));
+        }
     }, [jobId]);
 
     useEffect(() => {
@@ -361,11 +385,23 @@ export default function PublicJobDetail() {
             .finally(() => setLoading(false));
     }, [jobId]);
 
-    const handleSave = () => {
-        const list = JSON.parse(localStorage.getItem('savedJobs') || '[]');
-        const next = saved ? list.filter(id => id !== jobId) : [...list, jobId];
-        localStorage.setItem('savedJobs', JSON.stringify(next));
-        setSaved(!saved);
+    const handleSave = async () => {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (token) {
+            try {
+                const res = await axios.post(`${API_URL}/api/jobs/${jobId}/save`, {}, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setSaved(res.data.isSaved);
+            } catch (err) {
+                console.error("Error saving job:", err);
+            }
+        } else {
+            const list = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+            const next = saved ? list.filter(id => id !== jobId) : [...list, jobId];
+            localStorage.setItem('savedJobs', JSON.stringify(next));
+            setSaved(!saved);
+        }
     };
 
     const handleOpenApply = () => {

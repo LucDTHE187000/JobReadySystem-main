@@ -2,6 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 @theme {
+  --font-sans: 'Poppins', sans-serif;
   --color-navy: #0A2463;
   --color-navy-light: #1A3A7C;
   --color-navy-dark: #071A4A;
