@@ -21,6 +21,7 @@ export default function Register() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [userType, setUserType] = useState('candidate');
     const [error, setError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const { signUp, user } = useAuth();
@@ -38,6 +39,7 @@ export default function Register() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setPasswordError('');
         setSuccessMessage('');
 
         if (!fullName.trim()) {
@@ -58,15 +60,15 @@ export default function Register() {
             return;
         }
         if (!password) {
-            setError('Mật khẩu không được để trống');
+            setPasswordError('Mật khẩu không được để trống');
             return;
         }
         if (password.length < 6) {
-            setError('Mật khẩu phải có ít nhất 6 ký tự');
+            setPasswordError('Mật khẩu phải có ít nhất 6 ký tự');
             return;
         }
         if (password !== confirmPassword) {
-            setError('Mật khẩu xác nhận không khớp');
+            setPasswordError('Mật khẩu xác nhận không khớp');
             return;
         }
 
@@ -160,7 +162,16 @@ export default function Register() {
                         </div>
 
                         <div>
-                            <label htmlFor="email" className="block text-sm font-semibold text-[#0A2463] mb-2">Email công việc</label>
+                            <div className="flex items-center gap-1.5 mb-2">
+                                <label htmlFor="email" className="block text-sm font-semibold text-[#0A2463] mb-0">Email công việc</label>
+                                <div className="group relative flex items-center">
+                                    <AlertTriangle size={14} className="text-amber-500 cursor-pointer" />
+                                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-72 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl shadow-lg z-50">
+                                        <strong>Bạn hãy nhập email chính thức!</strong> Để nhận mã xác thực OTP và liên hệ từ nhà tuyển dụng.
+                                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-amber-100"></div>
+                                    </div>
+                                </div>
+                            </div>
                             <input
                                 id="email"
                                 type="email"
@@ -170,11 +181,9 @@ export default function Register() {
                                 className="w-full px-4 py-3 bg-[#F4F6FB] border border-[#DDE3F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A2463]"
                                 required
                             />
-                            <p className="text-[11px] text-amber-600 mt-1.5 leading-normal flex items-start gap-1">
-                                <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
-                                <span>
-                                    <strong>Bạn hãy nhập email chính thức!</strong> Để nhận liên hệ từ nhà tuyển dụng và nhận lại mật khẩu mới khi sử dụng tính năng quên mật khẩu.
-                                </span>
+                            <p className="mt-1.5 text-xs text-amber-600 flex items-start gap-1 font-medium animate-pulse">
+                                <AlertTriangle size={13} className="mt-0.5 flex-shrink-0 text-amber-500" />
+                                <span>Lưu ý: Hãy nhập đúng email chính thức để nhận mã kích hoạt OTP.</span>
                             </p>
                         </div>
 
@@ -214,6 +223,11 @@ export default function Register() {
                                 </div>
                             </div>
                         </div>
+                        {passwordError && (
+                            <div className="mt-2 text-xs text-red-600 bg-red-50 border border-red-200 p-2.5 rounded-lg">
+                                {passwordError}
+                            </div>
+                        )}
 
                         <div className="flex items-start gap-2">
                             <input type="checkbox" className="mt-1 accent-[#0A2463]" required />

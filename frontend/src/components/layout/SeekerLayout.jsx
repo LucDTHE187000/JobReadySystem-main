@@ -26,8 +26,14 @@ export default function SeekerLayout({ children, title, breadcrumb }) {
     const credits = user?.credits ?? 14000;
 
     return (
-        <div className="min-h-screen flex bg-[#F4F6FB]">
-            <aside className="hidden lg:flex w-64 min-h-screen bg-[#0A2463] flex-col flex-shrink-0">
+        <div 
+            className="min-h-screen flex bg-cover bg-center bg-no-repeat bg-fixed relative"
+            style={{ backgroundImage: `url('/background3.jpg')` }}
+        >
+            {/* Premium backdrop-blur and dark-gradient overlay */}
+            <div className="absolute inset-0 bg-[#030a21]/20 backdrop-blur-[0.5px] pointer-events-none" />
+
+            <aside className="relative z-10 hidden lg:flex w-64 min-h-screen bg-[#030A21]/75 backdrop-blur-md flex-col flex-shrink-0 border-r border-white/10">
                 <div className="p-5 border-b border-white/10">
                     <Link to="/" className="flex items-center gap-2">
                         <div className="w-9 h-9 bg-[#F5C518] rounded-lg flex items-center justify-center font-bold text-[#0A2463] text-sm">JR</div>
@@ -93,18 +99,18 @@ export default function SeekerLayout({ children, title, breadcrumb }) {
                 </div>
             </aside>
 
-            <div className="flex-1 flex flex-col min-w-0">
-                <header className="lg:hidden sticky top-0 z-40 bg-[#0A2463] px-4 py-3 flex items-center justify-between">
+            <div className="relative z-10 flex-1 flex flex-col min-w-0">
+                <header className="lg:hidden sticky top-0 z-40 bg-[#030A21]/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-white/10">
                     <Link to="/" className="font-bold text-white">JOB<span className="text-[#F5C518]">READY</span></Link>
                     <span className="text-[#F5C518] font-bold text-sm">{credits} credit</span>
                 </header>
 
                 <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
                     {breadcrumb && (
-                        <p className="text-xs text-[#5A6482] mb-2">{breadcrumb}</p>
+                        <p className="text-xs text-white/60 mb-2">{breadcrumb}</p>
                     )}
                     {title && (
-                        <h1 className="text-2xl sm:text-3xl font-bold text-[#0A2463] mb-6">{title}</h1>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-6">{title}</h1>
                     )}
                     {children}
                 </main>

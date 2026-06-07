@@ -59,11 +59,18 @@ export class AuthService {
             expiresAt: otpExpires,
         });
 
-        // Gửi email chứa mã OTP
-        const emailResult = await sendOTPEmail(normalizedEmail, otpCode, normalizedName);
-        if (!emailResult.success) {
-            console.warn("⚠️ Email không gửi được, nhưng OTP đã được tạo. User có thể xem OTP trong console.");
-        }
+        // Gửi email chứa mã OTP (chạy ngầm không block request)
+        sendOTPEmail(normalizedEmail, otpCode, normalizedName)
+            .then(emailResult => {
+                if (!emailResult.success) {
+                    console.warn(`⚠️ Email không gửi được tới ${normalizedEmail}, nhưng OTP đã được tạo. Code: ${otpCode}`);
+                } else {
+                    console.log(`📧 Đã gửi OTP thành công tới ${normalizedEmail}. Code: ${otpCode}`);
+                }
+            })
+            .catch(err => {
+                console.error(`❌ Lỗi gửi email tới ${normalizedEmail}:`, err);
+            });
 
         // Tạo thông báo chào mừng
         try {
@@ -142,10 +149,18 @@ export class AuthService {
             expiresAt: otpExpires,
         });
 
-        const emailResult = await sendOTPEmail(email, otpCode, user.name);
-        if (!emailResult.success) {
-            console.warn("⚠️  Email không gửi được, nhưng OTP đã được tạo. User có thể xem OTP trong console.");
-        }
+        // Gửi email chứa mã OTP mới (chạy ngầm không block request)
+        sendOTPEmail(email, otpCode, user.name)
+            .then(emailResult => {
+                if (!emailResult.success) {
+                    console.warn(`⚠️ Email không gửi được tới ${email}, nhưng OTP đã được tạo. Code: ${otpCode}`);
+                } else {
+                    console.log(`📧 Đã gửi OTP mới thành công tới ${email}. Code: ${otpCode}`);
+                }
+            })
+            .catch(err => {
+                console.error(`❌ Lỗi gửi email tới ${email}:`, err);
+            });
 
         return { message: "New OTP sent successfully. Please check your email." };
     }
@@ -251,10 +266,18 @@ export class AuthService {
             verified: false,
         });
 
-        const emailResult = await sendResetPasswordEmail(email, otpCode, user.name);
-        if (!emailResult.success) {
-            console.warn("⚠️  Email không gửi được, nhưng OTP đã được tạo. User có thể xem OTP trong console.");
-        }
+        // Gửi email reset password (chạy ngầm không block request)
+        sendResetPasswordEmail(email, otpCode, user.name)
+            .then(emailResult => {
+                if (!emailResult.success) {
+                    console.warn(`⚠️ Email không gửi được tới ${email}, nhưng OTP đã được tạo. Code: ${otpCode}`);
+                } else {
+                    console.log(`📧 Đã gửi reset password OTP thành công tới ${email}. Code: ${otpCode}`);
+                }
+            })
+            .catch(err => {
+                console.error(`❌ Lỗi gửi email tới ${email}:`, err);
+            });
 
         return {
             success: true,

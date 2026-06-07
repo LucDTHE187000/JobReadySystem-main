@@ -246,7 +246,7 @@ export default function Login() {
                     <div className="bg-white/10 backdrop-blur p-4 rounded-3xl border border-white/20 relative">
                         <img src={LOGIN_IMAGE} alt="Professional" className="w-full h-72 object-cover rounded-2xl" />
                         <span className="absolute top-6 left-6 px-3 py-1.5 bg-[#F5C518] text-[#0A2463] font-bold text-xs rounded-full">
-                            ✦ 50,000+ cơ hội việc làm
+                            ✦ 50+ cơ hội việc làm
                         </span>
                     </div>
                 </div>
@@ -285,7 +285,16 @@ export default function Login() {
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
-                            <label htmlFor="email" className="block text-sm font-semibold text-[#0A2463] mb-2">Địa chỉ Email</label>
+                            <div className="flex items-center gap-1.5 mb-2">
+                                <label htmlFor="email" className="block text-sm font-semibold text-[#0A2463] mb-0">Địa chỉ Email</label>
+                                <div className="group relative flex items-center">
+                                    <AlertTriangle size={14} className="text-amber-500 cursor-pointer" />
+                                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-72 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl shadow-lg z-50">
+                                        <strong>Bạn hãy nhập email chính thức!</strong> Để nhận liên hệ từ nhà tuyển dụng và nhận lại mật khẩu mới khi sử dụng tính năng quên mật khẩu.
+                                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-amber-100"></div>
+                                    </div>
+                                </div>
+                            </div>
                             <input
                                 id="email"
                                 type="email"
@@ -295,12 +304,6 @@ export default function Login() {
                                 className="w-full px-4 py-3 bg-[#F4F6FB] border border-[#DDE3F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A2463] focus:border-transparent"
                                 required
                             />
-                            <p className="text-[11px] text-amber-600 mt-1.5 leading-normal flex items-start gap-1">
-                                <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
-                                <span>
-                                    <strong>Bạn hãy nhập email chính thức!</strong> Để nhận liên hệ từ nhà tuyển dụng và nhận lại mật khẩu mới khi sử dụng tính năng quên mật khẩu.
-                                </span>
-                            </p>
                         </div>
 
                         <div>

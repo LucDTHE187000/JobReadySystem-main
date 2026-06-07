@@ -14,6 +14,7 @@ export const siteImages = {
   feature1: '/logo-jobready.png',
   feature2: '/images/Hero_homepage.png',
   feature3: '/hero-main.jpg',
+  guestBg: '/background4.jpg',
 };
 
 export const teamMembers = [

@@ -63,21 +63,17 @@ export default function Testimonials() {
     const displayList = [...blogs, ...DEFAULT_TESTIMONIALS].slice(0, 3);
 
     return (
-        <section className="py-20 lg:py-28 bg-[#F4F6FB] relative overflow-hidden">
-            {/* Ambient Background Glows */}
-            <div className="absolute top-1/4 left-[-10%] w-[400px] h-[400px] bg-[#0A2463]/3 rounded-full blur-[110px] pointer-events-none" />
-            <div className="absolute bottom-1/4 right-[-10%] w-[450px] h-[450px] bg-[#F5C518]/6 rounded-full blur-[120px] pointer-events-none" />
-
+        <section className="py-20 lg:py-28 bg-transparent relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <ScrollReveal className="text-center mb-16" delay={100} type="slide" direction="up">
-                    <span className="inline-flex items-center gap-1.5 px-4.5 py-1.5 bg-[#0A2463]/5 text-[#0A2463] text-xs font-black rounded-full mb-4 uppercase tracking-widest border border-navy/5">
-                        <MessageSquare size={12} className="text-[#0A2463]" />
+                    <span className="inline-flex items-center gap-1.5 px-4.5 py-1.5 bg-white/10 text-white/95 border border-white/10 text-xs font-black rounded-full mb-4 uppercase tracking-widest">
+                        <MessageSquare size={12} className="text-white" />
                         Góc chia sẻ
                     </span>
-                    <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl text-[#0A2463] mb-4 font-black tracking-tight">
+                    <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl text-white mb-4 font-black tracking-tight">
                         ỨNG VIÊN <span className="text-gradient-gold font-black">CHIA SẺ TRẢI NGHIỆM</span>
                     </h2>
-                    <p className="text-[#5A6482] text-sm sm:text-base max-w-xl mx-auto font-light leading-relaxed">
+                    <p className="text-white/60 text-sm sm:text-base max-w-xl mx-auto font-light leading-relaxed">
                         Cảm nhận thực tế của các ứng viên đã sử dụng JobReady để nâng cấp hồ sơ và chinh phục nhà tuyển dụng thành công.
                     </p>
                 </ScrollReveal>
@@ -86,10 +82,10 @@ export default function Testimonials() {
                     {displayList.map((item, i) => (
                         <ScrollReveal key={item._id} delay={150 * (i + 1)} type="all" direction="up">
                             <div 
-                                className="bg-white/85 backdrop-blur-md rounded-2xl p-7 border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-[#0A2463]/5 hover:-translate-y-2 transition-all duration-500 flex flex-col justify-between relative group h-full glow-border-navy"
+                                className="bg-white/5 hover:bg-white/15 backdrop-blur-md rounded-2xl p-7 border border-white/10 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col justify-between relative group h-full glow-border-gold"
                             >
                                 {/* Decorative quotes */}
-                                <span className="absolute top-6 right-6 text-gray-100/80 group-hover:text-[#F5C518]/15 transition-colors duration-500 scale-105 group-hover:scale-110 pointer-events-none">
+                                <span className="absolute top-6 right-6 text-white/5 group-hover:text-[#F5C518]/15 transition-colors duration-500 scale-105 group-hover:scale-110 pointer-events-none">
                                     <Quote size={48} className="rotate-180" />
                                 </span>
 
@@ -105,28 +101,28 @@ export default function Testimonials() {
                                                 <Star 
                                                     key={star} 
                                                     size={14} 
-                                                    className={star <= item.rating ? 'fill-[#F5C518] text-[#F5C518]' : 'text-gray-200'}
+                                                    className={star <= item.rating ? 'fill-[#F5C518] text-[#F5C518]' : 'text-white/20'}
                                                 />
                                             ))}
                                         </div>
                                     </div>
 
-                                    <h3 className="font-heading text-lg font-bold text-[#0A2463] mb-3 leading-snug line-clamp-2">
+                                    <h3 className="font-heading text-lg font-bold text-white mb-3 leading-snug line-clamp-2">
                                         {item.title}
                                     </h3>
-                                    <p className="text-sm text-[#5A6482]/90 leading-relaxed mb-6 italic font-light">
+                                    <p className="text-sm text-white/85 leading-relaxed mb-6 italic font-light">
                                         "{item.description}"
                                     </p>
                                 </div>
 
                                 {/* Author info */}
-                                <div className="flex items-center gap-3 pt-5 border-t border-gray-100/50 mt-auto">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#0A2463] to-[#1A3A7C] text-white font-black flex items-center justify-center shadow-md">
+                                <div className="flex items-center gap-3 pt-5 border-t border-white/5 mt-auto">
+                                    <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 text-[#F5C518] font-black flex items-center justify-center shadow-md">
                                         {item.userId?.name?.charAt(0) || 'Ứ'}
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-sm text-[#0A2463]">{item.userId?.name || 'Ứng viên giấu tên'}</h4>
-                                        <p className="text-xs text-[#5A6482]">
+                                        <h4 className="font-bold text-sm text-white">{item.userId?.name || 'Ứng viên giấu tên'}</h4>
+                                        <p className="text-xs text-white/50">
                                             {new Date(item.createdAt).toLocaleDateString('vi-VN')}
                                         </p>
                                     </div>

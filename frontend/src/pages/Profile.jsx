@@ -119,8 +119,8 @@ export default function Profile() {
 
     const tabBtn = (key) =>
         activeTab === key
-            ? 'bg-[#0A2463]/10 text-[#0A2463] border-l-2 border-[#F5C518]'
-            : 'text-[#5A6482] hover:bg-[#F4F6FB] border-l-2 border-transparent';
+            ? 'bg-white/10 text-white border-l-2 border-[#F5C518] font-bold'
+            : 'text-white/60 hover:text-white hover:bg-white/5 border-l-2 border-transparent';
 
     const isEmployer = isEmployerRole(user?.role);
     const PageWrapper = isEmployer ? ({ children }) => <div className="min-h-screen bg-[#F4F6FB]">{children}</div> : SeekerLayout;
@@ -129,7 +129,7 @@ export default function Profile() {
         <PageWrapper title="Hồ sơ & Credit" breadcrumb="Tài khoản › Hồ sơ">
             <div className="max-w-5xl mx-auto w-full">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <div className="md:col-span-2 bg-[#0A2463] rounded-2xl p-6 text-white">
+                    <div className="md:col-span-2 bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white shadow-xl">
                         <p className="text-xs uppercase tracking-wider text-white/60 mb-1">Số dư credit</p>
                         <p className="text-4xl font-bold text-[#F5C518]">{credits.toLocaleString('vi-VN')}</p>
                     </div>
@@ -219,10 +219,10 @@ export default function Profile() {
 
                     {/* Content Area */}
                     <div className={isEmployer ? '' : 'md:col-span-3'}>
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+                        <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 sm:p-8 text-white shadow-xl">
 
                             {message.text && (
-                                <div className={`p-4 rounded-xl mb-6 text-sm flex items-center gap-2 ${message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+                                <div className={`p-4 rounded-xl mb-6 text-sm flex items-center gap-2 backdrop-blur-md ${message.type === 'success' ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/25' : 'bg-red-500/15 text-red-300 border border-red-500/25'
                                     }`}>
                                     <div className={`w-1.5 h-1.5 rounded-full ${message.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}></div>
                                     {message.text}
@@ -270,56 +270,56 @@ export default function Profile() {
                                             />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-semibold text-gray-900">Ảnh đại diện</h3>
-                                            <p className="text-sm text-gray-500 mt-1">Chấp nhận JPG, PNG dung lượng tối đa 2MB</p>
+                                            <h3 className="text-lg font-semibold text-white">Ảnh đại diện</h3>
+                                            <p className="text-sm text-white/60 mt-1">Chấp nhận JPG, PNG dung lượng tối đa 2MB</p>
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                            <label className="text-sm font-medium text-white/80 flex items-center gap-2">
                                                 <User size={16} className="text-gray-400" /> Họ và tên
                                             </label>
                                             <input
                                                 type="text" name="name"
                                                 value={formData.name} onChange={handleInputChange}
-                                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0A2463] focus:bg-white transition-all outline-none"
+                                                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-[#F5C518] focus:bg-transparent placeholder:text-white/30 transition-all outline-none"
                                                 required
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                            <label className="text-sm font-medium text-white/80 flex items-center gap-2">
                                                 <Mail size={16} className="text-gray-400" /> Email <span className="text-xs text-gray-400 font-normal">(Không thể đổi)</span>
                                             </label>
                                             <input
                                                 type="email" value={user?.email || ''} readOnly
-                                                className="w-full px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 cursor-not-allowed outline-none"
+                                                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white/40 cursor-not-allowed outline-none"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                            <label className="text-sm font-medium text-white/80 flex items-center gap-2">
                                                 <Phone size={16} className="text-gray-400" /> Số điện thoại
                                             </label>
                                             <input
                                                 type="tel" name="phone"
                                                 value={formData.phone} onChange={handleInputChange}
-                                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0A2463] focus:bg-white transition-all outline-none"
+                                                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-[#F5C518] focus:bg-transparent placeholder:text-white/30 transition-all outline-none"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                            <label className="text-sm font-medium text-white/80 flex items-center gap-2">
                                                 <MapPin size={16} className="text-gray-400" /> Địa chỉ
                                             </label>
                                             <input
                                                 type="text" name="address"
                                                 value={formData.address} onChange={handleInputChange}
-                                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0A2463] focus:bg-white transition-all outline-none"
+                                                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-[#F5C518] focus:bg-transparent placeholder:text-white/30 transition-all outline-none"
                                             />
                                         </div>
                                     </div>
 
                                     <div className="pt-4 flex justify-end">
-                                        <button disabled={loading} type="submit" className="flex items-center gap-2 px-6 py-2.5 bg-[#0A2463] text-white font-medium rounded-xl hover:bg-[#071A4A] transition-colors">
+                                        <button disabled={loading} type="submit" className="flex items-center gap-2 px-6 py-2.5 bg-[#F5C518] text-[#0A2463] font-bold rounded-xl hover:bg-[#D4A800] transition-colors">
                                             <Save size={18} /> Lưu thay đổi
                                         </button>
                                     </div>
@@ -329,32 +329,32 @@ export default function Profile() {
                             {activeTab === 'professional' && (
                                 <form onSubmit={handleSaveProfile} className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Kỹ năng (Cánh nhau bằng dấu phẩy)</label>
+                                        <label className="text-sm font-medium text-white/80">Kỹ năng (Cánh nhau bằng dấu phẩy)</label>
                                         <input
                                             type="text" name="skills" placeholder="React, Node.js, Design..."
                                             value={formData.skills} onChange={handleInputChange}
-                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:bg-white transition-all outline-none"
+                                            className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-[#F5C518] focus:bg-transparent placeholder:text-white/30 transition-all outline-none"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Kinh nghiệm làm việc</label>
+                                        <label className="text-sm font-medium text-white/80">Kinh nghiệm làm việc</label>
                                         <textarea
                                             name="experience" rows={4} placeholder="Mô tả kinh nghiệm của bạn..."
                                             value={formData.experience} onChange={handleInputChange}
-                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:bg-white transition-all outline-none"
+                                            className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-[#F5C518] focus:bg-transparent placeholder:text-white/30 transition-all outline-none"
                                         ></textarea>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Học vấn</label>
+                                        <label className="text-sm font-medium text-white/80">Học vấn</label>
                                         <textarea
                                             name="education" rows={3} placeholder="Trường đại học, chứng chỉ..."
                                             value={formData.education} onChange={handleInputChange}
-                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:bg-white transition-all outline-none"
+                                            className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-[#F5C518] focus:bg-transparent placeholder:text-white/30 transition-all outline-none"
                                         ></textarea>
                                     </div>
 
                                     <div className="pt-4 flex justify-end">
-                                        <button disabled={loading} type="submit" className="flex items-center gap-2 px-6 py-2.5 bg-[#0A2463] text-white font-medium rounded-xl hover:bg-[#071A4A] transition-colors">
+                                        <button disabled={loading} type="submit" className="flex items-center gap-2 px-6 py-2.5 bg-[#F5C518] text-[#0A2463] font-bold rounded-xl hover:bg-[#D4A800] transition-colors">
                                             <Save size={18} /> Lưu hồ sơ nghề nghiệp
                                         </button>
                                     </div>
@@ -403,38 +403,38 @@ export default function Profile() {
                                             />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-semibold text-gray-900">Logo công ty</h3>
-                                            <p className="text-sm text-gray-500 mt-1">Chấp nhận JPG, PNG dung lượng tối đa 2MB. Logo hiển thị trên các tin tuyển dụng.</p>
+                                            <h3 className="text-lg font-semibold text-white">Logo công ty</h3>
+                                            <p className="text-sm text-white/60 mt-1">Chấp nhận JPG, PNG dung lượng tối đa 2MB. Logo hiển thị trên các tin tuyển dụng.</p>
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Tên công ty</label>
+                                        <label className="text-sm font-medium text-white/80">Tên công ty</label>
                                         <input
                                             type="text" name="companyName" placeholder="Tên doanh nghiệp của bạn"
                                             value={formData.companyName} onChange={handleInputChange}
-                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0A2463] focus:bg-white transition-all outline-none"
+                                            className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-[#F5C518] focus:bg-transparent placeholder:text-white/30 transition-all outline-none"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Website công ty</label>
+                                        <label className="text-sm font-medium text-white/80">Website công ty</label>
                                         <input
                                             type="text" name="companyWebsite" placeholder="https://..."
                                             value={formData.companyWebsite} onChange={handleInputChange}
-                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:bg-white transition-all outline-none"
+                                            className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-[#F5C518] focus:bg-transparent placeholder:text-white/30 transition-all outline-none"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Mô tả công ty</label>
+                                        <label className="text-sm font-medium text-white/80">Mô tả công ty</label>
                                         <textarea
                                             name="companyDescription" rows={5} placeholder="Giới thiệu về văn hóa, lĩnh vực hoạt động..."
                                             value={formData.companyDescription} onChange={handleInputChange}
-                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:bg-white transition-all outline-none"
+                                            className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-[#F5C518] focus:bg-transparent placeholder:text-white/30 transition-all outline-none"
                                         ></textarea>
                                     </div>
 
                                     <div className="pt-4 flex justify-end">
-                                        <button disabled={loading} type="submit" className="flex items-center gap-2 px-6 py-2.5 bg-[#0A2463] text-white font-medium rounded-xl hover:bg-[#071A4A] transition-colors">
+                                        <button disabled={loading} type="submit" className="flex items-center gap-2 px-6 py-2.5 bg-[#F5C518] text-[#0A2463] font-bold rounded-xl hover:bg-[#D4A800] transition-colors">
                                             <Save size={18} /> Cập nhật công ty
                                         </button>
                                     </div>
@@ -445,36 +445,36 @@ export default function Profile() {
                                 <form onSubmit={handleSavePassword} className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                     <div className="max-w-md space-y-5">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">Mật khẩu hiện tại</label>
+                                            <label className="text-sm font-medium text-white/80">Mật khẩu hiện tại</label>
                                             <input
                                                 type="password" name="oldPassword"
                                                 value={passwordData.oldPassword} onChange={handlePasswordChange}
-                                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0A2463] focus:bg-white transition-all outline-none"
+                                                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-[#F5C518] focus:bg-transparent placeholder:text-white/30 transition-all outline-none"
                                                 required
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">Mật khẩu mới</label>
+                                            <label className="text-sm font-medium text-white/80">Mật khẩu mới</label>
                                             <input
                                                 type="password" name="newPassword" minLength={6}
                                                 value={passwordData.newPassword} onChange={handlePasswordChange}
-                                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0A2463] focus:bg-white transition-all outline-none"
+                                                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-[#F5C518] focus:bg-transparent placeholder:text-white/30 transition-all outline-none"
                                                 required
                                             />
-                                            <p className="text-xs text-gray-500">Yêu cầu tối thiểu 6 ký tự.</p>
+                                            <p className="text-xs text-white/60">Yêu cầu tối thiểu 6 ký tự.</p>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">Xác nhận mật khẩu mới</label>
+                                            <label className="text-sm font-medium text-white/80">Xác nhận mật khẩu mới</label>
                                             <input
                                                 type="password" name="confirmPassword" minLength={6}
                                                 value={passwordData.confirmPassword} onChange={handlePasswordChange}
-                                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0A2463] focus:bg-white transition-all outline-none"
+                                                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-[#F5C518] focus:bg-transparent placeholder:text-white/30 transition-all outline-none"
                                                 required
                                             />
                                         </div>
 
                                         <div className="pt-4">
-                                            <button disabled={loading} type="submit" className="flex items-center justify-center gap-2 w-full px-6 py-2.5 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 transition-colors">
+                                            <button disabled={loading} type="submit" className="flex items-center justify-center gap-2 w-full px-6 py-2.5 bg-[#F5C518] text-[#0A2463] font-bold rounded-xl hover:bg-[#D4A800] transition-colors">
                                                 <Lock size={18} /> Đổi mật khẩu
                                             </button>
                                         </div>

@@ -47,8 +47,8 @@ export default function InterviewAnalytics() {
         return (
             <SeekerLayout title="Phân tích phỏng vấn">
                 <div className="flex items-center justify-center py-20">
-                    <Loader2 className="w-12 h-12 animate-spin text-[#0A2463] mx-auto mb-4" />
-                    <p className="text-[#5A6482] ml-4">Đang tải...</p>
+                    <Loader2 className="w-12 h-12 animate-spin text-white mx-auto mb-4" />
+                    <p className="text-white/60 ml-4">Đang tải...</p>
                 </div>
             </SeekerLayout>
         );
@@ -58,23 +58,23 @@ export default function InterviewAnalytics() {
         <div
             className={`rounded-2xl shadow-sm border p-6 ${
                 highlight
-                    ? 'bg-[#0A2463] text-white border-[#0A2463]'
-                    : 'bg-white border-[#DDE3F0]'
+                    ? 'bg-[#F5C518]/25 border-[#F5C518]/30 text-white'
+                    : 'bg-white/10 border-white/10 backdrop-blur-md text-white shadow-xl'
             }`}
         >
             <div className="flex items-center justify-between mb-4">
-                <p className={`text-sm font-semibold ${highlight ? 'text-white/70' : 'text-[#5A6482]'}`}>{label}</p>
-                <Icon className={`w-6 h-6 ${highlight ? 'text-[#F5C518]' : 'text-[#0A2463]'}`} />
+                <p className={`text-sm font-semibold ${highlight ? 'text-white/80' : 'text-white/60'}`}>{label}</p>
+                <Icon className={`w-6 h-6 ${highlight ? 'text-[#F5C518] font-bold font-bold' : 'text-white'}`} />
             </div>
             <div className="flex items-baseline gap-2">
-                <p className={`font-heading text-4xl ${highlight ? 'text-[#F5C518]' : 'text-[#0A2463]'}`}>
+                <p className={`font-heading text-4xl ${highlight ? 'text-[#F5C518] font-bold font-bold' : 'text-white'}`}>
                     {Math.round(score)}
                 </p>
-                <p className={highlight ? 'text-white/50' : 'text-[#5A6482]'}>/100</p>
+                <p className={highlight ? 'text-white/50' : 'text-white/60'}>/100</p>
             </div>
-            <div className={`mt-4 w-full rounded-full h-2 ${highlight ? 'bg-white/20' : 'bg-[#DDE3F0]'}`}>
+            <div className={`mt-4 w-full rounded-full h-2 ${highlight ? 'bg-white/20' : 'bg-white/10'}`}>
                 <div
-                    className={`h-2 rounded-full transition-all ${highlight ? 'bg-[#F5C518]' : 'bg-gradient-to-r from-[#0A2463] to-[#F5C518]'}`}
+                    className={`h-2 rounded-full transition-all ${highlight ? 'bg-[#F5C518]' : 'bg-gradient-to-r from-[#F5C518] to-emerald-400'}`}
                     style={{ width: `${Math.min(100, score)}%` }}
                 />
             </div>
@@ -84,7 +84,7 @@ export default function InterviewAnalytics() {
     return (
         <SeekerLayout title="Phân tích phỏng vấn" breadcrumb="Phỏng vấn › Analytics">
             <div className="max-w-6xl mx-auto w-full">
-                <p className="text-[#5A6482] mb-8 -mt-2">Theo dõi tiến độ luyện tập — mô hình HR Advisor</p>
+                <p className="text-white/60 mb-8 -mt-2">Theo dõi tiến độ luyện tập — mô hình HR Advisor</p>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     {[
@@ -93,12 +93,12 @@ export default function InterviewAnalytics() {
                         { label: 'Câu hỏi làm', value: analytics.totalQuestionsAnswered, icon: Zap },
                         { label: 'Cải thiện', value: `+${analytics.scoreImprovement.toFixed(1)}`, icon: TrendingUp },
                     ].map((stat, i) => (
-                        <div key={i} className="bg-white rounded-2xl shadow-sm p-4 border border-[#DDE3F0]">
+                        <div key={i} className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-4 text-white shadow-xl">
                             <div className="flex items-center justify-between mb-2">
-                                <p className="text-xs font-semibold text-[#5A6482]">{stat.label}</p>
-                                <stat.icon className="w-4 h-4 text-[#0A2463]" />
+                                <p className="text-xs font-semibold text-white/60">{stat.label}</p>
+                                <stat.icon className="w-4 h-4 text-white" />
                             </div>
-                            <p className="font-heading text-2xl text-[#0A2463]">{stat.value}</p>
+                            <p className="font-heading text-2xl text-white">{stat.value}</p>
                         </div>
                     ))}
                 </div>
@@ -109,8 +109,8 @@ export default function InterviewAnalytics() {
                     <ScoreCard label="Câu hỏi hành vi" score={analytics.behavioralScore} icon={Target} />
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-sm p-8 border border-[#DDE3F0] mb-8">
-                    <h2 className="font-heading text-2xl text-[#0A2463] mb-6 flex items-center gap-2">
+                <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-8 text-white shadow-xl mb-8">
+                    <h2 className="font-heading text-2xl text-white mb-6 flex items-center gap-2">
                         <BarChart3 className="w-6 h-6" />
                         Tiến trình điểm số theo lĩnh vực
                     </h2>
@@ -119,12 +119,12 @@ export default function InterviewAnalytics() {
                         {Object.entries(analytics.categoryScores || {}).map(([category, score]) => (
                             <div key={category}>
                                 <div className="flex justify-between mb-2">
-                                    <p className="font-semibold text-[#0A2463]">{category}</p>
-                                    <p className="font-bold text-[#0A2463]">{score.toFixed(0)}</p>
+                                    <p className="font-semibold text-white">{category}</p>
+                                    <p className="font-bold text-white">{score.toFixed(0)}</p>
                                 </div>
-                                <div className="w-full bg-[#DDE3F0] rounded-full h-3">
+                                <div className="w-full bg-white/10 rounded-full h-3 border border-white/5">
                                     <div
-                                        className="h-3 rounded-full bg-gradient-to-r from-[#0A2463] to-[#F5C518] transition-all"
+                                        className="h-3 rounded-full bg-gradient-to-r from-[#F5C518] to-emerald-400 transition-all"
                                         style={{ width: `${score}%` }}
                                     />
                                 </div>
@@ -135,15 +135,15 @@ export default function InterviewAnalytics() {
 
                 <div className="grid md:grid-cols-2 gap-6 mb-8">
                     {analytics.strongestCategories?.length > 0 && (
-                        <div className="bg-white rounded-2xl border border-[#DDE3F0] p-8 border-l-4 border-l-green-400">
-                            <h3 className="font-heading text-xl text-[#0A2463] mb-4 flex items-center gap-2">
-                                <Award className="w-6 h-6 text-green-600" />
+                        <div className="bg-white/10 border border-white/10 border-l-4 border-l-emerald-400 backdrop-blur-md rounded-2xl p-8 text-white">
+                            <h3 className="font-heading text-xl text-white mb-4 flex items-center gap-2">
+                                <Award className="w-6 h-6 text-emerald-400" />
                                 Điểm mạnh
                             </h3>
                             <ul className="space-y-2">
                                 {analytics.strongestCategories.map((cat, i) => (
-                                    <li key={i} className="flex items-center gap-2 text-[#5A6482]">
-                                        <span className="text-green-600">✓</span>
+                                    <li key={i} className="flex items-center gap-2 text-white/60">
+                                        <span className="text-emerald-400">✓</span>
                                         <span className="font-medium">{cat}</span>
                                     </li>
                                 ))}
@@ -152,15 +152,15 @@ export default function InterviewAnalytics() {
                     )}
 
                     {analytics.weakestCategories?.length > 0 && (
-                        <div className="bg-white rounded-2xl border border-[#DDE3F0] p-8 border-l-4 border-l-[#F5C518]">
-                            <h3 className="font-heading text-xl text-[#0A2463] mb-4 flex items-center gap-2">
-                                <AlertCircle className="w-6 h-6 text-[#F5C518]" />
+                        <div className="bg-white/10 border border-white/10 border-l-4 border-l-[#F5C518] backdrop-blur-md rounded-2xl p-8 text-white">
+                            <h3 className="font-heading text-xl text-white mb-4 flex items-center gap-2">
+                                <AlertCircle className="w-6 h-6 text-[#F5C518] font-bold font-bold" />
                                 Cần cải thiện
                             </h3>
                             <ul className="space-y-2">
                                 {analytics.weakestCategories.map((cat, i) => (
-                                    <li key={i} className="flex items-center gap-2 text-[#5A6482]">
-                                        <span className="text-[#0A2463]">→</span>
+                                    <li key={i} className="flex items-center gap-2 text-white/60">
+                                        <span className="text-white">→</span>
                                         <span className="font-medium">{cat}</span>
                                     </li>
                                 ))}
@@ -170,27 +170,27 @@ export default function InterviewAnalytics() {
                 </div>
 
                 {analytics.aiRecommendations?.length > 0 && (
-                    <div className="bg-white rounded-2xl shadow-sm p-8 border border-[#DDE3F0] mb-8">
-                        <h2 className="font-heading text-2xl text-[#0A2463] mb-6">Gợi ý từ AI</h2>
+                    <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-8 text-white shadow-xl mb-8">
+                        <h2 className="font-heading text-2xl text-white mb-6">Gợi ý từ AI</h2>
                         <div className="space-y-4">
                             {analytics.aiRecommendations.map((rec, i) => (
                                 <div
                                     key={i}
                                     className={`p-4 rounded-xl border-l-4 ${
                                         rec.priority === 'high'
-                                            ? 'bg-red-50 border-red-400'
+                                            ? 'bg-red-500/10 border border-red-500/20 text-red-300'
                                             : rec.priority === 'medium'
-                                            ? 'bg-[#F5C518]/10 border-[#F5C518]'
-                                            : 'bg-[#0A2463]/5 border-[#0A2463]'
+                                            ? 'bg-[#F5C518]/10 border border-[#F5C518]/20 text-[#F5C518] font-bold'
+                                            : 'bg-white/5 border border-white/10 text-white/80'
                                     }`}
                                 >
                                     <div className="flex items-start justify-between mb-2">
-                                        <p className="font-semibold text-[#0A2463]">{rec.category}</p>
-                                        <span className="text-xs font-semibold text-[#5A6482]">
+                                        <p className="font-semibold text-white">{rec.category}</p>
+                                        <span className="text-xs font-semibold text-white/60">
                                             {rec.priority === 'high' ? 'Cao' : rec.priority === 'medium' ? 'Trung bình' : 'Thấp'}
                                         </span>
                                     </div>
-                                    <p className="text-[#5A6482] text-sm">{rec.recommendation}</p>
+                                    <p className="text-white/60 text-sm">{rec.recommendation}</p>
                                 </div>
                             ))}
                         </div>
@@ -198,7 +198,7 @@ export default function InterviewAnalytics() {
                 )}
 
                 {analytics.firstInterviewDate && (
-                    <div className="bg-[#0A2463] rounded-2xl p-8 text-white mb-8">
+                    <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-8 text-white mb-8 shadow-xl">
                         <h2 className="font-heading text-xl mb-4">Thống kê thời gian</h2>
                         <div className="grid md:grid-cols-3 gap-6">
                             <div>
@@ -215,7 +215,7 @@ export default function InterviewAnalytics() {
                             </div>
                             <div>
                                 <p className="text-white/60 text-sm mb-1">Thời gian TB / câu</p>
-                                <p className="font-bold text-[#F5C518]">{Math.round(analytics.averageResponseTime)}s</p>
+                                <p className="font-bold text-[#F5C518] font-bold font-bold">{Math.round(analytics.averageResponseTime)}s</p>
                             </div>
                         </div>
                     </div>
@@ -224,7 +224,7 @@ export default function InterviewAnalytics() {
                 <div className="text-center">
                     <button
                         onClick={() => navigate('/interview')}
-                        className="px-8 py-3 bg-[#F5C518] text-[#0A2463] font-bold rounded-lg hover:bg-[#D4A800] transition-colors"
+                        className="px-8 py-3 bg-[#F5C518] text-white font-bold rounded-lg hover:bg-[#D4A800] transition-colors"
                     >
                         Luyện tập thêm
                     </button>

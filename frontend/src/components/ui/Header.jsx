@@ -5,7 +5,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import NotificationDropdown from './NotificationDropdown';
-import LanguageSelector from './LanguageSelector';
 import axios from 'axios';
 
 const ROLE_LABEL = {
@@ -87,7 +86,7 @@ export default function Header({ variant = 'dark' }) {
     const isActive = (path) => location.pathname === path;
 
     const headerClass = variant === 'dark'
-        ? `sticky top-0 z-50 bg-[#0A2463] transition-shadow duration-300 ${scrolled ? 'shadow-[0_2px_20px_rgba(10,36,99,0.15)]' : ''}`
+        ? `sticky top-0 z-50 bg-transparent transition-all duration-300 ${scrolled ? 'bg-[#030A21]/70 backdrop-blur-md shadow-[0_2px_20px_rgba(3,10,33,0.3)] border-b border-white/5' : ''}`
         : 'sticky top-0 z-50 bg-white border-b border-[#DDE3F0] shadow-sm';
 
     return (
@@ -171,7 +170,7 @@ export default function Header({ variant = 'dark' }) {
                                     <SettingsIcon size={20} />
                                 </Link>
 
-                                <LanguageSelector dark />
+
 
                                 <div className="relative hidden sm:block" ref={userMenuRef}>
                                     <button
@@ -226,7 +225,7 @@ export default function Header({ variant = 'dark' }) {
                             </>
                         ) : (
                             <div className="hidden sm:flex items-center gap-2">
-                                <LanguageSelector dark />
+
                                 <Link to="/login" className="px-4 py-2 text-sm border border-white/30 text-white rounded-md hover:bg-white/10 font-medium transition-colors">
                                     {t('auth.login')}
                                 </Link>

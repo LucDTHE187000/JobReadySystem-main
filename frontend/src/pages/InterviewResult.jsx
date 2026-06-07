@@ -50,17 +50,17 @@ export default function InterviewResult() {
         // Sử dụng recommendation từ backend nếu có, nếu không thì tính dựa trên score
         if (recommendation) {
             const rec = recommendation.toLowerCase();
-            if (rec.includes('strong hire')) return { text: 'Strong Hire', color: 'text-green-600', bg: 'bg-green-100', icon: CheckCircle };
-            if (rec.includes('hire')) return { text: 'Hire', color: 'text-blue-600', bg: 'bg-blue-100', icon: CheckCircle };
-            if (rec.includes('consider')) return { text: 'Consider', color: 'text-amber-600', bg: 'bg-amber-100', icon: Target };
-            if (rec.includes('no hire')) return { text: 'No Hire', color: 'text-red-600', bg: 'bg-red-100', icon: XCircle };
+            if (rec.includes('strong hire')) return { text: 'Strong Hire', color: 'text-emerald-300', bg: 'bg-emerald-500/15 border border-emerald-500/25', icon: CheckCircle };
+            if (rec.includes('hire')) return { text: 'Hire', color: 'text-blue-300', bg: 'bg-blue-500/15 border border-blue-500/25', icon: CheckCircle };
+            if (rec.includes('consider')) return { text: 'Consider', color: 'text-amber-300', bg: 'bg-amber-500/15 border border-amber-500/25', icon: Target };
+            if (rec.includes('no hire')) return { text: 'No Hire', color: 'text-red-300', bg: 'bg-red-500/15 border border-red-500/25', icon: XCircle };
         }
 
         // Fallback dựa trên score
-        if (score >= 85) return { text: 'Strong Hire', color: 'text-green-600', bg: 'bg-green-100', icon: CheckCircle };
-        if (score >= 70) return { text: 'Hire', color: 'text-blue-600', bg: 'bg-blue-100', icon: CheckCircle };
-        if (score >= 50) return { text: 'Consider', color: 'text-amber-600', bg: 'bg-amber-100', icon: Target };
-        return { text: 'No Hire', color: 'text-red-600', bg: 'bg-red-100', icon: XCircle };
+        if (score >= 85) return { text: 'Strong Hire', color: 'text-emerald-300', bg: 'bg-emerald-500/15 border border-emerald-500/25', icon: CheckCircle };
+        if (score >= 70) return { text: 'Hire', color: 'text-blue-300', bg: 'bg-blue-500/15 border border-blue-500/25', icon: CheckCircle };
+        if (score >= 50) return { text: 'Consider', color: 'text-amber-300', bg: 'bg-amber-500/15 border border-amber-500/25', icon: Target };
+        return { text: 'No Hire', color: 'text-red-300', bg: 'bg-red-500/15 border border-red-500/25', icon: XCircle };
     };
 
     // Calculate skill scores from question data
@@ -107,7 +107,7 @@ export default function InterviewResult() {
         return (
             <SeekerLayout title="Kết quả phỏng vấn">
                 <div className="flex items-center justify-center py-20">
-                    <p className="text-[#5A6482]">Đang tải kết quả...</p>
+                    <p className="text-white/60">Đang tải kết quả...</p>
                 </div>
             </SeekerLayout>
         );
@@ -120,7 +120,7 @@ export default function InterviewResult() {
         <SeekerLayout title="Kết quả phỏng vấn" breadcrumb={`Phỏng vấn › ${session.jobTitle || 'Kết quả'}`}>
             <div className="max-w-6xl mx-auto w-full space-y-6">
                 {/* Header with Overall Score */}
-                <div className="bg-white rounded-3xl shadow-lg border border-[#DDE3F0] overflow-hidden">
+                <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-3xl shadow-xl overflow-hidden">
                     <div className="bg-gradient-to-r from-[#0A2463] to-[#071A4A] text-white px-8 py-8">
                         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                             <div>
@@ -144,8 +144,8 @@ export default function InterviewResult() {
 
                 {/* Skill Scores Radar Chart */}
                 <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-white rounded-3xl shadow-lg border border-[#DDE3F0] p-8">
-                        <h2 className="text-2xl font-bold text-[#0A2463] mb-6 flex items-center gap-2">
+                    <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-3xl shadow-xl p-8">
+                        <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                             <Brain className="w-6 h-6 text-[#F5C518]" />
                             Skill Scores
                         </h2>
@@ -160,12 +160,12 @@ export default function InterviewResult() {
                                 <div key={idx}>
                                     <div className="flex items-center justify-between mb-2">
                                         <div className="flex items-center gap-2">
-                                            <skill.icon className="w-4 h-4 text-[#5A6482]" />
-                                            <p className="font-semibold text-[#0A2463]">{skill.label}</p>
+                                            <skill.icon className="w-4 h-4 text-white/60" />
+                                            <p className="font-semibold text-white">{skill.label}</p>
                                         </div>
-                                        <span className="text-lg font-bold text-[#0A2463]">{skill.score}%</span>
+                                        <span className="text-lg font-bold text-white">{skill.score}%</span>
                                     </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                                    <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
                                         <div
                                             className={`${skill.color} h-full rounded-full transition-all duration-1000`}
                                             style={{ width: `${skill.score}%` }}
@@ -177,99 +177,99 @@ export default function InterviewResult() {
                     </div>
 
                     {/* Interview Stats */}
-                    <div className="bg-white rounded-3xl shadow-lg border border-[#DDE3F0] p-8">
-                        <h2 className="text-2xl font-bold text-[#0A2463] mb-6 flex items-center gap-2">
+                    <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-3xl shadow-xl p-8">
+                        <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                             <TrendingUp className="w-6 h-6 text-[#F5C518]" />
                             Interview Stats
                         </h2>
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-[#F4F6FB] rounded-2xl p-4">
-                                <p className="text-sm text-[#5A6482] font-semibold mb-1">Thời gian</p>
-                                <p className="text-2xl font-bold text-[#0A2463]">{Math.floor(session.duration / 60)}m {session.duration % 60}s</p>
+                            <div className="bg-white/5 border border-white/5 rounded-2xl p-4">
+                                <p className="text-sm text-white/60 font-semibold mb-1">Thời gian</p>
+                                <p className="text-2xl font-bold text-white">{Math.floor(session.duration / 60)}m {session.duration % 60}s</p>
                             </div>
-                            <div className="bg-[#F4F6FB] rounded-2xl p-4">
-                                <p className="text-sm text-[#5A6482] font-semibold mb-1">Câu hỏi</p>
-                                <p className="text-2xl font-bold text-[#0A2463]">{session.answeredQuestions}/{session.totalQuestions}</p>
+                            <div className="bg-white/5 border border-white/5 rounded-2xl p-4">
+                                <p className="text-sm text-white/60 font-semibold mb-1">Câu hỏi</p>
+                                <p className="text-2xl font-bold text-white">{session.answeredQuestions}/{session.totalQuestions}</p>
                             </div>
-                            <div className="bg-[#F4F6FB] rounded-2xl p-4">
-                                <p className="text-sm text-[#5A6482] font-semibold mb-1">Loại phỏng vấn</p>
-                                <p className="text-2xl font-bold text-[#0A2463]">{session.interviewType}</p>
+                            <div className="bg-white/5 border border-white/5 rounded-2xl p-4">
+                                <p className="text-sm text-white/60 font-semibold mb-1">Loại phỏng vấn</p>
+                                <p className="text-2xl font-bold text-white">{session.interviewType}</p>
                             </div>
-                            <div className="bg-[#F4F6FB] rounded-2xl p-4">
-                                <p className="text-sm text-[#5A6482] font-semibold mb-1">Mức độ</p>
-                                <p className="text-2xl font-bold text-[#0A2463]">{session.difficultyLevel || 2}/5</p>
+                            <div className="bg-white/5 border border-white/5 rounded-2xl p-4">
+                                <p className="text-sm text-white/60 font-semibold mb-1">Mức độ</p>
+                                <p className="text-2xl font-bold text-white">{session.difficultyLevel || 2}/5</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Question-by-Question Analysis */}
-                <div className="bg-white rounded-3xl shadow-lg border border-[#DDE3F0] overflow-hidden">
-                    <div className="bg-[#F4F6FB] px-8 py-6 border-b border-[#DDE3F0]">
-                        <h3 className="text-xl font-bold text-[#0A2463]">Question-by-Question Analysis</h3>
+                <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-3xl shadow-xl overflow-hidden">
+                    <div className="bg-white/5 px-8 py-6 border-b border-white/10">
+                        <h3 className="text-xl font-bold text-white">Question-by-Question Analysis</h3>
                     </div>
                     <div className="p-8 space-y-4">
                         {questions.length > 0 ? (
                             questions.map((q, index) => (
-                                <div key={q._id} className="border border-[#DDE3F0] rounded-2xl overflow-hidden">
+                                <div key={q._id} className="border border-white/10 bg-white/5 rounded-2xl overflow-hidden">
                                     <button
                                         onClick={() => toggleQuestion(q._id)}
-                                        className="w-full p-6 flex items-center justify-between hover:bg-[#F4F6FB] transition-colors"
+                                        className="w-full p-6 flex items-center justify-between hover:bg-white/10 transition-colors"
                                     >
                                         <div className="text-left flex-1">
-                                            <p className="text-sm font-semibold text-[#5A6482] mb-1">Question {index + 1} ({q.questionType})</p>
-                                            <p className="font-semibold text-[#0A2463]">{q.questionText}</p>
+                                            <p className="text-sm font-semibold text-white/60 mb-1">Question {index + 1} ({q.questionType})</p>
+                                            <p className="font-semibold text-white">{q.questionText}</p>
                                         </div>
                                         <div className="flex items-center gap-4 ml-4">
                                             <div className={`px-4 py-2 rounded-lg font-bold ${
-                                                q.aiScore >= 80 ? 'bg-green-100 text-green-700' :
-                                                q.aiScore >= 60 ? 'bg-blue-100 text-blue-700' :
-                                                'bg-red-100 text-red-700'
+                                                q.aiScore >= 80 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/20' :
+                                                q.aiScore >= 60 ? 'bg-blue-500/20 text-blue-300 border border-blue-500/20' :
+                                                'bg-red-500/20 text-red-300 border border-red-500/20'
                                             }`}>
                                                 {q.aiScore}/100
                                             </div>
-                                            {expandedQuestions[q._id] ? <ChevronUp className="w-5 h-5 text-[#0A2463]" /> : <ChevronDown className="w-5 h-5 text-[#0A2463]" />}
+                                            {expandedQuestions[q._id] ? <ChevronUp className="w-5 h-5 text-white" /> : <ChevronDown className="w-5 h-5 text-white" />}
                                         </div>
                                     </button>
 
                                     {expandedQuestions[q._id] && (
-                                        <div className="px-6 pb-6 space-y-4 bg-[#F4F6FB]">
+                                        <div className="px-6 pb-6 space-y-4 bg-white/5">
                                             <div>
-                                                <p className="text-xs font-bold text-[#5A6482] mb-2 uppercase">Candidate Answer</p>
-                                                <p className="text-[#5A6482] bg-white rounded-lg p-4">{q.userAnswer}</p>
+                                                <p className="text-xs font-bold text-white/60 mb-2 uppercase">Candidate Answer</p>
+                                                <p className="text-white/60 bg-white/10 border border-white/10 rounded-lg p-4">{q.userAnswer}</p>
                                             </div>
 
                                             {q.keyPoints?.length > 0 && (
-                                                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                                                    <p className="text-xs font-bold text-green-700 mb-2">✓ Strengths</p>
-                                                    <ul className="space-y-1 text-sm text-[#5A6482]">
+                                                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 rounded-lg p-4">
+                                                    <p className="text-xs font-bold text-emerald-300 mb-2">✓ Strengths</p>
+                                                    <ul className="space-y-1 text-sm text-white/60">
                                                         {q.keyPoints.map((p, i) => <li key={i}>• {p}</li>)}
                                                     </ul>
                                                 </div>
                                             )}
 
                                             {q.missedPoints?.length > 0 && (
-                                                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                                                    <p className="text-xs font-bold text-amber-700 mb-2">→ Areas for Improvement</p>
-                                                    <ul className="space-y-1 text-sm text-[#5A6482]">
+                                                <div className="bg-amber-500/10 border border-amber-500/20 text-amber-300 rounded-lg p-4">
+                                                    <p className="text-xs font-bold text-amber-300 mb-2">→ Areas for Improvement</p>
+                                                    <ul className="space-y-1 text-sm text-white/60">
                                                         {q.missedPoints.map((p, i) => <li key={i}>• {p}</li>)}
                                                     </ul>
                                                 </div>
                                             )}
 
                                             {q.suggestions?.length > 0 && (
-                                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                                <div className="bg-blue-500/10 border border-blue-500/20 text-blue-300 rounded-lg p-4">
                                                     <p className="text-xs font-bold text-blue-700 mb-2">� Suggested Better Answer</p>
-                                                    <ul className="space-y-1 text-sm text-[#5A6482]">
+                                                    <ul className="space-y-1 text-sm text-white/60">
                                                         {q.suggestions.map((p, i) => <li key={i}>• {p}</li>)}
                                                     </ul>
                                                 </div>
                                             )}
 
                                             {q.aiFeedback && (
-                                                <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                                                <div className="bg-purple-500/10 border border-purple-500/20 text-purple-300 rounded-lg p-4">
                                                     <p className="text-xs font-bold text-purple-700 mb-2">💬 AI Feedback</p>
-                                                    <p className="text-sm text-[#5A6482]">{q.aiFeedback}</p>
+                                                    <p className="text-sm text-white/60">{q.aiFeedback}</p>
                                                 </div>
                                             )}
                                         </div>
@@ -277,7 +277,7 @@ export default function InterviewResult() {
                                 </div>
                             ))
                         ) : (
-                            <p className="text-[#5A6482] text-center py-8">Chưa có dữ liệu câu hỏi</p>
+                            <p className="text-white/60 text-center py-8">Chưa có dữ liệu câu hỏi</p>
                         )}
                     </div>
                 </div>
@@ -285,39 +285,39 @@ export default function InterviewResult() {
                 {/* Final Summary */}
                 <div className="grid md:grid-cols-2 gap-6">
                     {/* Strengths */}
-                    <div className="bg-white rounded-3xl shadow-lg border border-[#DDE3F0] p-8">
-                        <h3 className="text-xl font-bold text-green-700 mb-4 flex items-center gap-2">
+                    <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-3xl shadow-xl p-8">
+                        <h3 className="text-xl font-bold text-emerald-300 mb-4 flex items-center gap-2">
                             <CheckCircle className="w-6 h-6" />
                             Strengths
                         </h3>
                         <ul className="space-y-3">
                             {(session.strengths || []).map((strength, i) => (
                                 <li key={i} className="flex gap-3 items-start">
-                                    <span className="text-green-600 font-bold mt-1">✓</span>
-                                    <span className="text-[#5A6482]">{strength}</span>
+                                    <span className="text-emerald-400 font-bold mt-1">✓</span>
+                                    <span className="text-white/60">{strength}</span>
                                 </li>
                             ))}
                             {(!session.strengths || session.strengths.length === 0) && (
-                                <p className="text-[#5A6482] italic">Chưa có dữ liệu</p>
+                                <p className="text-white/60 italic">Chưa có dữ liệu</p>
                             )}
                         </ul>
                     </div>
 
                     {/* Weaknesses */}
-                    <div className="bg-white rounded-3xl shadow-lg border border-[#DDE3F0] p-8">
-                        <h3 className="text-xl font-bold text-amber-700 mb-4 flex items-center gap-2">
+                    <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-3xl shadow-xl p-8">
+                        <h3 className="text-xl font-bold text-amber-300 mb-4 flex items-center gap-2">
                             <XCircle className="w-6 h-6" />
                             Areas to Improve
                         </h3>
                         <ul className="space-y-3">
                             {(session.improvements || []).map((improvement, i) => (
                                 <li key={i} className="flex gap-3 items-start">
-                                    <span className="text-amber-600 font-bold mt-1">→</span>
-                                    <span className="text-[#5A6482]">{improvement}</span>
+                                    <span className="text-amber-400 font-bold mt-1">→</span>
+                                    <span className="text-white/60">{improvement}</span>
                                 </li>
                             ))}
                             {(!session.improvements || session.improvements.length === 0) && (
-                                <p className="text-[#5A6482] italic">Chưa có dữ liệu</p>
+                                <p className="text-white/60 italic">Chưa có dữ liệu</p>
                             )}
                         </ul>
                     </div>
@@ -325,13 +325,13 @@ export default function InterviewResult() {
 
                 {/* Overall Feedback */}
                 {session.overallFeedback && (
-                    <div className="bg-gradient-to-r from-[#0A2463]/5 to-[#F5C518]/5 rounded-3xl border border-[#DDE3F0] p-8">
-                        <h3 className="text-xl font-bold text-[#0A2463] mb-4">Final Summary</h3>
-                        <p className="text-[#5A6482] leading-relaxed">{session.overallFeedback}</p>
+                    <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-3xl p-8 shadow-xl">
+                        <h3 className="text-xl font-bold text-white mb-4">Final Summary</h3>
+                        <p className="text-white/60 leading-relaxed">{session.overallFeedback}</p>
                         {session.nextSteps && session.nextSteps.length > 0 && (
                             <div className="mt-4">
-                                <p className="text-sm font-bold text-[#0A2463] mb-2">Next Steps:</p>
-                                <ul className="space-y-1 text-sm text-[#5A6482]">
+                                <p className="text-sm font-bold text-white mb-2">Next Steps:</p>
+                                <ul className="space-y-1 text-sm text-white/60">
                                     {session.nextSteps.map((step, i) => <li key={i}>• {step}</li>)}
                                 </ul>
                             </div>
@@ -350,14 +350,14 @@ export default function InterviewResult() {
                     </button>
                     <button
                         onClick={() => {/* Download logic */}}
-                        className="py-4 px-6 bg-white border-2 border-[#0A2463] text-[#0A2463] font-bold rounded-2xl hover:bg-[#F4F6FB] transition-all flex items-center justify-center gap-2"
+                        className="py-4 px-6 bg-white border-2 border-[#0A2463] text-white font-bold rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-2"
                     >
                         <Download className="w-5 h-5" />
                         Download Report
                     </button>
                     <button
                         onClick={() => navigate('/dashboard')}
-                        className="py-4 px-6 bg-[#F5C518] text-[#0A2463] font-bold rounded-2xl hover:bg-[#D4A800] transition-all flex items-center justify-center gap-2"
+                        className="py-4 px-6 bg-[#F5C518] text-white font-bold rounded-2xl hover:bg-[#D4A800] transition-all flex items-center justify-center gap-2"
                     >
                         <ArrowRight className="w-5 h-5" />
                         Back to Dashboard

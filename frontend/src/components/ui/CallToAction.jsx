@@ -19,10 +19,10 @@ export default function CallToAction() {
         }
     };
     return (
-        <section className="py-20 lg:py-28 bg-white relative overflow-hidden">
+        <section className="py-20 lg:py-28 bg-transparent relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <ScrollReveal delay={100} type="scale" direction="up">
-                    <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#0A2463] via-[#09205A] to-[#051336] p-10 sm:p-16 lg:p-20 text-center shadow-2xl border border-white/10">
+                    <div className="relative overflow-hidden rounded-[32px] bg-white/5 backdrop-blur-md p-10 sm:p-16 lg:p-20 text-center shadow-2xl border border-white/10">
                         {/* Decorative glowing blobs */}
                         <div className="absolute top-0 right-0 w-80 h-80 bg-[#F5C518]/15 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 animate-float-slow pointer-events-none" />
                         <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#1A3A7C]/40 rounded-full blur-[110px] translate-y-1/2 -translate-x-1/2 animate-float-reverse pointer-events-none" />
@@ -40,14 +40,14 @@ export default function CallToAction() {
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <button 
                                     onClick={handleRegister} 
-                                    className="inline-flex items-center justify-center gap-2.5 px-9 py-4 bg-gradient-to-r from-[#F5C518] to-[#D4A800] text-[#0A2463] rounded-xl text-base font-black shadow-lg shadow-[#F5C518]/15 hover:shadow-[#F5C518]/30 hover:scale-104 active:scale-95 transition-all duration-300 cursor-pointer"
+                                    className="inline-flex items-center justify-center gap-2.5 px-9 py-4 bg-gradient-to-r from-[#F5C518] to-[#D4A800] text-[#0A2463] rounded-xl text-base font-black shadow-lg shadow-[#F5C518]/15 hover:shadow-[#F5C518]/30 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer"
                                 >
-                                    Đăng ký miễn phí
+                                    {user ? 'Vào Dashboard' : 'Đăng ký miễn phí'}
                                     <ArrowRight className="w-5 h-5" />
                                 </button>
                                 <Link 
                                     to="/pricing" 
-                                    className="inline-flex items-center justify-center gap-2.5 px-9 py-4 border border-white/15 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-white/40 text-white rounded-xl text-base font-bold hover:scale-104 active:scale-95 transition-all duration-300"
+                                    className="inline-flex items-center justify-center gap-2.5 px-9 py-4 border border-white/15 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-white/40 text-white rounded-xl text-base font-bold hover:scale-105 active:scale-95 transition-all duration-300"
                                 >
                                     <FileText className="w-5 h-5" />
                                     Xem bảng giá

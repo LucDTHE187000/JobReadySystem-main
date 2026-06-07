@@ -332,7 +332,7 @@ export default function InterviewSession() {
         return (
             <SeekerLayout title="Phòng phỏng vấn">
                 <div className="flex justify-center py-20">
-                    <Loader2 className="w-10 h-10 animate-spin text-[#0A2463]" />
+                    <Loader2 className="w-10 h-10 animate-spin text-white" />
                 </div>
             </SeekerLayout>
         );
@@ -385,10 +385,10 @@ export default function InterviewSession() {
                             </div>
                         )}
                         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3">
-                            <button type="button" onClick={toggleMic} className={`p-3 rounded-full transition-all ${micOn ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-red-500 text-white hover:bg-red-600'}`}>
+                            <button type="button" onClick={toggleMic} className={`p-3 rounded-full transition-all ${micOn ? 'bg-white/15 text-white hover:bg-white/25 border border-white/10' : 'bg-red-500 text-white hover:bg-red-600 border border-red-500/20'}`}>
                                 {micOn ? <Mic size={20} /> : <MicOff size={20} />}
                             </button>
-                            <button type="button" onClick={toggleCamera} className={`p-3 rounded-full transition-all ${camOn ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-red-500 text-white hover:bg-red-600'}`}>
+                            <button type="button" onClick={toggleCamera} className={`p-3 rounded-full transition-all ${camOn ? 'bg-white/15 text-white hover:bg-white/25 border border-white/10' : 'bg-red-500 text-white hover:bg-red-600 border border-red-500/20'}`}>
                                 <Video size={20} />
                             </button>
                             <button type="button" onClick={() => navigate('/interview-history')} className="p-3 rounded-full bg-red-600 text-white hover:bg-red-700">
@@ -399,10 +399,10 @@ export default function InterviewSession() {
                 </div>
 
                 {/* Chat Section - Scrollable */}
-                <div className="w-full lg:w-1/2 h-full lg:h-screen flex flex-col bg-white border-t lg:border-t-0 lg:border-l border-[#DDE3F0] overflow-hidden">
-                    <div className="px-4 py-3 border-b border-[#DDE3F0] flex items-center gap-2 flex-shrink-0">
-                        <Bot className="text-[#0A2463]" size={20} />
-                        <span className="font-semibold text-[#0A2463] text-sm">Trò chuyện phỏng vấn</span>
+                <div className="w-full lg:w-1/2 h-full lg:h-screen flex flex-col bg-[#030A21]/75 backdrop-blur-md border-t lg:border-t-0 lg:border-l border-white/10 text-white overflow-hidden">
+                    <div className="px-4 py-3 border-b border-white/10 flex items-center gap-2 flex-shrink-0 bg-white/5">
+                        <Bot className="text-white" size={20} />
+                        <span className="font-semibold text-white text-sm">Trò chuyện phỏng vấn</span>
                     </div>
                     <div className="flex-1 overflow-y-auto p-4 space-y-3">
                         {messages.map((m, i) => (
@@ -412,8 +412,8 @@ export default function InterviewSession() {
                                         m.role === 'user'
                                             ? 'bg-[#0A2463] text-white rounded-br-md'
                                             : m.isFeedback
-                                            ? 'bg-[#F5C518]/15 text-[#0A2463] border border-[#F5C518]/30 rounded-bl-md'
-                                            : 'bg-[#F4F6FB] text-[#0A2463] rounded-bl-md'
+                                            ? 'bg-[#F5C518]/15 text-white border border-[#F5C518]/30 rounded-bl-md'
+                                            : 'bg-white/10 text-white rounded-bl-md'
                                     }`}
                                 >
                                     {m.text}
@@ -421,20 +421,20 @@ export default function InterviewSession() {
                             </div>
                         ))}
                         {submitting && (
-                            <div className="flex items-center gap-2 text-[#5A6482] text-sm">
+                            <div className="flex items-center gap-2 text-white/60 text-sm">
                                 <Loader2 className="w-4 h-4 animate-spin" /> AI đang chấm điểm...
                             </div>
                         )}
                         <div ref={chatEndRef} />
                     </div>
-                    <div className="p-3 border-t border-[#DDE3F0] flex gap-2 flex-shrink-0">
+                    <div className="p-3 border-t border-white/10 flex gap-2 flex-shrink-0 bg-white/5">
                         <div className="flex-1 flex gap-1">
                             <input
                                 value={userAnswer}
                                 onChange={(e) => setUserAnswer(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
                                 placeholder="Nhập hoặc nói câu trả lời..."
-                                className="flex-1 px-3 py-2.5 rounded-xl border border-[#DDE3F0] text-sm focus:ring-2 focus:ring-[#0A2463] outline-none"
+                                className="flex-1 px-3 py-2.5 rounded-xl border-white/10 bg-white/5 text-white placeholder:text-white/30 text-sm focus:ring-2 focus:ring-[#0A2463] outline-none"
                                 disabled={submitting}
                             />
                             <button
@@ -443,7 +443,7 @@ export default function InterviewSession() {
                                 onPointerUp={stopListening}
                                 onPointerLeave={stopListening}
                                 style={{ touchAction: 'none' }}
-                                className={`px-3 py-2.5 rounded-xl transition-all ${isListening ? 'bg-red-500 text-white scale-105 animate-pulse' : 'bg-[#0A2463] text-white hover:bg-[#071A4A]'} disabled:opacity-40`}
+                                className={`px-3 py-2.5 rounded-xl transition-all ${isListening ? 'bg-red-500 text-white scale-105 animate-pulse' : 'bg-[#F5C518] text-white hover:bg-[#D4A800] font-bold'} disabled:opacity-40`}
                                 title="Nhấn và giữ để nói"
                                 disabled={submitting}
                             >

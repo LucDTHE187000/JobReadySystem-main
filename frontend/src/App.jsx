@@ -9,6 +9,10 @@ import Dashboard from './pages/Dashboard';
 import LandingPage from './pages/LandingPage';
 import About from './pages/About';
 import Pricing from './pages/Pricing';
+import Contact from './pages/Contact';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
+import ScrollToTop from './components/ui/ScrollToTop';
 import CVUpload from './pages/CVUpload';
 import Profile from './pages/Profile';
 import ApplicationsList from './pages/Job/ApplicationsList';
@@ -37,6 +41,7 @@ function App() {
     <LanguageProvider>
       <AuthProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -47,6 +52,9 @@ function App() {
             <Route path="/pricing" element={
               <NoEmployerRoute><Pricing /></NoEmployerRoute>
             } />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
             <Route path="/jobs" element={
               <NoEmployerRoute><JobSearch /></NoEmployerRoute>
             } />

@@ -25,7 +25,7 @@ const DIFFICULTY_LEVELS = [
 ];
 
 const inputClass =
-    'w-full px-4 py-3 rounded-lg border border-[#DDE3F0] bg-white focus:ring-2 focus:ring-[#0A2463] focus:border-transparent outline-none transition';
+    'w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 focus:ring-2 focus:ring-[#F5C518] focus:border-transparent outline-none transition';
 
 export default function InterviewPractice() {
     const { user, refreshUser } = useAuth();
@@ -89,7 +89,7 @@ export default function InterviewPractice() {
                 <div className="flex-1 flex items-center justify-center px-4">
                     <div className="text-center">
                         <h2 className="font-heading text-3xl text-[#0A2463] mb-4">Vui lòng đăng nhập</h2>
-                        <p className="text-[#5A6482] mb-6">Bạn cần đăng nhập để sử dụng tính năng Interview Practice</p>
+                        <p className="text-white/70 mb-6">Bạn cần đăng nhập để sử dụng tính năng Interview Practice</p>
                         <button
                             onClick={() => navigate('/login')}
                             className="px-6 py-3 bg-[#0A2463] text-white font-medium rounded-lg hover:bg-[#071A4A] transition-colors"
@@ -130,25 +130,25 @@ export default function InterviewPractice() {
         <SeekerLayout title="Luyện phỏng vấn AI" breadcrumb="Phỏng vấn › Cấu hình">
             <div className="max-w-5xl mx-auto w-full">
                 <div className="mb-8">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-[#0A2463] mb-2">Luyện tập phỏng vấn cùng AI</h1>
-                    <p className="text-lg text-[#5A6482]">Luyện tập phỏng vấn với AI, nhận feedback realtime</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Luyện tập phỏng vấn cùng AI</h1>
+                    <p className="text-lg text-white/70">Luyện tập phỏng vấn với AI, nhận feedback realtime</p>
 
                     {/* CV Status Alert Box */}
                     {!cvLoading && (
                         <div className="mt-4">
                             {/* Case A: User has never uploaded or scanned a CV */}
                             {!hasCv && (
-                                <div className="p-5 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-4 shadow-sm">
-                                    <FileText className="w-6 h-6 text-[#0A2463] flex-shrink-0 mt-0.5" />
+                                <div className="p-5 bg-blue-500/10 border border-blue-500/20 backdrop-blur-md rounded-xl flex items-start gap-4 shadow-sm text-white">
+                                    <FileText className="w-6 h-6 text-[#F5C518] flex-shrink-0 mt-0.5" />
                                     <div className="flex-1">
-                                        <h4 className="font-bold text-[#0A2463] text-sm sm:text-base">🚀 Tối ưu hóa phỏng vấn với CV của bạn</h4>
-                                        <p className="text-xs sm:text-sm text-[#5A6482] mt-1 leading-relaxed">
+                                        <h4 className="font-bold text-white text-sm sm:text-base">🚀 Tối ưu hóa phỏng vấn với CV của bạn</h4>
+                                        <p className="text-xs sm:text-sm text-white/70 mt-1 leading-relaxed">
                                             Bạn chưa tải lên CV. Bạn có thể <strong>tải lên CV có sẵn</strong> hoặc <strong>tự thiết kế CV online</strong> trực tiếp trên hệ thống để AI có thể chấm điểm, phân tích kỹ năng và đưa ra các câu hỏi phỏng vấn sát thực tế nhất cho bạn.
                                         </p>
                                         <div className="mt-3">
                                             <button
                                                 onClick={() => navigate('/cv-upload')}
-                                                className="px-4 py-2 bg-[#0A2463] hover:bg-[#071A4A] text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
+                                                className="px-4 py-2 bg-[#F5C518] text-[#0A2463] hover:bg-[#D4A800] text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
                                             >
                                                 <FileText className="w-4 h-4" />
                                                 Tải lên hoặc Thiết kế CV ngay
@@ -160,21 +160,21 @@ export default function InterviewPractice() {
 
                             {/* Case B: User has scanned a CV and score < 60 */}
                             {hasCv && (cvScore === null || cvScore < 60) && (
-                                <div className="p-5 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-4 shadow-sm">
+                                <div className="p-5 bg-amber-500/10 border border-amber-500/20 backdrop-blur-md rounded-xl flex items-start gap-4 shadow-sm text-white">
                                     <AlertCircle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
                                     <div className="flex-1">
-                                        <h4 className="font-bold text-amber-800 text-sm sm:text-base">⚠️ CV của bạn cần được cải thiện</h4>
-                                        <p className="text-xs sm:text-sm text-amber-700 mt-1 leading-relaxed">
+                                        <h4 className="font-bold text-amber-300 font-bold text-sm sm:text-base">⚠️ CV của bạn cần được cải thiện</h4>
+                                        <p className="text-xs sm:text-sm text-amber-200 mt-1 leading-relaxed">
                                             Điểm CV của bạn hiện tại dưới mức khuyến nghị (60 điểm) {cvScore ? `(${cvScore}/100)` : ''}.
                                             Chúng tôi khuyên bạn nên cải thiện CV trước khi ứng tuyển. Tuy nhiên, bạn vẫn có thể tiếp tục luyện tập phỏng vấn.
                                         </p>
-                                        <p className="text-xs sm:text-sm text-amber-600/90 mt-1.5 font-mono italic bg-amber-100/50 p-2 rounded-lg border border-amber-200/50">
+                                        <p className="text-xs sm:text-sm text-amber-100 mt-1.5 font-mono italic bg-white/5 p-2 rounded-lg border border-white/10">
                                             "Your CV score is below the recommended threshold (60 points). We recommend improving your CV before applying for jobs. However, you may still continue to practice interviews."
                                         </p>
                                         <div className="mt-3 flex gap-3">
                                             <button
                                                 onClick={() => navigate('/cv-upload')}
-                                                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
+                                                className="px-4 py-2 bg-[#F5C518] text-[#0A2463] hover:bg-[#D4A800] text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
                                             >
                                                 <FileText className="w-4 h-4" />
                                                 Cải thiện hoặc Tạo lại CV
@@ -186,14 +186,14 @@ export default function InterviewPractice() {
 
                             {/* Case C: User has scanned a CV and score >= 60 */}
                             {hasCv && cvScore >= 60 && (
-                                <div className="p-5 bg-green-50 border border-green-200 rounded-xl flex items-start gap-4 shadow-sm">
+                                <div className="p-5 bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-md rounded-xl flex items-start gap-4 shadow-sm text-white">
                                     <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
                                     <div className="flex-1">
-                                        <h4 className="font-bold text-green-800 text-sm sm:text-base">✓ CV đạt yêu cầu chất lượng</h4>
-                                        <p className="text-xs sm:text-sm text-green-700 mt-1 leading-relaxed">
+                                        <h4 className="font-bold text-emerald-300 font-bold text-sm sm:text-base">✓ CV đạt yêu cầu chất lượng</h4>
+                                        <p className="text-xs sm:text-sm text-emerald-200 mt-1 leading-relaxed">
                                             CV của bạn đạt chất lượng khuyến nghị ({cvScore}/100). Bạn đã sẵn sàng để phỏng vấn.
                                         </p>
-                                        <p className="text-xs sm:text-sm text-green-600/90 mt-1.5 font-mono italic bg-green-100/50 p-2 rounded-lg border border-green-200/50">
+                                        <p className="text-xs sm:text-sm text-emerald-100 mt-1.5 font-mono italic bg-white/5 p-2 rounded-lg border border-white/10">
                                             "Your CV meets the recommended quality threshold. You are ready to participate in AI Interview."
                                         </p>
                                     </div>
@@ -205,13 +205,13 @@ export default function InterviewPractice() {
 
                 <div className="grid lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2">
-                        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-md p-8 border border-[#DDE3F0]">
+                        <form onSubmit={handleSubmit} className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-8 text-white">
                             {error && (
-                                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">{error}</div>
+                                <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-300">{error}</div>
                             )}
 
                             <div className="mb-6">
-                                <label className="block text-sm font-semibold text-[#0A2463] mb-2">Vị trí tuyển dụng</label>
+                                <label className="block text-sm font-semibold text-white mb-2">Vị trí tuyển dụng</label>
                                 <input
                                     type="text"
                                     value={formData.jobTitle}
@@ -223,20 +223,20 @@ export default function InterviewPractice() {
                             </div>
 
                             <div className="mb-6">
-                                <label className="block text-sm font-semibold text-[#0A2463] mb-2">Lĩnh vực công việc</label>
+                                <label className="block text-sm font-semibold text-white mb-2">Lĩnh vực công việc</label>
                                 <select
                                     value={formData.jobCategory}
                                     onChange={(e) => setFormData({ ...formData, jobCategory: e.target.value })}
                                     className={inputClass}
                                 >
                                     {JOB_CATEGORIES.map((cat) => (
-                                        <option key={cat} value={cat}>{cat}</option>
+                                        <option className="bg-slate-900 text-white" key={cat} value={cat}>{cat}</option>
                                     ))}
                                 </select>
                             </div>
 
                             <div className="mb-6">
-                                <label className="block text-sm font-semibold text-[#0A2463] mb-2">Mô tả công việc (Tùy chọn)</label>
+                                <label className="block text-sm font-semibold text-white mb-2">Mô tả công việc (Tùy chọn)</label>
                                 <textarea
                                     value={formData.jobDescription}
                                     onChange={(e) => setFormData({ ...formData, jobDescription: e.target.value })}
@@ -247,27 +247,27 @@ export default function InterviewPractice() {
                             </div>
 
                             <div className="mb-8">
-                                <label className="block text-sm font-semibold text-[#0A2463] mb-3">Loại phỏng vấn</label>
+                                <label className="block text-sm font-semibold text-white mb-3">Loại phỏng vấn</label>
                                 <div className="space-y-3">
                                     {INTERVIEW_TYPES.map(({ value, label, icon: Icon, desc }) => (
                                         <div
                                             key={value}
                                             className={`p-4 rounded-lg border-2 cursor-pointer transition ${
                                                 formData.interviewType === value
-                                                    ? 'border-[#0A2463] bg-[#0A2463]/5'
-                                                    : 'border-[#DDE3F0] hover:border-[#0A2463]/30'
+                                                    ? 'border-[#F5C518] bg-white/20'
+                                                    : 'border-white/10 hover:border-white/20 bg-white/5'
                                             }`}
                                             onClick={() => setFormData({ ...formData, interviewType: value })}
                                         >
                                             <div className="flex items-start gap-3">
                                                 <Icon
                                                     className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
-                                                        formData.interviewType === value ? 'text-[#0A2463]' : 'text-gray-400'
+                                                        formData.interviewType === value ? 'text-[#F5C518]' : 'text-white/40'
                                                     }`}
                                                 />
                                                 <div className="flex-1">
-                                                    <p className="font-semibold text-[#0A2463]">{label}</p>
-                                                    <p className="text-sm text-[#5A6482]">{desc}</p>
+                                                    <p className="font-semibold text-white">{label}</p>
+                                                    <p className="text-sm text-white/70">{desc}</p>
                                                 </div>
                                                 <input
                                                     type="radio"
@@ -275,7 +275,7 @@ export default function InterviewPractice() {
                                                     value={value}
                                                     checked={formData.interviewType === value}
                                                     onChange={(e) => setFormData({ ...formData, interviewType: e.target.value })}
-                                                    className="ml-auto accent-[#0A2463]"
+                                                    className="ml-auto accent-[#F5C518]"
                                                 />
                                             </div>
                                         </div>
@@ -285,7 +285,7 @@ export default function InterviewPractice() {
 
                             {/* Mức độ khó — NEW */}
                             <div className="mb-8">
-                                <label className="block text-sm font-semibold text-[#0A2463] mb-3">Mức độ khó</label>
+                                <label className="block text-sm font-semibold text-white mb-3">Mức độ khó</label>
                                 <input
                                     type="range"
                                     min={1}
@@ -297,14 +297,14 @@ export default function InterviewPractice() {
                                     }
                                     className="difficulty-slider w-full mb-4"
                                 />
-                                <div className="flex justify-between text-xs text-[#5A6482] mb-3 px-1">
+                                <div className="flex justify-between text-xs text-white/70 mb-3 px-1">
                                     {DIFFICULTY_LEVELS.map((d) => (
-                                        <span key={d.level} className={formData.difficultyLevel === d.level ? 'text-[#0A2463] font-bold' : ''}>
+                                        <span key={d.level} className={formData.difficultyLevel === d.level ? 'text-[#F5C518] font-bold' : 'text-white/60'}>
                                             {d.level}
                                         </span>
                                     ))}
                                 </div>
-                                <div className="rounded-xl px-4 py-3 text-center bg-gradient-to-r from-[#0A2463] to-[#F5C518]">
+                                <div className="rounded-xl px-4 py-3 text-center bg-white/15 border border-white/10 rounded-xl">
                                     <p className="font-bold text-white text-lg">
                                         {currentDifficulty.level} — {currentDifficulty.label}
                                     </p>
@@ -315,7 +315,7 @@ export default function InterviewPractice() {
                             <button
                                 type="submit"
                                 disabled={loading || credits < sessionCost}
-                                className="w-full py-3 bg-[#0A2463] text-white font-semibold rounded-lg hover:bg-[#071A4A] disabled:bg-gray-400 transition-colors flex items-center justify-center gap-2"
+                                className="w-full py-3 bg-[#F5C518] text-[#0A2463] font-bold rounded-lg hover:bg-[#D4A800] transition disabled:bg-gray-400 transition-colors flex items-center justify-center gap-2"
                             >
                                 {loading ? (
                                     <>
@@ -333,7 +333,7 @@ export default function InterviewPractice() {
                     </div>
 
                     <div className="space-y-6">
-                        <div className="bg-[#0A2463] rounded-2xl p-6 text-white border border-[#1A3A7C]">
+                        <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white">
                             <p className="text-xs uppercase text-white/60 mb-1">Chi phí phiên</p>
                             <p className="text-3xl font-bold text-[#F5C518]">{sessionCost.toLocaleString('vi-VN')} credit</p>
                             <p className="text-sm text-white/70 mt-2">Số dư: <span className="text-[#F5C518] font-semibold">{credits.toLocaleString('vi-VN')}</span></p>
@@ -341,8 +341,8 @@ export default function InterviewPractice() {
                                 <p className="text-red-300 text-xs mt-2">Không đủ credit — hãy nạp thêm tại Pricing.</p>
                             )}
                         </div>
-                        <div className="bg-white rounded-2xl shadow-md p-6 border border-[#DDE3F0] border-l-4 border-l-[#F5C518]">
-                            <h3 className="font-bold text-[#0A2463] mb-4">Tính năng</h3>
+                        <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white border-l-4 border-l-[#F5C518]">
+                            <h3 className="font-bold text-white mb-4">Tính năng</h3>
                             <div className="space-y-3">
                                 {[
                                     { icon: '🤖', text: 'AI sinh câu hỏi theo ngành' },
@@ -352,13 +352,13 @@ export default function InterviewPractice() {
                                 ].map((feature, i) => (
                                     <div key={i} className="flex items-center gap-3">
                                         <span className="text-lg">{feature.icon}</span>
-                                        <p className="text-sm text-[#5A6482]">{feature.text}</p>
+                                        <p className="text-sm text-white/70">{feature.text}</p>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        <div className="bg-[#0A2463] rounded-2xl p-6 text-white">
+                        <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white">
                             <h3 className="font-bold mb-3">💡 Mẹo hay</h3>
                             <ul className="text-sm text-white/80 space-y-2">
                                 <li>• Dán job description để câu hỏi chính xác hơn</li>

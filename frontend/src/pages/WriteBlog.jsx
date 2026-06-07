@@ -75,17 +75,17 @@ export default function WriteBlog() {
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                 {/* Form Column */}
                 <div className="xl:col-span-2 space-y-6">
-                    <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-100 shadow-sm">
+                    <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 sm:p-8 text-white shadow-xl">
                         <div className="mb-6">
-                            <h2 className="text-xl font-bold text-[#0A2463] mb-2">Chia Sẻ Hành Trình Của Bạn</h2>
-                            <p className="text-sm text-gray-500">
+                            <h2 className="text-xl font-bold text-white mb-2">Chia Sẻ Hành Trình Của Bạn</h2>
+                            <p className="text-sm text-white/60">
                                 Hãy viết về trải nghiệm phỏng vấn, ôn luyện CV hoặc những bài học quý giá mà bạn học được tại JobReady để tiếp thêm động lực cho các ứng viên khác nhé!
                             </p>
                         </div>
 
                         {message.text && (
                             <div className={`p-4 rounded-xl mb-6 text-sm font-semibold flex items-center gap-2 ${
-                                message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+                                message.type === 'success' ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/25 backdrop-blur-md' : 'bg-red-500/15 text-red-300 border border-red-500/25 backdrop-blur-md'
                             }`}>
                                 <CheckCircle2 size={18} />
                                 {message.text}
@@ -94,7 +94,7 @@ export default function WriteBlog() {
 
                         <form onSubmit={handleSubmit} className="space-y-5">
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">Tiêu đề bài chia sẻ</label>
+                                <label className="block text-sm font-semibold text-white/80 mb-2">Tiêu đề bài chia sẻ</label>
                                 <input
                                     type="text"
                                     value={title}
@@ -107,11 +107,11 @@ export default function WriteBlog() {
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Trạng thái kết quả đạt được</label>
+                                    <label className="block text-sm font-semibold text-white/80 mb-2">Trạng thái kết quả đạt được</label>
                                     <select
                                         value={outcome}
                                         onChange={(e) => setOutcome(e.target.value)}
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0A2463] text-sm bg-white"
+                                        className="w-full px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-[#F5C518] text-sm bg-white/5 text-white placeholder:text-white/30"
                                     >
                                         {outcomes.map(item => (
                                             <option key={item} value={item}>{item}</option>
@@ -120,7 +120,7 @@ export default function WriteBlog() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Đánh giá độ hữu ích của JobReady</label>
+                                    <label className="block text-sm font-semibold text-white/80 mb-2">Đánh giá độ hữu ích của JobReady</label>
                                     <div className="flex items-center gap-1.5 h-[46px] px-4 border border-gray-200 rounded-xl">
                                         {[1, 2, 3, 4, 5].map((star) => (
                                             <button
@@ -140,7 +140,7 @@ export default function WriteBlog() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">Nội dung chi tiết trải nghiệm</label>
+                                <label className="block text-sm font-semibold text-white/80 mb-2">Nội dung chi tiết trải nghiệm</label>
                                 <textarea
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
@@ -165,23 +165,23 @@ export default function WriteBlog() {
 
                 {/* Right Column (My posted blogs) */}
                 <div className="space-y-6">
-                    <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm h-full flex flex-col">
+                    <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white shadow-xl h-full flex flex-col">
                         <div className="flex items-center gap-2 mb-6">
                             <Award className="text-[#F5C518]" size={22} />
-                            <h2 className="text-lg font-bold text-[#0A2463]">Bài Viết Của Bạn</h2>
+                            <h2 className="text-lg font-bold text-white">Bài Viết Của Bạn</h2>
                         </div>
 
                         <div className="space-y-4 flex-1 overflow-y-auto max-h-[500px] pr-1">
                             {myBlogs.length === 0 ? (
                                 <div className="text-center py-12 text-gray-400">
-                                    <Quote size={36} className="mx-auto mb-2 text-gray-200" />
+                                    <Quote size={36} className="mx-auto mb-2 text-white/20" />
                                     <p className="text-sm">Bạn chưa đăng bài chia sẻ nào.</p>
                                 </div>
                             ) : (
                                 myBlogs.map((blog) => (
-                                    <div key={blog._id} className="p-4 bg-slate-50 rounded-xl border border-gray-100">
+                                    <div key={blog._id} className="p-4 bg-white/5 rounded-xl border border-white/10 text-white">
                                         <div className="flex items-center justify-between mb-2">
-                                            <span className="px-2.5 py-0.5 bg-[#0A2463]/10 text-[#0A2463] font-bold text-[10px] rounded-full">
+                                            <span className="px-2.5 py-0.5 bg-[#0A2463]/10 text-white font-bold text-[10px] rounded-full">
                                                 {blog.outcome}
                                             </span>
                                             <div className="flex items-center gap-0.5">
@@ -194,9 +194,9 @@ export default function WriteBlog() {
                                                 ))}
                                             </div>
                                         </div>
-                                        <h4 className="font-bold text-sm text-gray-900 mb-1 line-clamp-1">{blog.title}</h4>
-                                        <p className="text-xs text-gray-600 line-clamp-3 mb-2 leading-relaxed">{blog.description}</p>
-                                        <span className="text-[10px] text-gray-400">
+                                        <h4 className="font-bold text-sm text-white mb-1 line-clamp-1">{blog.title}</h4>
+                                        <p className="text-xs text-white/70 line-clamp-3 mb-2 leading-relaxed">{blog.description}</p>
+                                        <span className="text-[10px] text-white/50">
                                             {new Date(blog.createdAt).toLocaleDateString('vi-VN')}
                                         </span>
                                     </div>

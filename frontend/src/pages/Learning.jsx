@@ -116,7 +116,7 @@ export default function Learning() {
             <SeekerLayout title="Học tập & Nâng cao kỹ năng" breadcrumb="Activity Hub › Khóa học & Bài học">
                 <div className="max-w-6xl mx-auto w-full">
                     {/* Welcome Banner */}
-                    <div className="relative overflow-hidden bg-gradient-to-r from-[#0A2463] to-[#247BA0] rounded-3xl p-8 sm:p-10 text-white mb-8 shadow-xl">
+                    <div className="relative overflow-hidden bg-white/10 border border-white/10 backdrop-blur-md rounded-3xl p-8 sm:p-10 text-white mb-8 shadow-xl">
                         <div className="absolute top-0 right-0 translate-x-12 -translate-y-12 w-64 h-64 bg-white/10 rounded-full blur-2xl"></div>
                         <div className="relative z-10 max-w-2xl">
                             <span className="bg-[#F5C518]/25 border border-[#F5C518]/30 text-[#F5C518] px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 w-fit mb-4">
@@ -139,8 +139,8 @@ export default function Learning() {
                                 onClick={() => setActiveCategory(cat.key)}
                                 className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border whitespace-nowrap shadow-sm ${
                                     activeCategory === cat.key
-                                        ? 'bg-[#0A2463] text-white border-[#0A2463]'
-                                        : 'bg-white text-gray-600 hover:text-[#0A2463] border-gray-200 hover:border-[#0A2463]/30'
+                                        ? 'bg-[#F5C518] text-[#0A2463] border-[#F5C518]'
+                                        : 'bg-white/5 text-white/70 hover:text-white border-white/10 hover:bg-white/10'
                                 }`}
                             >
                                 {cat.label}
@@ -151,14 +151,14 @@ export default function Learning() {
                     {/* Courses grid */}
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-3">
-                            <Loader2 className="w-10 h-10 animate-spin text-[#0A2463]" />
-                            <p className="text-sm text-gray-500 font-medium">Đang tải danh sách bài học...</p>
+                            <Loader2 className="w-10 h-10 animate-spin text-[#F5C518]" />
+                            <p className="text-sm text-white/60 font-medium">Đang tải danh sách bài học...</p>
                         </div>
                     ) : filteredCourses.length === 0 ? (
-                        <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center shadow-sm">
-                            <BookMarked className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                            <p className="text-gray-500 font-medium">Chưa có khóa học nào thuộc lĩnh vực này</p>
-                            <p className="text-sm text-gray-400 mt-1">Vui lòng chọn các danh mục khác hoặc quay lại sau.</p>
+                        <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-12 text-center shadow-sm text-white">
+                            <BookMarked className="w-12 h-12 text-white/40 mx-auto mb-3" />
+                            <p className="text-white/60 font-medium">Chưa có khóa học nào thuộc lĩnh vực này</p>
+                            <p className="text-sm text-white/60 mt-1">Vui lòng chọn các danh mục khác hoặc quay lại sau.</p>
                         </div>
                     ) : (
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -168,7 +168,7 @@ export default function Learning() {
                                 return (
                                     <div
                                         key={course._id}
-                                        className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group"
+                                        className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl overflow-hidden hover:bg-white/15 hover:-translate-y-1 transition-all duration-300 flex flex-col group text-white"
                                     >
                                         {/* Gradient Header Thumbnail */}
                                         <div 
@@ -192,9 +192,9 @@ export default function Learning() {
                                         </div>
 
                                         {/* Description & Info */}
-                                        <div className="p-5 flex-1 flex flex-col justify-between bg-white">
+                                        <div className="p-5 flex-1 flex flex-col justify-between bg-transparent">
                                             <div>
-                                                <p className="text-gray-500 text-xs sm:text-sm line-clamp-3 mb-5 leading-relaxed">
+                                                <p className="text-white/70 text-xs sm:text-sm line-clamp-3 mb-5 leading-relaxed">
                                                     {course.description}
                                                 </p>
                                                 {/* Author */}
@@ -206,30 +206,30 @@ export default function Learning() {
                                                         {course.instructor?.name?.charAt(0) || 'I'}
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <p className="text-xs font-bold text-gray-800 truncate">{course.instructor?.name}</p>
-                                                        <p className="text-[10px] text-gray-400 truncate">{course.instructor?.title}</p>
+                                                        <p className="text-xs font-bold text-white truncate">{course.instructor?.name}</p>
+                                                        <p className="text-[10px] text-white/50 truncate">{course.instructor?.title}</p>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             {/* Details & Action */}
-                                            <div className="border-t border-gray-100 pt-4 flex items-center justify-between">
-                                                <div className="flex items-center gap-3 text-xs text-gray-500 font-medium">
+                                            <div className="border-t border-white/10 pt-4 flex items-center justify-between">
+                                                <div className="flex items-center gap-3 text-xs text-white/60 font-medium">
                                                     <span className="flex items-center gap-1">
-                                                        <Clock className="w-3.5 h-3.5 text-gray-400" />
+                                                        <Clock className="w-3.5 h-3.5 text-white/40" />
                                                         {course.duration}
                                                     </span>
                                                     <span className="flex items-center gap-1">
-                                                        <BookOpen className="w-3.5 h-3.5 text-gray-400" />
+                                                        <BookOpen className="w-3.5 h-3.5 text-white/40" />
                                                         {course.lessonsCount} bài
                                                     </span>
                                                 </div>
                                                 {isFinished ? (
-                                                    <span className="text-xs text-emerald-600 font-bold flex items-center gap-1 bg-emerald-50 px-2 py-1 rounded-lg">
+                                                    <span className="text-xs text-emerald-600 font-bold flex items-center gap-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 px-2 py-1 rounded-lg">
                                                         <CheckCircle className="w-3.5 h-3.5" /> Hoàn thành
                                                     </span>
                                                 ) : completedCount > 0 ? (
-                                                    <span className="text-xs text-[#0A2463] font-bold bg-[#0A2463]/5 px-2 py-1 rounded-lg border border-[#0A2463]/10">
+                                                    <span className="text-xs text-[#F5C518] font-bold bg-white/10 px-2 py-1 rounded-lg border border-white/10 text-white">
                                                         Đang học ({completedCount}/{course.lessonsCount})
                                                     </span>
                                                 ) : null}
@@ -237,10 +237,10 @@ export default function Learning() {
                                         </div>
 
                                         {/* Play Button Action */}
-                                        <div className="px-5 pb-5 bg-white">
+                                        <div className="px-5 pb-5 bg-transparent">
                                             <button
                                                 onClick={() => handleSelectCourse(course._id)}
-                                                className="w-full py-2.5 bg-[#0A2463] hover:bg-[#071A4A] text-white text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group-hover:bg-[#F5C518] group-hover:text-[#0A2463] hover:shadow-md"
+                                                className="w-full py-2.5 bg-white/10 border border-white/10 text-white text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group-hover:bg-[#F5C518] group-hover:text-[#0A2463] hover:bg-[#F5C518] hover:text-[#0A2463] hover:shadow-md"
                                             >
                                                 <PlayCircle className="w-4 h-4" /> Bắt đầu học
                                             </button>
@@ -265,15 +265,15 @@ export default function Learning() {
                 {/* Back to List */}
                 <button
                     onClick={() => { setSelectedCourse(null); setActiveLesson(null); }}
-                    className="flex items-center gap-1.5 text-sm font-bold text-gray-600 hover:text-[#0A2463] mb-6 transition"
+                    className="flex items-center gap-1.5 text-sm font-bold text-gray-600 hover:text-[#F5C518] mb-6 transition"
                 >
                     <ChevronLeft className="w-4 h-4" /> Quay lại danh sách
                 </button>
 
                 {courseDetailLoading ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-3">
-                        <Loader2 className="w-10 h-10 animate-spin text-[#0A2463]" />
-                        <p className="text-sm text-gray-500 font-medium">Đang tải nội dung khóa học...</p>
+                        <Loader2 className="w-10 h-10 animate-spin text-[#F5C518]" />
+                        <p className="text-sm text-white/60 font-medium">Đang tải nội dung khóa học...</p>
                     </div>
                 ) : (
                     <div className="grid lg:grid-cols-3 gap-8 items-start">
@@ -281,7 +281,7 @@ export default function Learning() {
                         <div className="lg:col-span-2 space-y-6">
                             {/* Video / Player Area */}
                             {activeLesson && (
-                                <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+                                <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl overflow-hidden text-white">
                                     {activeLesson.videoUrl ? (
                                         <div className="aspect-video w-full bg-black relative">
                                             <iframe
@@ -294,9 +294,9 @@ export default function Learning() {
                                         </div>
                                     ) : (
                                         <div className="aspect-video w-full bg-slate-900 flex flex-col items-center justify-center text-white p-8 text-center gap-3">
-                                            <Video className="w-16 h-16 text-slate-700 animate-pulse" />
+                                            <Video className="w-16 h-16 text-white/40 animate-pulse" />
                                             <p className="text-lg font-bold">Bài học không có video</p>
-                                            <p className="text-sm text-slate-400 max-w-sm">Mời bạn đọc tài liệu hướng dẫn chi tiết ở phần bên dưới.</p>
+                                            <p className="text-sm text-white/60 max-w-sm">Mời bạn đọc tài liệu hướng dẫn chi tiết ở phần bên dưới.</p>
                                         </div>
                                     )}
 
@@ -304,11 +304,11 @@ export default function Learning() {
                                     <div className="p-6">
                                         <div className="flex items-start justify-between gap-4 mb-4">
                                             <div>
-                                                <span className="text-xs bg-blue-50 text-blue-600 font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">
+                                                <span className="text-xs bg-[#F5C518]/20 text-[#F5C518] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">
                                                     Bài {activeLesson.order}
                                                 </span>
-                                                <h2 className="text-xl font-bold text-gray-900 mt-2">{activeLesson.title}</h2>
-                                                <p className="text-sm text-gray-500 mt-1">{activeLesson.description}</p>
+                                                <h2 className="text-xl font-bold text-white mt-2">{activeLesson.title}</h2>
+                                                <p className="text-sm text-white/70 mt-1">{activeLesson.description}</p>
                                             </div>
                                             <button
                                                 onClick={() => handleToggleCompleteLesson(activeLesson._id)}
@@ -324,11 +324,11 @@ export default function Learning() {
                                         </div>
 
                                         {/* Reading content */}
-                                        <div className="border-t border-gray-100 pt-6 mt-6">
-                                            <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
+                                        <div className="border-t border-white/10 pt-6 mt-6">
+                                            <h3 className="font-bold text-white mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
                                                 <FileText className="w-4 h-4 text-cyan-600" /> Tài liệu tự học nâng cao
                                             </h3>
-                                            <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-5 text-sm text-gray-700 leading-relaxed whitespace-pre-line text-justify shadow-inner">
+                                            <div className="bg-white/5 border border-white/10 rounded-xl p-5 text-sm text-white/80 leading-relaxed whitespace-pre-line text-justify shadow-inner">
                                                 {activeLesson.content || "Chưa có tài liệu bổ trợ cho bài học này."}
                                             </div>
                                         </div>
@@ -337,14 +337,14 @@ export default function Learning() {
                             )}
 
                             {/* Instructor Card */}
-                            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm flex flex-col sm:flex-row gap-4 items-center sm:items-start text-center sm:text-left">
-                                <div className="w-16 h-16 rounded-full bg-[#0A2463] text-white flex items-center justify-center font-bold text-2xl shadow-md flex-shrink-0">
+                            <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 flex flex-col sm:flex-row gap-4 items-center sm:items-start text-center sm:text-left text-white">
+                                <div className="w-16 h-16 rounded-full bg-white/10 border border-white/10 text-[#F5C518] flex items-center justify-center font-bold text-2xl shadow-md flex-shrink-0">
                                     {selectedCourse.instructor?.name?.charAt(0)}
                                 </div>
                                 <div className="flex-1 space-y-1">
-                                    <h4 className="font-bold text-gray-900 text-lg">{selectedCourse.instructor?.name}</h4>
-                                    <p className="text-xs text-[#0A2463] font-semibold">{selectedCourse.instructor?.title}</p>
-                                    <p className="text-xs text-gray-500 leading-relaxed pt-1">
+                                    <h4 className="font-bold text-white text-lg">{selectedCourse.instructor?.name}</h4>
+                                    <p className="text-xs text-[#F5C518] font-semibold">{selectedCourse.instructor?.title}</p>
+                                    <p className="text-xs text-white/70 leading-relaxed pt-1">
                                         Giảng viên có nhiều năm kinh nghiệm thực chiến trong ngành, chịu trách nhiệm xây dựng nội dung bài giảng chất lượng cao bám sát thực tiễn phỏng vấn của các doanh nghiệp hàng đầu.
                                     </p>
                                 </div>
@@ -354,22 +354,22 @@ export default function Learning() {
                         {/* RIGHT: Course outline - 1 column */}
                         <div className="space-y-6">
                             {/* Course Progress Card */}
-                            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-                                <h3 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wider">Tiến độ khóa học</h3>
-                                <div className="flex items-center justify-between text-sm text-gray-600 mb-2 font-semibold">
+                            <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white">
+                                <h3 className="font-bold text-white mb-4 text-sm uppercase tracking-wider">Tiến độ khóa học</h3>
+                                <div className="flex items-center justify-between text-sm text-white/80 mb-2 font-semibold">
                                     <span>Tốc độ hoàn thành</span>
                                     <span>{Math.round((completedList.length / selectedCourse.lessonsCount) * 100)}%</span>
                                 </div>
-                                <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden mb-4 border border-gray-200/50">
+                                <div className="w-full h-2.5 bg-white/5 rounded-full overflow-hidden mb-4 border border-white/10">
                                     <div
                                         className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 transition-all duration-500"
                                         style={{ width: `${(completedList.length / selectedCourse.lessonsCount) * 100}%` }}
                                     ></div>
                                 </div>
-                                <div className="text-xs text-gray-500 flex justify-between">
+                                <div className="text-xs text-white/60 flex justify-between">
                                     <span>Đã xong: {completedList.length}/{selectedCourse.lessonsCount} bài</span>
                                     {isCourseCompleted && (
-                                        <span className="text-emerald-600 font-bold flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100 animate-bounce">
+                                        <span className="text-emerald-600 font-bold flex items-center gap-1 bg-emerald-500/20 px-2 py-0.5 rounded-lg border border-emerald-500/30 text-emerald-300 animate-bounce">
                                             <Award className="w-3.5 h-3.5" /> Xuất sắc!
                                         </span>
                                     )}
@@ -377,13 +377,13 @@ export default function Learning() {
                             </div>
 
                             {/* Lessons Playlist */}
-                            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-                                <div className="bg-[#0A2463] px-5 py-4 text-white">
+                            <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl overflow-hidden text-white">
+                                <div className="bg-white/5 border-b border-white/10 px-5 py-4 text-white">
                                     <h3 className="font-bold text-sm uppercase tracking-wider flex items-center gap-2">
                                         <BookMarked className="w-4 h-4 text-[#F5C518]" /> Danh sách bài học
                                     </h3>
                                 </div>
-                                <div className="divide-y divide-gray-100 max-h-[420px] overflow-y-auto">
+                                <div className="divide-y divide-white/10 max-h-[420px] overflow-y-auto">
                                     {selectedCourse.lessons && [...selectedCourse.lessons].sort((a,b) => a.order - b.order).map((les, index) => {
                                         const isSelected = activeLesson?._id === les._id;
                                         const isCompleted = completedList.includes(les._id);
@@ -391,8 +391,8 @@ export default function Learning() {
                                             <button
                                                 key={les._id}
                                                 onClick={() => setActiveLesson(les)}
-                                                className={`w-full p-4 flex gap-3 text-left transition-all hover:bg-slate-50 cursor-pointer ${
-                                                    isSelected ? 'bg-blue-50/50 border-l-4 border-[#0A2463]' : ''
+                                                className={`w-full p-4 flex gap-3 text-left transition-all hover:bg-white/5 cursor-pointer ${
+                                                    isSelected ? 'bg-white/10 border-l-4 border-[#F5C518]' : ''
                                                 }`}
                                             >
                                                 {/* Play / Check Icon */}
@@ -400,18 +400,18 @@ export default function Learning() {
                                                     {isCompleted ? (
                                                         <CheckCircle className="w-5 h-5 text-emerald-500 fill-emerald-100" />
                                                     ) : (
-                                                        <PlayCircle className={`w-5 h-5 ${isSelected ? 'text-[#0A2463]' : 'text-gray-400'}`} />
+                                                        <PlayCircle className={`w-5 h-5 ${isSelected ? 'text-[#F5C518]' : 'text-white/40'}`} />
                                                     )}
                                                 </div>
 
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex justify-between items-center gap-2">
-                                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Bài {les.order}</span>
-                                                        <span className="text-[10px] text-gray-400 flex items-center gap-0.5">
+                                                        <span className="text-[10px] text-white/40 font-bold uppercase tracking-wider">Bài {les.order}</span>
+                                                        <span className="text-[10px] text-white/40 flex items-center gap-0.5">
                                                             <Clock className="w-2.5 h-2.5" /> {les.duration}
                                                         </span>
                                                     </div>
-                                                    <p className={`text-xs font-bold mt-1 line-clamp-2 leading-snug ${isSelected ? 'text-[#0A2463]' : 'text-gray-800'}`}>
+                                                    <p className={`text-xs font-bold mt-1 line-clamp-2 leading-snug ${isSelected ? 'text-[#F5C518]' : 'text-white/80'}`}>
                                                         {les.title}
                                                     </p>
                                                 </div>

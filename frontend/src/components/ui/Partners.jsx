@@ -3,11 +3,11 @@ import { ScrollReveal } from './ScrollAnimations';
 
 export default function Partners() {
     return (
-        <section className="py-20 lg:py-28 bg-[#0A2463] relative overflow-hidden">
+        <section className="py-20 lg:py-28 bg-transparent relative overflow-hidden">
             {/* Ambient Background Glows */}
             <div className="absolute top-[-10%] left-[15%] w-[350px] h-[350px] bg-[#F5C518]/12 rounded-full blur-[100px] animate-float-slow pointer-events-none" />
             <div className="absolute bottom-[-15%] right-[15%] w-[400px] h-[400px] bg-[#F5C518]/8 rounded-full blur-[120px] pointer-events-none animate-float-reverse" />
-            <div className="absolute inset-0 bg-gradient-to-br from-[#0A2463] via-[#081F54] to-[#05143A] -z-10" />
+            <div className="absolute inset-0 bg-transparent -z-10" />
 
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
                 <ScrollReveal className="text-center mb-16" delay={100} type="slide" direction="up">

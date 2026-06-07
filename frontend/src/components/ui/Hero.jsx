@@ -6,9 +6,10 @@ import { ScrollReveal, AnimatedCounter } from './ScrollAnimations';
 const HERO_IMAGE = '/abc.jpg';
 
 const stats = [
-    { value: '5,000+', label: 'câu hỏi' },
-    { value: '12,000+', label: 'người dùng' },
-    { value: '98%', label: 'hài lòng' },
+    { value: '100+', label: 'người dùng' },
+    { value: '20+', label: 'doanh nghiệp' },
+    { value: '100+', label: 'câu hỏi AI' },
+    { value: '75%', label: 'hài lòng' },
 ];
 
 export default function Hero() {
@@ -27,7 +28,7 @@ export default function Hero() {
     };
 
     return (
-        <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-[#0A2463]">
+        <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-transparent">
             {/* Ambient Background Glows */}
             <div className="absolute top-[15%] left-[5%] w-72 h-72 rounded-full bg-[#F5C518]/15 blur-[120px] animate-float-slow pointer-events-none" />
             <div className="absolute bottom-[10%] right-[10%] w-96 h-96 rounded-full bg-[#1A3A7C]/40 blur-[130px] animate-float-reverse pointer-events-none" />
@@ -46,7 +47,7 @@ export default function Hero() {
                     )`,
                 }}
             />
-            <div className="absolute inset-0 bg-gradient-to-br from-[#0A2463] via-[#081F54] to-[#05143A] -z-10" />
+            <div className="absolute inset-0 bg-transparent -z-10" />
 
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 w-full z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
