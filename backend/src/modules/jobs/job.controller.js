@@ -76,6 +76,25 @@ const applyJob = async (req, res) => {
       $inc: { applicationsCount: 1 },
     });
 
+    // Tạo thông báo cho ứng viên & nhà tuyển dụng
+    try {
+      const { NotificationService } = await import("../notification/notification.service.js");
+      await NotificationService.createNotification(
+        jobseekerId,
+        "Ứng tuyển thành công",
+        `Hồ sơ của bạn cho vị trí "${job.title}" đã được gửi đi thành công.`,
+        "application"
+      );
+      await NotificationService.createNotification(
+        job.recruiterId,
+        "Ứng tuyển mới",
+        `Một ứng viên vừa nộp hồ sơ ứng tuyển vị trí "${job.title}".`,
+        "application"
+      );
+    } catch (notiErr) {
+      console.error("Failed to create application notifications:", notiErr);
+    }
+
     res.status(201).json({
       message: "Apply thành công",
       data: application,

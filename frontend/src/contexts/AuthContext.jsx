@@ -57,11 +57,12 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const signIn = async (email, password, rememberMe = false) => {
+  const signIn = async (email, password, rememberMe = false, otp = undefined) => {
     try {
       const response = await axios.post(`${API_URL}/api/auth/login`, {
         email,
-        password
+        password,
+        otp
       });
 
       const { token, user } = response.data;

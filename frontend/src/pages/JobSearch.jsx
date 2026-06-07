@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import SeekerLayout from '../components/layout/SeekerLayout';
 import { useAuth } from '../contexts/AuthContext';
+import Header from '../components/ui/Header';
+import Footer from '../components/ui/Footer';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -376,7 +378,19 @@ export default function JobSearch() {
     const hasFilters = selectedTypes.length > 0 || salaryRange || (location && location !== 'Tất cả địa điểm');
 
     const { user } = useAuth();
-    const Wrapper = user ? SeekerLayout : ({ children }) => <div className="min-h-screen bg-[#F4F6FB]">{children}</div>;
+    const Wrapper = user 
+        ? SeekerLayout 
+        : ({ children }) => (
+            <div className="min-h-screen bg-[#F4F6FB] flex flex-col justify-between">
+                <div>
+                    <Header />
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                        {children}
+                    </div>
+                </div>
+                <Footer />
+            </div>
+        );
 
     return (
         <Wrapper title="Tìm việc làm" breadcrumb="Việc làm › Tìm kiếm">

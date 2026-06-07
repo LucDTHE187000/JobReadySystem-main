@@ -21,6 +21,22 @@ const CATEGORIES = [
 export default function Learning() {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
+    const getGradientStyle = (thumbnail) => {
+        if (!thumbnail) {
+            return { background: 'linear-gradient(135deg, #0A2463, #247BA0)' };
+        }
+        // Extract hex values from from-[#HEX] and to-[#HEX]
+        const fromMatch = thumbnail.match(/from-\[#?([a-fA-F0-9]{3,8})\]/);
+        const toMatch = thumbnail.match(/to-\[#?([a-fA-F0-9]{3,8})\]/);
+        
+        if (fromMatch && toMatch) {
+            const fromColor = `#${fromMatch[1]}`;
+            const toColor = `#${toMatch[1]}`;
+            return { background: `linear-gradient(135deg, ${fromColor}, ${toColor})` };
+        }
+        return { background: 'linear-gradient(135deg, #0A2463, #247BA0)' };
+    };
+
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState('all');
@@ -152,39 +168,41 @@ export default function Learning() {
                                 return (
                                     <div
                                         key={course._id}
-                                        className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-all flex flex-col group"
+                                        className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group"
                                     >
                                         {/* Gradient Header Thumbnail */}
-                                        <div className={`h-40 bg-gradient-to-br ${course.thumbnail || 'from-[#0A2463] to-[#247BA0]'} p-6 flex flex-col justify-between text-white relative`}>
-                                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-xl group-hover:scale-110 transition-transform"></div>
+                                        <div 
+                                            style={getGradientStyle(course.thumbnail)} 
+                                            className="h-40 p-6 flex flex-col justify-between text-white relative"
+                                        >
+                                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-xl group-hover:scale-110 transition-transform duration-500"></div>
                                             <div className="flex justify-between items-center z-10">
-                                                <span className="text-xs bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-lg font-bold border border-white/10 uppercase tracking-wide">
+                                                <span className="text-[10px] bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-lg font-bold border border-white/10 uppercase tracking-wider text-white">
                                                     {course.field}
                                                 </span>
-                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase z-10 ${
-                                                    course.level === 'Advanced' ? 'bg-red-500 text-white' :
-                                                    course.level === 'Intermediate' ? 'bg-orange-500 text-white' :
-                                                    'bg-green-500 text-white'
-                                                }`}>
+                                                <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase z-10 bg-white/25 backdrop-blur-md border border-white/10 text-white">
                                                     {course.level}
                                                 </span>
                                             </div>
                                             <div className="z-10">
-                                                <h3 className="font-bold text-lg leading-snug line-clamp-2 drop-shadow-sm group-hover:text-[#F5C518] transition-colors">
+                                                <h3 className="font-heading font-extrabold text-lg leading-snug line-clamp-2 drop-shadow-md text-white group-hover:text-[#F5C518] transition-colors duration-300">
                                                     {course.title}
                                                 </h3>
                                             </div>
                                         </div>
 
                                         {/* Description & Info */}
-                                        <div className="p-5 flex-1 flex flex-col justify-between">
+                                        <div className="p-5 flex-1 flex flex-col justify-between bg-white">
                                             <div>
                                                 <p className="text-gray-500 text-xs sm:text-sm line-clamp-3 mb-5 leading-relaxed">
                                                     {course.description}
                                                 </p>
                                                 {/* Author */}
                                                 <div className="flex items-center gap-2.5 mb-5">
-                                                    <div className="w-8 h-8 rounded-full bg-[#0A2463] text-white flex items-center justify-center font-bold text-xs">
+                                                    <div 
+                                                        style={getGradientStyle(course.thumbnail)} 
+                                                        className="w-9 h-9 rounded-full text-white flex items-center justify-center font-bold text-sm shadow-sm"
+                                                    >
                                                         {course.instructor?.name?.charAt(0) || 'I'}
                                                     </div>
                                                     <div className="min-w-0">
@@ -196,7 +214,7 @@ export default function Learning() {
 
                                             {/* Details & Action */}
                                             <div className="border-t border-gray-100 pt-4 flex items-center justify-between">
-                                                <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                <div className="flex items-center gap-3 text-xs text-gray-500 font-medium">
                                                     <span className="flex items-center gap-1">
                                                         <Clock className="w-3.5 h-3.5 text-gray-400" />
                                                         {course.duration}
@@ -211,7 +229,7 @@ export default function Learning() {
                                                         <CheckCircle className="w-3.5 h-3.5" /> Hoàn thành
                                                     </span>
                                                 ) : completedCount > 0 ? (
-                                                    <span className="text-xs text-blue-600 font-bold bg-blue-50 px-2 py-1 rounded-lg">
+                                                    <span className="text-xs text-[#0A2463] font-bold bg-[#0A2463]/5 px-2 py-1 rounded-lg border border-[#0A2463]/10">
                                                         Đang học ({completedCount}/{course.lessonsCount})
                                                     </span>
                                                 ) : null}
@@ -219,10 +237,10 @@ export default function Learning() {
                                         </div>
 
                                         {/* Play Button Action */}
-                                        <div className="px-5 pb-5">
+                                        <div className="px-5 pb-5 bg-white">
                                             <button
                                                 onClick={() => handleSelectCourse(course._id)}
-                                                className="w-full py-2.5 bg-[#0A2463] hover:bg-[#071A4A] text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 group-hover:bg-[#F5C518] group-hover:text-[#0A2463]"
+                                                className="w-full py-2.5 bg-[#0A2463] hover:bg-[#071A4A] text-white text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group-hover:bg-[#F5C518] group-hover:text-[#0A2463] hover:shadow-md"
                                             >
                                                 <PlayCircle className="w-4 h-4" /> Bắt đầu học
                                             </button>

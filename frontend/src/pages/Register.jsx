@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Briefcase, User, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Briefcase, User, Eye, EyeOff, ArrowRight, AlertTriangle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const REGISTER_IMAGE = '/images/Register_side.png';
@@ -77,9 +77,9 @@ export default function Register() {
             setError(result.error.message);
             setLoading(false);
         } else {
-            setSuccessMessage('Đăng ký thành công! Chuyển hướng đến trang đăng nhập...');
+            setSuccessMessage('Đăng ký thành công! Đang chuyển hướng đến trang nhập mã xác thực OTP...');
             setLoading(false);
-            setTimeout(() => navigate('/login'), 2000);
+            setTimeout(() => navigate(`/login?email=${encodeURIComponent(email)}&unverified=true`), 2000);
         }
     };
 
@@ -170,6 +170,12 @@ export default function Register() {
                                 className="w-full px-4 py-3 bg-[#F4F6FB] border border-[#DDE3F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A2463]"
                                 required
                             />
+                            <p className="text-[11px] text-amber-600 mt-1.5 leading-normal flex items-start gap-1">
+                                <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
+                                <span>
+                                    <strong>Bạn hãy nhập email chính thức!</strong> Để nhận liên hệ từ nhà tuyển dụng và nhận lại mật khẩu mới khi sử dụng tính năng quên mật khẩu.
+                                </span>
+                            </p>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">

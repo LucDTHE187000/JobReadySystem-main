@@ -28,5 +28,8 @@ adminRouter.get("/jobs", adminOnly, AdminController.getAllJobs);
 adminRouter.put("/jobs/:jobId/status", adminOnly, AdminController.updateJobStatus);
 adminRouter.delete("/jobs/:jobId", adminOnly, AdminController.deleteJob);
 
+// ===== PAYMENT MANAGEMENT =====
+adminRouter.get("/payments", adminOnly, AdminController.getAllPayments);
+
 // ===== SYSTEM STATS =====
 adminRouter.get("/stats", adminOnly, AdminController.getStats);

@@ -1,6 +1,7 @@
 import { UserModel } from "../users/user.model.js";
 import Job from "../jobs/job.model.js";
 import JobApplication from "../Application/jobApplication.model.js";
+import { CreditPaymentModel } from "../payment/creditPayment.model.js";
 
 export class AdminController {
     // ========================
@@ -272,6 +273,132 @@ export class AdminController {
             });
         } catch (error) {
             console.error("Admin getStats error:", error);
+            return res.status(500).json({ message: "Lỗi server" });
+        }
+    }
+
+    // ========================
+    // GET ALL PAYMENTS WITH STATS (admin view)
+    // ========================
+    static async getAllPayments(req, res) {
+        try {
+            const { status, search, page = 1, limit = 20 } = req.query;
+            const filter = {};
+            if (status) filter.status = status;
+
+            // Search by user email or user name or packageName
+            if (search) {
+                const matchedUsers = await UserModel.find({
+                    $or: [
+                        { name: { $regex: search, $options: "i" } },
+                        { email: { $regex: search, $options: "i" } }
+                    ]
+                }).select("_id");
+                
+                const userIds = matchedUsers.map(u => u._id);
+                filter.$or = [
+                    { user: { $in: userIds } },
+                    { packageName: { $regex: search, $options: "i" } }
+                ];
+            }
+
+            const skip = (Number(page) - 1) * Number(limit);
+            const [payments, total] = await Promise.all([
+                CreditPaymentModel.find(filter)
+                    .populate("user", "name email")
+                    .sort({ createdAt: -1 })
+                    .skip(skip)
+                    .limit(Number(limit))
+                    .lean(),
+                CreditPaymentModel.countDocuments(filter),
+            ]);
+
+            // Calculate overall stats for all payments (no pagination filter)
+            const allPaymentsStats = await CreditPaymentModel.aggregate([
+                {
+                    $group: {
+                        _id: null,
+                        totalRevenue: {
+                            $sum: {
+                                $cond: [{ $eq: ["$status", "PAID"] }, "$amount", 0]
+                            }
+                        },
+                        successCount: {
+                            $sum: {
+                                $cond: [{ $eq: ["$status", "PAID"] }, 1, 0]
+                            }
+                        },
+                        pendingCount: {
+                            $sum: {
+                                $cond: [{ $eq: ["$status", "PENDING"] }, 1, 0]
+                            }
+                        },
+                        cancelledCount: {
+                            $sum: {
+                                $cond: [{ $eq: ["$status", "CANCELLED"] }, 1, 0]
+                            }
+                        },
+                        totalCount: { $sum: 1 }
+                    }
+                }
+            ]);
+
+            const stats = allPaymentsStats[0] || {
+                totalRevenue: 0,
+                successCount: 0,
+                pendingCount: 0,
+                cancelledCount: 0,
+                totalCount: 0
+            };
+
+            // Calculate revenue by date for the last 14 days
+            const fourteenDaysAgo = new Date();
+            fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+
+            const dailyStats = await CreditPaymentModel.aggregate([
+                {
+                    $match: {
+                        status: "PAID",
+                        paidAt: { $gte: fourteenDaysAgo }
+                    }
+                },
+                {
+                    $group: {
+                        _id: {
+                            $dateToString: { format: "%Y-%m-%d", date: "$paidAt", timezone: "+07:00" }
+                        },
+                        revenue: { $sum: "$amount" },
+                        count: { $sum: 1 }
+                    }
+                },
+                { $sort: { _id: 1 } }
+            ]);
+
+            // Fill empty days for the last 14 days
+            const chartData = [];
+            for (let i = 13; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateString = date.toISOString().split("T")[0];
+                const dayMatch = dailyStats.find(d => d._id === dateString);
+                chartData.push({
+                    date: dateString,
+                    revenue: dayMatch ? dayMatch.revenue : 0,
+                    count: dayMatch ? dayMatch.count : 0
+                });
+            }
+
+            return res.status(200).json({
+                payments,
+                total,
+                page: Number(page),
+                totalPages: Math.ceil(total / Number(limit)),
+                stats,
+                chartData
+            });
+
+        } catch (error) {
+            console.error("Admin getAllPayments error:", error);
             return res.status(500).json({ message: "Lỗi server" });
         }
     }

@@ -22,6 +22,9 @@ import feedbackRouter from "./modules/feedback/feedback.router.js";
 import { courseRouter } from "./modules/courses/course.router.js";
 import { seedCourses } from "./modules/courses/course.seeder.js";
 import { adminRouter } from "./modules/admin/admin.router.js";
+import notificationRouter from "./modules/notification/notification.router.js";
+import campaignRouter from "./modules/campaign/campaign.router.js";
+import blogRouter from "./modules/blog/blog.router.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -85,6 +88,9 @@ app.use("/api/payment", paymentRouter);
 app.use("/api/feedback", feedbackRouter);
 app.use("/api/courses", courseRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/notifications", notificationRouter);
+app.use("/api/campaigns", campaignRouter);
+app.use("/api/blogs", blogRouter);
 
 
 // ===== ERROR HANDLER =====

@@ -102,6 +102,19 @@ export const setInterviewDate = async (req, res) => {
 
         await application.save();
 
+        // Tạo thông báo cho ứng viên
+        try {
+            const { NotificationService } = await import("../notification/notification.service.js");
+            await NotificationService.createNotification(
+                application.jobseekerId,
+                "Lời mời phỏng vấn",
+                `Bạn có lịch phỏng vấn vị trí "${job.title}" vào lúc ${new Date(interviewDate).toLocaleString("vi-VN")}.`,
+                "interview"
+            );
+        } catch (notiErr) {
+            console.error("Failed to create interview schedule notification:", notiErr);
+        }
+
         return res.status(200).json({
             message: "Interview scheduled successfully",
             data: application,
@@ -145,6 +158,31 @@ export const updateApplicationStatus = async (req, res) => {
 
         application.status = status;
         await application.save();
+
+        // Tạo thông báo cho ứng viên
+        try {
+            const { NotificationService } = await import("../notification/notification.service.js");
+            const statusMap = {
+                accepted: "Đã trúng tuyển",
+                rejected: "Từ chối hồ sơ",
+                pending: "Chờ duyệt",
+                interview: "Lời mời phỏng vấn"
+            };
+            const typeMap = {
+                accepted: "success",
+                rejected: "error",
+                pending: "info",
+                interview: "interview"
+            };
+            await NotificationService.createNotification(
+                application.jobseekerId,
+                `Cập nhật ứng tuyển: ${statusMap[status] || status}`,
+                `Hồ sơ của bạn cho vị trí "${job.title}" đã được chuyển sang trạng thái: "${statusMap[status] || status}".`,
+                typeMap[status] || "info"
+            );
+        } catch (notiErr) {
+            console.error("Failed to create application status notification:", notiErr);
+        }
 
         return res.status(200).json({
             message: "Cập nhật trạng thái thành công",

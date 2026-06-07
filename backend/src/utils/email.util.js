@@ -48,9 +48,9 @@ export const sendOTPEmail = async (to, otp, name = "User") => {
         const transporter = createTransporter();
 
         const mailOptions = {
-            from: `"JobSeeker System" <${process.env.EMAIL_USER || "noreply@jobseekersystem.com"}>`,
+            from: `"JobReady System" <${process.env.EMAIL_USER || "noreply@jobready.com"}>`,
             to: to,
-            subject: "Verify Your Email - JobSeeker System",
+            subject: "Verify Your Email - JobReady System",
             html: `
                 <!DOCTYPE html>
                 <html>
@@ -69,11 +69,11 @@ export const sendOTPEmail = async (to, otp, name = "User") => {
                 <body>
                     <div class="container">
                         <div class="header">
-                            <h1>JobSeeker System</h1>
+                            <h1>JobReady System</h1>
                         </div>
                         <div class="content">
                             <h2>Hello ${name}!</h2>
-                            <p>Thank you for registering with JobSeeker System. Please verify your email address by entering the OTP code below:</p>
+                            <p>Thank you for registering with JobReady System. Please verify your email address by entering the OTP code below:</p>
                             
                             <div class="otp-box">
                                 <div class="otp-code">${otp}</div>
@@ -83,7 +83,7 @@ export const sendOTPEmail = async (to, otp, name = "User") => {
                             <p>If you didn't create an account, please ignore this email.</p>
                         </div>
                         <div class="footer">
-                            <p>&copy; ${new Date().getFullYear()} JobSeeker System. All rights reserved.</p>
+                            <p>&copy; ${new Date().getFullYear()} JobReady System. All rights reserved.</p>
                         </div>
                     </div>
                 </body>
@@ -92,7 +92,7 @@ export const sendOTPEmail = async (to, otp, name = "User") => {
             text: `
                 Hello ${name}!
                 
-                Thank you for registering with JobSeeker System. Please verify your email address by entering the OTP code below:
+                Thank you for registering with JobReady System. Please verify your email address by entering the OTP code below:
                 
                 ${otp}
                 
@@ -100,7 +100,7 @@ export const sendOTPEmail = async (to, otp, name = "User") => {
                 
                 If you didn't create an account, please ignore this email.
                 
-                © ${new Date().getFullYear()} JobSeeker System. All rights reserved.
+                © ${new Date().getFullYear()} JobReady System. All rights reserved.
             `
         };
 
@@ -145,9 +145,9 @@ export const sendResetPasswordEmail = async (to, otp, name = "User") => {
         const transporter = createTransporter();
 
         const mailOptions = {
-            from: `"JobSeeker System" <${process.env.EMAIL_USER || "noreply@jobseekersystem.com"}>`,
+            from: `"JobReady System" <${process.env.EMAIL_USER || "noreply@jobready.com"}>`,
             to: to,
-            subject: "Reset Your Password - JobSeeker System",
+            subject: "Reset Your Password - JobReady System",
             html: `
                 <!DOCTYPE html>
                 <html>
@@ -167,7 +167,7 @@ export const sendResetPasswordEmail = async (to, otp, name = "User") => {
                 <body>
                     <div class="container">
                         <div class="header">
-                            <h1>JobSeeker System</h1>
+                            <h1>JobReady System</h1>
                         </div>
                         <div class="content">
                             <h2>Hello ${name}!</h2>
@@ -184,7 +184,7 @@ export const sendResetPasswordEmail = async (to, otp, name = "User") => {
                             <p>After verifying the OTP, you will be able to set a new password for your account.</p>
                         </div>
                         <div class="footer">
-                            <p>&copy; ${new Date().getFullYear()} JobSeeker System. All rights reserved.</p>
+                            <p>&copy; ${new Date().getFullYear()} JobReady System. All rights reserved.</p>
                         </div>
                     </div>
                 </body>
@@ -201,7 +201,7 @@ export const sendResetPasswordEmail = async (to, otp, name = "User") => {
                 
                 After verifying the OTP, you will be able to set a new password for your account.
                 
-                © ${new Date().getFullYear()} JobSeeker System. All rights reserved.
+                © ${new Date().getFullYear()} JobReady System. All rights reserved.
             `
         };
 

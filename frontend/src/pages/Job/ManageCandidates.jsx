@@ -11,6 +11,10 @@ import {
     Calendar,
     ChevronLeft,
     ChevronRight,
+    Minus,
+    X,
+    Send,
+    Trash2,
 } from "lucide-react";
 
 export default function ManageCandidates() {
@@ -24,6 +28,52 @@ export default function ManageCandidates() {
     const [selectedJob, setSelectedJob] = useState("");
     const [selectedCandidate, setSelectedCandidate] = useState(null);
     const [interviewDate, setInterviewDate] = useState("");
+
+    // Contact candidate states
+    const [contactCandidate, setContactCandidate] = useState(null);
+    const [contactModalOpen, setContactModalOpen] = useState(false);
+    const [emailSubject, setEmailSubject] = useState("");
+    const [emailBody, setEmailBody] = useState("");
+    const [sendingEmail, setSendingEmail] = useState(false);
+    const [isMinimized, setIsMinimized] = useState(false);
+
+    const handleContactClick = (candidate) => {
+        const jobseeker = candidate.jobseekerId;
+        if (!jobseeker || !jobseeker.email) {
+            alert("Ứng viên không có thông tin email hợp lệ");
+            return;
+        }
+        setContactCandidate(candidate);
+        setEmailSubject(`Cơ hội việc làm từ ${user?.companyName || user?.name || "JobReady"}`);
+        setEmailBody(`Chào ${jobseeker.name || "bạn"},\n\nChúng tôi đã xem qua hồ sơ ứng tuyển của bạn cho vị trí ${candidate.jobId?.title || ""} trên hệ thống JobReady và rất ấn tượng với kỹ năng/kinh nghiệm của bạn.\nChúng tôi muốn trao đổi thêm về các cơ hội việc làm tại công ty.\n\nTrân trọng,\n${user?.companyName || user?.name || "Bộ phận tuyển dụng"}`);
+        setContactModalOpen(true);
+        setIsMinimized(false);
+    };
+
+    const handleSendEmail = async (e) => {
+        e.preventDefault();
+        if (!contactCandidate || !contactCandidate.jobseekerId?.email) return;
+
+        setSendingEmail(true);
+        try {
+            const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+            await axios.post(`${API_URL}/api/users/candidates/contact`, {
+                candidateEmail: contactCandidate.jobseekerId.email,
+                subject: emailSubject,
+                body: emailBody
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            alert("Đã gửi email liên hệ thành công!");
+            setContactModalOpen(false);
+        } catch (err) {
+            console.error("Error sending contact email:", err);
+            alert(err.response?.data?.message || "Không thể gửi email. Vui lòng thử lại sau.");
+        } finally {
+            setSendingEmail(false);
+        }
+    };
 
     useEffect(() => {
         if (!user) return;
@@ -294,6 +344,16 @@ export default function ManageCandidates() {
                                                     Hẹn phỏng vấn
                                                 </button>
 
+                                                {/* LIÊN HỆ GỬI MAIL */}
+                                                <button
+                                                    onClick={() => handleContactClick(c)}
+                                                    className="inline-flex items-center gap-1 px-3 py-1 bg-purple-600 text-white text-xs rounded-lg hover:bg-purple-700 transition"
+                                                    title="Gửi email liên hệ"
+                                                >
+                                                    <Mail size={14} />
+                                                    Liên hệ
+                                                </button>
+
                                                 {/* CẬP NHẬT TRẠNG THÁI */}
                                                 <select
                                                     value={c.status}
@@ -393,6 +453,99 @@ export default function ManageCandidates() {
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                    )}
+
+                    {/* Gmail-style Compose Email Modal */}
+                    {contactModalOpen && contactCandidate && contactCandidate.jobseekerId && (
+                        <div
+                            className={`fixed bottom-0 right-4 lg:right-12 z-50 w-full max-w-lg bg-white rounded-t-2xl shadow-2xl border border-gray-300 flex flex-col transition-all duration-300 ${
+                                isMinimized ? "h-11" : "h-[450px]"
+                            }`}
+                        >
+                            {/* Header */}
+                            <div className="bg-[#0A2463] text-white px-4 py-2.5 rounded-t-2xl flex items-center justify-between cursor-pointer flex-shrink-0" onClick={() => setIsMinimized(!isMinimized)}>
+                                <span className="font-semibold text-sm">Thư mới (Liên hệ ứng viên)</span>
+                                <div className="flex items-center gap-3" onClick={e => e.stopPropagation()}>
+                                    <button
+                                        onClick={() => setIsMinimized(!isMinimized)}
+                                        className="text-white/80 hover:text-white p-0.5 rounded hover:bg-white/10"
+                                        title="Thu nhỏ / Phóng to"
+                                    >
+                                        <Minus size={16} />
+                                    </button>
+                                    <button
+                                        onClick={() => setContactModalOpen(false)}
+                                        className="text-white/80 hover:text-white p-0.5 rounded hover:bg-white/10"
+                                        title="Đóng"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Form Body - Hidden when minimized */}
+                            {!isMinimized && (
+                                <form onSubmit={handleSendEmail} className="flex-1 flex flex-col overflow-hidden">
+                                    {/* To Field */}
+                                    <div className="flex items-center px-4 py-2 border-b border-gray-200 text-sm">
+                                        <span className="text-gray-500 w-12 flex-shrink-0">Tới:</span>
+                                        <div className="flex-1 bg-gray-100 rounded px-2.5 py-1 text-gray-700 font-medium truncate">
+                                            {contactCandidate.jobseekerId.name} &lt;{contactCandidate.jobseekerId.email}&gt;
+                                        </div>
+                                    </div>
+
+                                    {/* Subject Field */}
+                                    <div className="flex items-center px-4 py-2 border-b border-gray-200 text-sm">
+                                        <span className="text-gray-500 w-12 flex-shrink-0">Tiêu đề:</span>
+                                        <input
+                                            type="text"
+                                            value={emailSubject}
+                                            onChange={e => setEmailSubject(e.target.value)}
+                                            placeholder="Nhập tiêu đề thư..."
+                                            required
+                                            className="flex-1 focus:outline-none text-gray-800"
+                                        />
+                                    </div>
+
+                                    {/* Message Body */}
+                                    <div className="flex-1 px-4 py-3 overflow-auto">
+                                        <textarea
+                                            value={emailBody}
+                                            onChange={e => setEmailBody(e.target.value)}
+                                            placeholder="Nhập nội dung thư liên hệ..."
+                                            required
+                                            className="w-full h-full resize-none focus:outline-none text-gray-800 text-sm leading-relaxed"
+                                        />
+                                    </div>
+
+                                    {/* Footer / Actions */}
+                                    <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between flex-shrink-0">
+                                        <div className="flex items-center gap-3">
+                                            <button
+                                                type="submit"
+                                                disabled={sendingEmail}
+                                                className="flex items-center gap-2 px-5 py-2 bg-[#0A2463] text-white rounded-lg text-sm font-semibold hover:bg-[#071A4A] transition-colors disabled:opacity-50"
+                                            >
+                                                {sendingEmail ? "Đang gửi..." : (
+                                                    <>
+                                                        Gửi <Send size={14} />
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => setContactModalOpen(false)}
+                                            className="p-2 text-gray-400 hover:text-red-500 rounded-lg hover:bg-gray-100 transition-colors"
+                                            title="Hủy thư nháp"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
                         </div>
                     )}
 

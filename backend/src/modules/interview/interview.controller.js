@@ -145,16 +145,15 @@ class InterviewController {
             const actualQuestionCount = questionsArray.length;
             const targetCount = Math.max(totalQuestionsInSession, actualQuestionCount);
             
-            // IMPORTANT: +1 because current answer was just submitted
-            const isLastQuestion = (answeredCount + 1) >= targetCount;
+            const isLastQuestion = answeredCount >= targetCount;
 
             console.log(`[SUBMIT ANSWER] sessionId=${evaluatedQuestion.sessionId}`);
             console.log(`  Session.totalQuestions = ${sessionForCheck?.totalQuestions}`);
             console.log(`  Actual questions created = ${actualQuestionCount}`);
             console.log(`  Target count (max of both) = ${targetCount}`);
-            console.log(`  Already answered: ${answeredCount}, Current: +1, Total so far: ${answeredCount + 1}`);
+            console.log(`  Already answered: ${answeredCount}, Total so far: ${answeredCount}`);
             console.log(`  isLastQuestion = ${isLastQuestion}`);
-            console.log(`  Calculation: (${answeredCount} + 1) >= ${targetCount} = ${isLastQuestion}`);
+            console.log(`  Calculation: ${answeredCount} >= ${targetCount} = ${isLastQuestion}`);
 
             res.status(200).json({
                 success: true,
@@ -454,7 +453,7 @@ class InterviewController {
             if (session.questions.length > 0) {
                 const lastQ = session.questions[session.questions.length - 1];
                 const questionAge = Date.now() - new Date(lastQ.createdAt || 0).getTime();
-                const isFreshUnanswered = !lastQ.userAnswer && questionAge < 300000; // 5 phút
+                const isFreshUnanswered = !lastQ.userAnswer && questionAge < 30000; // 30 giây
                 
                 if (isFreshUnanswered) {
                     console.log(`[REFRESH SAFE] Câu hỏi cuối cùng Q${lastQ.questionNumber} vẫn chưa được trả lời (age=${questionAge}ms). Return luôn thay vì gen mới.`);
@@ -724,7 +723,7 @@ class InterviewController {
             // ENHANCED DUPLICATE DETECTION
             // ==========================================
             function isDuplicateQuestion(newQ, previousQuestions) {
-                if (!newQ || previousQuestions.length === 0) return false;
+                if (!newQ || newQ.trim().length <= 50 || previousQuestions.length === 0) return false;
                 
                 const normalize = (q) => {
                     return q.toLowerCase().trim()
@@ -757,13 +756,13 @@ class InterviewController {
                         return true;
                     }
                     
-                    // 3. KEYWORD MATCH - if 70%+ of keywords match (indicates similar topic)
+                    // 3. KEYWORD MATCH - if 85%+ of keywords match (indicates similar topic)
                     const commonKeywords = [...newQKeywords].filter(k => prevQKeywords.has(k));
                     const matchRatio = newQKeywords.size > 0 
                         ? commonKeywords.length / newQKeywords.size 
                         : 0;
                     
-                    if (matchRatio >= 0.7) {
+                    if (matchRatio >= 0.85) {
                         console.warn(`[DUP CHECK] Keyword match: ${matchRatio.toFixed(2)} (${commonKeywords.length}/${newQKeywords.size})`);
                         return true;
                     }
@@ -853,31 +852,7 @@ Trả về JSON THUẦN TUY (không markdown, không text ngoài):
                     }
                 } catch (groqErr) {
                     console.error("[GROQ FALLBACK ERROR] Lỗi khi gọi Groq để sinh câu hỏi:", groqErr.message);
-                    
-                    // GEMINI FALLBACK - nếu Groq thất bại, thử dùng Gemini (nhanh hơn)
-                    try {
-                        console.log("[GEMINI FALLBACK] Groq thất bại, chuyển sang Gemini...");
-                        const geminiRaw = await req.geminiClient.generateWithPrompt(prompt);
-                        const geminiParsed = req.geminiClient.parseJsonResponse(geminiRaw);
-                        
-                        if (geminiParsed && (geminiParsed.questionText || geminiParsed.question)) {
-                            const geminiQuestion = geminiParsed.questionText || geminiParsed.question;
-                            
-                            // Re-check for duplicates after Gemini generation
-                            if (!isDuplicateQuestion(geminiQuestion, previousQuestions)) {
-                                questionText = geminiQuestion;
-                                aiResponse.questionText = questionText;
-                                aiResponse.question = questionText;
-                                aiResponse.questionType = geminiParsed.questionType || 'Technical';
-                                aiResponse.topic = geminiParsed.topic || targetDomain;
-                                console.log(`[GEMINI FALLBACK SUCCESS] Generated unique question: "${questionText.substring(0, 80)}..."`);
-                            } else {
-                                console.warn(`[GEMINI DUPE CHECK FAILED] Gemini returned duplicate, will use static fallback`);
-                            }
-                        }
-                    } catch (geminiErr) {
-                        console.error("[GEMINI FALLBACK ERROR] Gemini cũng thất bại:", geminiErr.message);
-                    }
+                    console.log("[GROQ FALLBACK] Groq thất bại, sử dụng câu hỏi dự phòng tĩnh.");
                 }
             }
 

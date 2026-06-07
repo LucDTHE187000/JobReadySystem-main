@@ -156,6 +156,22 @@ export class UserController {
 
             const result = await sendContactEmail(candidateEmail, subject, body, senderName);
             if (result.success) {
+                // Tạo thông báo cho ứng viên
+                try {
+                    const candidate = await UserModel.findOne({ email: candidateEmail });
+                    if (candidate) {
+                        const { NotificationService } = await import("../notification/notification.service.js");
+                        await NotificationService.createNotification(
+                            candidate._id,
+                            `Tin nhắn từ nhà tuyển dụng`,
+                            `Nhà tuyển dụng ${senderName} đã gửi thư liên hệ với bạn: "${subject}"`,
+                            "feedback"
+                        );
+                    }
+                } catch (notiErr) {
+                    console.error("Failed to create contact candidate notification:", notiErr);
+                }
+
                 return res.status(200).json({ message: "Gửi email thành công", devMode: result.devMode });
             } else {
                 return res.status(500).json({ message: result.error || "Gửi email thất bại" });

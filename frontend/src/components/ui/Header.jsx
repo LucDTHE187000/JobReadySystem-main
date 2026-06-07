@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import NotificationDropdown from './NotificationDropdown';
 import LanguageSelector from './LanguageSelector';
+import axios from 'axios';
 
 const ROLE_LABEL = {
     ADMIN: 'Quản trị viên',
@@ -31,6 +32,8 @@ export default function Header({ variant = 'dark' }) {
     const location = useLocation();
     const isEmployer = user?.role === 'EMPLOYER' || user?.role === 'ADMIN';
 
+    const [unreadCount, setUnreadCount] = useState(0);
+
     const notificationRef = useRef(null);
     const bellRef = useRef(null);
     const userMenuRef = useRef(null);
@@ -40,6 +43,26 @@ export default function Header({ variant = 'dark' }) {
         window.addEventListener('scroll', onScroll);
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
+
+    useEffect(() => {
+        if (!user) return;
+        const fetchUnread = async () => {
+            const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+            if (!token) return;
+            try {
+                const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/notifications`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const count = res.data?.filter(n => !n.isRead).length || 0;
+                setUnreadCount(count);
+            } catch (error) {
+                console.error("Fetch unread count failed:", error);
+            }
+        };
+        fetchUnread();
+        const interval = setInterval(fetchUnread, 30000); // Poll every 30 seconds
+        return () => clearInterval(interval);
+    }, [user]);
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -133,7 +156,9 @@ export default function Header({ variant = 'dark' }) {
                                         className={`relative p-2 rounded-lg transition-colors ${isNotificationOpen ? 'bg-white/15 text-gold' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
                                     >
                                         <Bell size={20} />
-                                        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-gold border-2 border-navy rounded-full"></span>
+                                        {unreadCount > 0 && (
+                                            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-gold border-2 border-[#0A2463] rounded-full animate-pulse"></span>
+                                        )}
                                     </button>
                                     {isNotificationOpen && (
                                         <div ref={notificationRef}>

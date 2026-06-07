@@ -30,7 +30,7 @@ export class AuthService {
             throw new Error("Email already registered");
         }
 
-        // Tạo tài khoản mới - Verify email directly (no OTP required)
+        // Tạo tài khoản mới - Cần xác thực email qua OTP
         let user;
         try {
             user = await UserModel.create({
@@ -38,7 +38,7 @@ export class AuthService {
                 password,
                 name: normalizedName,
                 role: role || "JOB_SEEKER",
-                isVerified: true,
+                isVerified: false,
             });
         } catch (error) {
             if (error.code === 11000 || error.message.includes("duplicate")) {
@@ -47,10 +47,42 @@ export class AuthService {
             throw error;
         }
 
+        // Tạo mã OTP xác thực email
+        const otpCode = generateOTP();
+        const otpExpires = generateOTPExpiry();
+
+        await OtpModel.create({
+            userId: user._id,
+            email: normalizedEmail,
+            code: otpCode,
+            purpose: "verify_email",
+            expiresAt: otpExpires,
+        });
+
+        // Gửi email chứa mã OTP
+        const emailResult = await sendOTPEmail(normalizedEmail, otpCode, normalizedName);
+        if (!emailResult.success) {
+            console.warn("⚠️ Email không gửi được, nhưng OTP đã được tạo. User có thể xem OTP trong console.");
+        }
+
+        // Tạo thông báo chào mừng
+        try {
+            const { NotificationService } = await import("../notification/notification.service.js");
+            await NotificationService.createNotification(
+                user._id,
+                "Chào mừng đến với JobReady System",
+                "Chúc mừng bạn đã tạo tài khoản thành công! Hãy cập nhật hồ sơ cá nhân để có trải nghiệm tốt nhất.",
+                "system"
+            );
+        } catch (notiErr) {
+            console.error("Welcome notification creation failed:", notiErr);
+        }
+
         return {
-            message: "Đăng ký thành công. Vui lòng đăng nhập để tiếp tục.",
+            message: "Đăng ký thành công. Vui lòng xác thực mã OTP gửi về email của bạn.",
             userId: user._id,
             email: user.email,
+            needsVerification: true
         };
     }
 
@@ -120,16 +152,39 @@ export class AuthService {
 
     // Đăng nhập
     static async login(credentials) {
-        const { email, password } = credentials;
+        const { email, password, otp } = credentials;
         const user = await UserModel.findOne({ email });
         if (!user) throw new Error("Invalid credentials");
-        if (!user.isVerified) throw new Error("Email not verified");
-        if (user.isActive === false) {
-            throw new Error("Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.");
-        }
 
         const isPasswordValid = await user.comparePassword(password);
         if (!isPasswordValid) throw new Error("Invalid credentials");
+
+        if (!user.isVerified) {
+            if (!otp) {
+                throw new Error("Email not verified. Please verify your email first.");
+            }
+
+            // Lấy OTP trong bảng OtpModel
+            const otpRecord = await OtpModel.findOne({ email }).sort({ createdAt: -1 });
+            if (!otpRecord) throw new Error("OTP not found. Please request a new OTP.");
+
+            if (new Date() > otpRecord.expiresAt) {
+                throw new Error("OTP expired. Please request a new OTP.");
+            }
+
+            if (otpRecord.code !== otp.trim()) {
+                throw new Error("Invalid OTP");
+            }
+
+            // Cập nhật user và xóa OTP
+            user.isVerified = true;
+            await user.save();
+            await OtpModel.deleteMany({ email });
+        }
+
+        if (user.isActive === false) {
+            throw new Error("Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.");
+        }
 
         const token = generateTokenFromUser(user);
         return {

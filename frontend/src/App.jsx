@@ -30,6 +30,7 @@ import FeedbackReview from './pages/FeedbackReview';
 import Learning from './pages/Learning';
 import CandidateSearch from './pages/Job/CandidateSearch';
 import AdminDashboard from './pages/AdminDashboard';
+import WriteBlog from './pages/WriteBlog';
 
 function App() {
   return (
@@ -94,6 +95,9 @@ function App() {
             } />
             <Route path="/learning" element={
               <JobSeekerRoute><Learning /></JobSeekerRoute>
+            } />
+            <Route path="/write-blog" element={
+              <JobSeekerRoute><WriteBlog /></JobSeekerRoute>
             } />
             <Route path="/employer/feedback" element={
               <EmployerRoute><FeedbackReview /></EmployerRoute>

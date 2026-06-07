@@ -11,7 +11,8 @@ export const registerSchema = z.object({
 
 export const loginSchema = z.object({
     email: z.string().email("Invalid email"),
-    password: z.string().min(6, "Password must be at least 6 characters")
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    otp: z.string().optional()
 });
 
 export const verifyOTPSchema = z.object({
@@ -143,6 +144,13 @@ export class AuthController {
             }
             if (error.message === "Email not verified. Please verify your email first.") {
                 return res.status(403).json({ message: "Email not verified. Please verify your email first." });
+            }
+            if ([
+                "OTP not found. Please request a new OTP.",
+                "OTP expired. Please request a new OTP.",
+                "Invalid OTP"
+            ].includes(error.message)) {
+                return res.status(400).json({ message: error.message });
             }
             console.error("Login error:", error);
             return res.status(500).json({ message: "Internal server error" });

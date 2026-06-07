@@ -6,7 +6,7 @@ import {
     Users, Briefcase, BarChart3, Shield, Search, ChevronLeft, ChevronRight,
     Lock, Unlock, Trash2, CheckCircle, XCircle, Clock, TrendingUp,
     UserCheck, FileText, LayoutDashboard, LogOut, AlertTriangle,
-    Building2, CheckCircle2, Ban, Eye, Bell
+    Building2, CheckCircle2, Ban, Eye, Bell, CreditCard
 } from "lucide-react";
 
 const API = "http://localhost:4000/api/admin";
@@ -27,6 +27,7 @@ const ADMIN_NAV = [
     { id: "users", label: "Người dùng", icon: Users },
     { id: "employers", label: "Duyệt doanh nghiệp", icon: Building2 },
     { id: "jobs", label: "Tin tuyển dụng", icon: Briefcase },
+    { id: "payments", label: "Quản lý thanh toán", icon: CreditCard },
 ];
 
 function AdminSidebar({ active, setActive, user, onLogout, pendingCount }) {
@@ -59,8 +60,8 @@ function AdminSidebar({ active, setActive, user, onLogout, pendingCount }) {
                             <Icon size={18} /> {label}
                             {showBadge && (
                                 <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
-                                    {pendingCount > 9 ? '9+' : pendingCount}
-                                </span>
+                                    {pendingCount > 99 ? '99+' : pendingCount}
+                                </span> 
                             )}
                         </button>
                     );
@@ -705,6 +706,461 @@ function JobsTab() {
 }
 
 // ============================================================
+// PAYMENTS TAB (PAYOS STYLE)
+// ============================================================
+function PaymentsTab() {
+    const [payments, setPayments] = useState([]);
+    const [stats, setStats] = useState({
+        totalRevenue: 0,
+        successCount: 0,
+        pendingCount: 0,
+        cancelledCount: 0,
+        totalCount: 0
+    });
+    const [chartData, setChartData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [search, setSearch] = useState("");
+    const [statusFilter, setStatusFilter] = useState("");
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [hoveredPoint, setHoveredPoint] = useState(null);
+
+    const fetchPayments = useCallback(async () => {
+        setLoading(true);
+        try {
+            const params = { page, limit: 10 };
+            if (search) params.search = search;
+            if (statusFilter) params.status = statusFilter;
+            const res = await axios.get(`${API}/payments`, {
+                headers: authHeader(),
+                params
+            });
+            setPayments(res.data.payments || []);
+            setStats(res.data.stats || {
+                totalRevenue: 0,
+                successCount: 0,
+                pendingCount: 0,
+                cancelledCount: 0,
+                totalCount: 0
+            });
+            setChartData(res.data.chartData || []);
+            setTotalPages(res.data.totalPages || 1);
+        } catch (e) {
+            console.error("Error fetching payments:", e);
+        } finally {
+            setLoading(false);
+        }
+    }, [page, search, statusFilter]);
+
+    useEffect(() => {
+        fetchPayments();
+    }, [fetchPayments]);
+
+    // Handle search input
+    const handleSearchChange = (e) => {
+        setSearch(e.target.value);
+        setPage(1);
+    };
+
+    const handleFilterStatus = (status) => {
+        setStatusFilter(status);
+        setPage(1);
+    };
+
+    // SVG Line chart computations
+    const renderChart = () => {
+        if (!chartData || chartData.length === 0) return null;
+        
+        const width = 800;
+        const height = 240;
+        const paddingLeft = 70;
+        const paddingRight = 20;
+        const paddingTop = 20;
+        const paddingBottom = 40;
+        
+        const chartWidth = width - paddingLeft - paddingRight;
+        const chartHeight = height - paddingTop - paddingBottom;
+        
+        const maxVal = Math.max(...chartData.map(d => d.revenue), 100000);
+        
+        // Compute coordinates
+        const points = chartData.map((d, index) => {
+            const x = paddingLeft + (index / (chartData.length - 1)) * chartWidth;
+            const y = (paddingTop + chartHeight) - (d.revenue / maxVal) * chartHeight;
+            return { x, y, data: d };
+        });
+        
+        // Generate path
+        const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+        
+        // Generate area path
+        const areaPath = points.length > 0 
+            ? `${linePath} L ${points[points.length - 1].x} ${paddingTop + chartHeight} L ${points[0].x} ${paddingTop + chartHeight} Z`
+            : '';
+
+        // Generate Y axis grid lines (4 lines)
+        const gridLines = [];
+        for (let i = 0; i <= 4; i++) {
+            const ratio = i / 4;
+            const y = paddingTop + chartHeight - ratio * chartHeight;
+            const value = ratio * maxVal;
+            gridLines.push({ y, value });
+        }
+        
+        return (
+            <div className="relative w-full overflow-x-auto">
+                <svg viewBox={`0 0 ${width} ${height}`} className="w-full min-w-[700px] h-auto overflow-visible select-none">
+                    <defs>
+                        <linearGradient id="chart-grad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.35"/>
+                            <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.0"/>
+                        </linearGradient>
+                    </defs>
+
+                    {/* Grid Lines */}
+                    {gridLines.map((line, i) => (
+                        <g key={i} className="opacity-40">
+                            <line 
+                                x1={paddingLeft} 
+                                y1={line.y} 
+                                x2={width - paddingRight} 
+                                y2={line.y} 
+                                stroke="#DDE3F0" 
+                                strokeWidth="1"
+                                strokeDasharray="4 4"
+                            />
+                            <text 
+                                x={paddingLeft - 8} 
+                                y={line.y + 4} 
+                                fill="#9CA3AF" 
+                                fontSize="10" 
+                                textAnchor="end"
+                                className="font-mono font-medium"
+                            >
+                                {line.value >= 1000000 ? `${(line.value / 1000000).toFixed(1)}M` : `${(line.value / 1000).toFixed(0)}K`}
+                            </text>
+                        </g>
+                    ))}
+
+                    {/* Area Path under line */}
+                    {areaPath && (
+                        <path d={areaPath} fill="url(#chart-grad)" />
+                    )}
+
+                    {/* Main Line Path */}
+                    {linePath && (
+                        <path 
+                            d={linePath} 
+                            fill="none" 
+                            stroke="#3B82F6" 
+                            strokeWidth="3" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                        />
+                    )}
+
+                    {/* X Axis labels */}
+                    {points.map((p, i) => {
+                        // Show labels for every 2 days to avoid overlap
+                        if (i % 2 !== 0 && i !== points.length - 1) return null;
+                        const dateObj = new Date(p.data.date);
+                        const label = `${dateObj.getDate()}/${dateObj.getMonth() + 1}`;
+                        return (
+                            <text 
+                                key={i} 
+                                x={p.x} 
+                                y={height - paddingBottom + 18} 
+                                fill="#9CA3AF" 
+                                fontSize="10" 
+                                textAnchor="middle"
+                                className="font-semibold"
+                            >
+                                {label}
+                            </text>
+                        );
+                    })}
+
+                    {/* Interactive Circles */}
+                    {points.map((p, i) => (
+                        <g key={i} className="group cursor-pointer">
+                            <circle 
+                                cx={p.x} 
+                                cy={p.y} 
+                                r="4" 
+                                fill="#3B82F6" 
+                                stroke="#FFFFFF" 
+                                strokeWidth="2"
+                                className="transition-all duration-150 hover:r-6"
+                                onMouseEnter={() => setHoveredPoint({ x: p.x, y: p.y, data: p.data })}
+                                onMouseLeave={() => setHoveredPoint(null)}
+                            />
+                            <circle 
+                                cx={p.x} 
+                                cy={p.y} 
+                                r="12" 
+                                fill="transparent" 
+                                onMouseEnter={() => setHoveredPoint({ x: p.x, y: p.y, data: p.data })}
+                                onMouseLeave={() => setHoveredPoint(null)}
+                            />
+                        </g>
+                    ))}
+                </svg>
+
+                {/* Tooltip Overlay */}
+                {hoveredPoint && (
+                    <div 
+                        className="absolute bg-slate-900/95 text-white px-3 py-2 rounded-xl shadow-lg border border-slate-700 text-xs pointer-events-none z-10 flex flex-col gap-0.5"
+                        style={{
+                            left: `${(hoveredPoint.x / width) * 100}%`,
+                            top: `${(hoveredPoint.y / height) * 100 - 60}%`,
+                            transform: "translateX(-50%)"
+                        }}
+                    >
+                        <span className="font-bold text-[10px] text-gray-400 uppercase tracking-wider">
+                            {new Date(hoveredPoint.data.date).toLocaleDateString("vi-VN", { dateStyle: "medium" })}
+                        </span>
+                        <span className="font-semibold text-sky-400">
+                            Doanh thu: {hoveredPoint.data.revenue.toLocaleString("vi-VN")} đ
+                        </span>
+                        <span className="text-gray-300">
+                            {hoveredPoint.data.count} giao dịch thành công
+                        </span>
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    return (
+        <div>
+            {/* Header */}
+            <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h2 className="text-2xl font-bold text-[#0A2463] mb-1">Quản lý thanh toán</h2>
+                    <p className="text-sm text-gray-500">Giám sát doanh thu và lịch sử giao dịch PayOS thực tế</p>
+                </div>
+                <button 
+                    onClick={fetchPayments} 
+                    className="self-start px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 text-sm font-semibold transition"
+                >
+                    Tải lại dữ liệu
+                </button>
+            </div>
+
+            {/* Stats Dashboard */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+                {/* Doanh thu */}
+                <div className="bg-white rounded-2xl p-5 border border-[#DDE3F0] shadow-sm flex items-center justify-between">
+                    <div className="space-y-1">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Doanh thu (Paid)</p>
+                        <p className="text-2xl font-bold text-emerald-600">{(stats.totalRevenue || 0).toLocaleString("vi-VN")} đ</p>
+                    </div>
+                    <div className="bg-emerald-50 p-3 rounded-xl">
+                        <TrendingUp size={24} className="text-emerald-600" />
+                    </div>
+                </div>
+
+                {/* Tổng giao dịch */}
+                <div className="bg-white rounded-2xl p-5 border border-[#DDE3F0] shadow-sm flex items-center justify-between">
+                    <div className="space-y-1">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tổng đơn hàng</p>
+                        <p className="text-2xl font-bold text-blue-600">{(stats.totalCount || 0).toLocaleString("vi-VN")}</p>
+                    </div>
+                    <div className="bg-blue-50 p-3 rounded-xl">
+                        <FileText size={24} className="text-blue-600" />
+                    </div>
+                </div>
+
+                {/* Thành công */}
+                <div className="bg-white rounded-2xl p-5 border border-[#DDE3F0] shadow-sm flex items-center justify-between">
+                    <div className="space-y-1">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Thành công</p>
+                        <p className="text-2xl font-bold text-emerald-600">{stats.successCount || 0}</p>
+                        <p className="text-[10px] text-gray-400 font-medium">
+                            Tỉ lệ: {stats.totalCount ? Math.round((stats.successCount / stats.totalCount) * 100) : 0}%
+                        </p>
+                    </div>
+                    <div className="bg-emerald-50 p-3 rounded-xl">
+                        <CheckCircle size={24} className="text-emerald-600" />
+                    </div>
+                </div>
+
+                {/* Chờ thanh toán / Huỷ */}
+                <div className="bg-white rounded-2xl p-5 border border-[#DDE3F0] shadow-sm flex items-center justify-between">
+                    <div className="space-y-1">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Chờ / Đã Huỷ</p>
+                        <p className="text-2xl font-bold text-slate-700">
+                            {stats.pendingCount || 0} <span className="text-gray-300">/</span> <span className="text-red-500">{stats.cancelledCount || 0}</span>
+                        </p>
+                        <p className="text-[10px] text-gray-400 font-medium">Chưa thanh toán & Bị hủy bỏ</p>
+                    </div>
+                    <div className="bg-slate-50 p-3 rounded-xl flex gap-1">
+                        <Clock size={16} className="text-amber-500" />
+                        <XCircle size={16} className="text-red-500" />
+                    </div>
+                </div>
+            </div>
+
+            {/* PayOS Revenue Chart */}
+            <div className="bg-white rounded-2xl p-6 border border-[#DDE3F0] shadow-sm mb-8">
+                <div className="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 className="font-bold text-gray-900">Biểu đồ doanh thu</h3>
+                        <p className="text-xs text-gray-500 mt-0.5">Biến động doanh thu hàng ngày trong 14 ngày qua</p>
+                    </div>
+                    <span className="text-xs bg-blue-50 text-blue-600 font-bold px-2.5 py-1 rounded-lg">PayOS Realtime</span>
+                </div>
+                {chartData.length > 0 ? renderChart() : <div className="h-48 flex items-center justify-center text-gray-400 text-sm">Chưa có dữ liệu giao dịch thành công</div>}
+            </div>
+
+            {/* Transactions List */}
+            <div className="bg-white rounded-2xl border border-[#DDE3F0] overflow-hidden shadow-sm">
+                {/* Filters */}
+                <div className="p-5 border-b border-[#DDE3F0] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex flex-wrap gap-2">
+                        {[
+                            { value: "", label: "Tất cả giao dịch" },
+                            { value: "PAID", label: "Thành công" },
+                            { value: "PENDING", label: "Chờ thanh toán" },
+                            { value: "CANCELLED", label: "Đã hủy" }
+                        ].map(opt => (
+                            <button
+                                key={opt.value}
+                                onClick={() => handleFilterStatus(opt.value)}
+                                className={`px-4 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                                    statusFilter === opt.value
+                                        ? "bg-[#0A2463] text-white border-[#0A2463] shadow-sm"
+                                        : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                                }`}
+                            >
+                                {opt.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="relative w-full md:w-80">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                        <input
+                            type="text"
+                            placeholder="Tìm kiếm email, gói cước..."
+                            value={search}
+                            onChange={handleSearchChange}
+                            className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0A2463] focus:border-transparent"
+                        />
+                    </div>
+                </div>
+
+                {/* Table */}
+                <div className="overflow-x-auto">
+                    <table className="w-full border-collapse text-left">
+                        <thead>
+                            <tr className="bg-slate-50 border-b border-[#DDE3F0] text-gray-500 font-semibold text-xs uppercase tracking-wider">
+                                <th className="px-6 py-4">Mã đơn hàng</th>
+                                <th className="px-6 py-4">Người dùng</th>
+                                <th className="px-6 py-4">Gói dịch vụ</th>
+                                <th className="px-6 py-4">Số tiền</th>
+                                <th className="px-6 py-4">Trạng thái</th>
+                                <th className="px-6 py-4">Thời gian</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#DDE3F0] text-sm text-gray-700">
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="6" className="text-center py-10">
+                                        <div className="flex justify-center items-center gap-2">
+                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#0A2463]" />
+                                            <span className="text-xs text-gray-500 font-medium">Đang tải lịch sử giao dịch...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : payments.length === 0 ? (
+                                <tr>
+                                    <td colSpan="6" className="text-center py-10 text-gray-400 font-medium">Không tìm thấy giao dịch nào</td>
+                                </tr>
+                            ) : (
+                                payments.map(p => (
+                                    <tr key={p._id} className="hover:bg-slate-50/50 transition-colors">
+                                        <td className="px-6 py-4 font-mono text-xs font-bold text-gray-900">
+                                            #{p.payosOrderCode}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div>
+                                                <p className="font-semibold text-gray-900">{p.user?.name || "Người dùng ẩn"}</p>
+                                                <p className="text-xs text-gray-400">{p.user?.email || "—"}</p>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div>
+                                                <p className="font-semibold text-gray-800">{p.packageName}</p>
+                                                <p className="text-xs text-gray-400">+{p.creditAmount?.toLocaleString()} Credits</p>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 font-semibold text-gray-900">
+                                            {(p.amount || 0).toLocaleString("vi-VN")} đ
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            {p.status === "PAID" && (
+                                                <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-lg border border-emerald-100">
+                                                    <CheckCircle size={12} className="fill-emerald-700 text-white" />
+                                                    Thành công
+                                                </span>
+                                            )}
+                                            {p.status === "PENDING" && (
+                                                <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-lg border border-amber-100">
+                                                    <Clock size={12} />
+                                                    Chờ thanh toán
+                                                </span>
+                                            )}
+                                            {p.status === "CANCELLED" && (
+                                                <span className="inline-flex items-center gap-1 bg-red-50 text-red-700 text-xs font-bold px-2.5 py-1 rounded-lg border border-red-100">
+                                                    <XCircle size={12} />
+                                                    Đã hủy
+                                                </span>
+                                            )}
+                                            {!["PAID", "PENDING", "CANCELLED"].includes(p.status) && (
+                                                <span className="inline-flex items-center gap-1 bg-slate-50 text-slate-700 text-xs font-bold px-2.5 py-1 rounded-lg border border-slate-100">
+                                                    {p.status}
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 text-xs text-gray-500">
+                                            {new Date(p.createdAt).toLocaleString("vi-VN")}
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-between px-6 py-4 border-t border-[#DDE3F0]">
+                        <p className="text-xs text-gray-500 font-medium">Trang {page} / {totalPages}</p>
+                        <div className="flex gap-2">
+                            <button 
+                                onClick={() => setPage(p => Math.max(1, p - 1))} 
+                                disabled={page === 1} 
+                                className="p-1.5 rounded-lg border border-[#DDE3F0] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                            >
+                                <ChevronLeft size={16} />
+                            </button>
+                            <button 
+                                onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
+                                disabled={page === totalPages} 
+                                className="p-1.5 rounded-lg border border-[#DDE3F0] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                            >
+                                <ChevronRight size={16} />
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+// ============================================================
 // MAIN ADMIN PAGE
 // ============================================================
 export default function AdminDashboard() {
@@ -751,6 +1207,7 @@ export default function AdminDashboard() {
         users: <UsersTab />,
         employers: <EmployersTab />,
         jobs: <JobsTab />,
+        payments: <PaymentsTab />,
     };
 
     return (

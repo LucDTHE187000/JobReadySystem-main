@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     Home, FileText, BrainCircuit, History, BarChart3, User, LogOut,
-    Briefcase, ClipboardList, CreditCard, Plus, MessageSquare, BookOpen
+    Briefcase, ClipboardList, CreditCard, Plus, MessageSquare, BookOpen, PenTool
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -15,6 +15,7 @@ const NAV = [
     { to: '/interview-analytics', label: 'Phân tích', icon: BarChart3 },
     { to: '/my-applications', label: 'Ứng tuyển', icon: ClipboardList },
     { to: '/profile', label: 'Hồ sơ', icon: User },
+    { to: '/write-blog', label: 'Viết Blog', icon: PenTool },
     { to: '/feedback', label: 'Feedback', icon: MessageSquare },
 ];
 

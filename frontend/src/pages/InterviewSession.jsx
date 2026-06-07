@@ -6,7 +6,6 @@ import { Send, Loader2, Mic, MicOff, Video, PhoneOff, Bot, User, AlertCircle, Mi
 import SeekerLayout from '../components/layout/SeekerLayout';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
-const TOTAL_QUESTIONS = 5;
 
 export default function InterviewSession() {
     const { sessionId } = useParams();
@@ -18,8 +17,13 @@ export default function InterviewSession() {
     const recognitionRef = useRef(null);
     const questionFetchedRef = useRef(false); // Use ref to prevent double fetches
     const previousSessionIdRef = useRef(null); // Track session changes
+    const sessionRef = useRef(null);
 
     const [session, setSession] = useState(null);
+
+    useEffect(() => {
+        sessionRef.current = session;
+    }, [session]);
     const [messages, setMessages] = useState([]);
     const [userAnswer, setUserAnswer] = useState('');
     const [loading, setLoading] = useState(true);
@@ -169,6 +173,7 @@ export default function InterviewSession() {
             const s = res.data.data?.session || res.data.data;
             if (!s) throw new Error('Session data empty');
             setSession(s);
+            sessionRef.current = s;
             setTotalQuestions(s?.totalQuestions || 5);
             setMessages([{ role: 'ai', text: `Xin chào! Tôi là AI phỏng vấn JobReady. Hôm nay chúng ta sẽ luyện tập vị trí **${s?.jobTitle || ''}**. Hãy trả lời tự tin và rõ ràng nhé!` }]);
             setLoading(false);
@@ -251,7 +256,10 @@ export default function InterviewSession() {
         setSubmitting(true);
 
         try {
-            if (!currentQuestionId) return;
+            if (!currentQuestionId) {
+                setSubmitting(false);
+                return;
+            }
 
             console.log('[SUBMIT ANSWER] Submitting answer for question:', currentQuestionId);
             const submitRes = await axios.post(
@@ -279,6 +287,7 @@ export default function InterviewSession() {
                     setTimeout(() => {
                         console.log('[REDIRECT] Navigating to result page');
                         navigate(`/interview/${sessionId}/result`);
+                        setSubmitting(false);
                     }, 1500);
                 } catch (completeErr) {
                     console.error('[COMPLETE INTERVIEW ERROR]', completeErr?.response?.data || completeErr.message);
@@ -290,17 +299,25 @@ export default function InterviewSession() {
                     setTimeout(() => {
                         console.log('[FALLBACK REDIRECT] Redirecting to result page despite error');
                         navigate(`/interview/${sessionId}/result`);
+                        setSubmitting(false);
                     }, 2500);
                 }
             } else {
                 // Next question
                 console.log('[NEXT QUESTION] Moving to next question');
                 setQuestionIndex(i => i + 1);
-                setTimeout(() => fetchQuestion(session), 1000);
+                setTimeout(async () => {
+                    try {
+                        await fetchQuestion(sessionRef.current);
+                    } catch (fetchErr) {
+                        console.error('[FETCH NEXT QUESTION ERROR]', fetchErr);
+                    } finally {
+                        setSubmitting(false);
+                    }
+                }, 1000);
             }
         } catch (e) {
             console.error('[HANDLE SEND ERROR]', e?.response?.data || e.message);
-        } finally {
             setSubmitting(false);
         }
     };
@@ -422,9 +439,13 @@ export default function InterviewSession() {
                             />
                             <button
                                 type="button"
-                                onClick={isListening ? stopListening : startListening}
-                                className={`px-3 py-2.5 rounded-xl transition-all ${isListening ? 'bg-red-500 text-white' : 'bg-[#0A2463] text-white hover:bg-[#071A4A]'}`}
-                                title={isListening ? 'Dừng lắng nghe' : 'Bắt đầu nói'}
+                                onPointerDown={startListening}
+                                onPointerUp={stopListening}
+                                onPointerLeave={stopListening}
+                                style={{ touchAction: 'none' }}
+                                className={`px-3 py-2.5 rounded-xl transition-all ${isListening ? 'bg-red-500 text-white scale-105 animate-pulse' : 'bg-[#0A2463] text-white hover:bg-[#071A4A]'} disabled:opacity-40`}
+                                title="Nhấn và giữ để nói"
+                                disabled={submitting}
                             >
                                 <Mic2 size={18} />
                             </button>
