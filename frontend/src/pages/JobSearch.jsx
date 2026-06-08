@@ -441,7 +441,7 @@ export default function JobSearch() {
                 style={{ backgroundImage: `url(${siteImages.guestBg})` }}
             >
                 {/* Premium backdrop-blur and dark-gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-b from-[#030a21]/85 via-[#051336]/80 to-[#030a21]/90 backdrop-blur-[3px] pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-zinc-950/70 to-black/90 backdrop-blur-[3px] pointer-events-none" />
 
                 <div className="relative z-10 flex-1 flex flex-col justify-between">
                     <div>

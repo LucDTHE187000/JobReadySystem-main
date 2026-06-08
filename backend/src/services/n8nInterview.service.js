@@ -1,8 +1,9 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import groqService from '../config/groq.js';
 
 /**
  * Author: Dương Trọng Lực - mssv: HE187000
- * Description: Thay thế N8N bằng Google Gemini trực tiếp.
+ * Description: Thay thế N8N bằng Google Gemini trực tiếp, nay bổ sung thêm Groq làm primary engine.
  * Interface giữ nguyên 100% để interview.controller.js không cần sửa.
  */
 
@@ -20,7 +21,26 @@ function getModel() {
     });
 }
 
-async function callGemini(prompt) {
+async function callAI(prompt) {
+    // 1. Thử dùng Groq trước (llama-3.3-70b-versatile nhanh và ổn định)
+    try {
+        console.log("[AI CALL] Đang gọi Groq Service làm primary...");
+        const responseText = await groqService.generateWithPrompt(prompt);
+        if (responseText) {
+            try {
+                return JSON.parse(responseText);
+            } catch (jsonErr) {
+                const m = responseText.match(/\{[\s\S]*\}/);
+                if (m) return JSON.parse(m[0]);
+                throw jsonErr;
+            }
+        }
+    } catch (groqErr) {
+        console.warn("[AI CALL] Groq thất bại, đang chuyển sang fallback Gemini:", groqErr.message);
+    }
+
+    // 2. Fallback sang Gemini
+    console.log("[AI CALL] Đang gọi Gemini làm fallback...");
     const model = getModel();
     const result = await model.generateContent(prompt);
     const text = result.response.text();
@@ -90,7 +110,7 @@ Trả về JSON:
   "followUpQuestion": "câu hỏi follow-up nếu ứng viên trả lời quá ngắn hoặc chung chung"
 }`;
 
-        return await callGemini(prompt);
+        return await callAI(prompt);
     }
 
     // ─── 2. EVALUATE ANSWER ───────────────────────────────────────────────────
@@ -124,7 +144,7 @@ Trả về JSON:
   "followUpQuestion": "câu hỏi đào sâu hơn nếu muốn"
 }`;
 
-        return await callGemini(prompt);
+        return await callAI(prompt);
     }
 
     // ─── 3. FOLLOW-UP ─────────────────────────────────────────────────────────
@@ -148,7 +168,7 @@ Trả về JSON:
   "topic": "Follow-up"
 }`;
 
-        return await callGemini(prompt);
+        return await callAI(prompt);
     }
 
     // ─── 4. OVERALL FEEDBACK ──────────────────────────────────────────────────
@@ -177,7 +197,7 @@ Trả về JSON:
   "hiringRecommendation": "Strong Yes / Yes / Maybe / No"
 }`;
 
-        return await callGemini(prompt);
+        return await callAI(prompt);
     }
 
     // ─── 5. ANALYZE CV ────────────────────────────────────────────────────────
@@ -201,7 +221,7 @@ Phân tích chi tiết và trả về JSON:
   "summary": "tóm tắt ngắn gọn về ứng viên bằng tiếng Việt"
 }`;
 
-        return await callGemini(prompt);
+        return await callAI(prompt);
     }
 }
 

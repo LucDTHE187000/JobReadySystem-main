@@ -353,7 +353,7 @@ export class AdminController {
 
             // Calculate revenue by date for the last 14 days
             const fourteenDaysAgo = new Date();
-            fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+            fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 15); // Safely cover 14 days in local timezone
 
             const dailyStats = await CreditPaymentModel.aggregate([
                 {
@@ -374,10 +374,11 @@ export class AdminController {
                 { $sort: { _id: 1 } }
             ]);
 
-            // Fill empty days for the last 14 days
+            // Fill empty days for the last 14 days in local (+07:00) timezone
             const chartData = [];
             for (let i = 13; i >= 0; i--) {
                 const date = new Date();
+                date.setHours(date.getHours() + 7); // Shift to local timezone
                 date.setDate(date.getDate() - i);
                 const dateString = date.toISOString().split("T")[0];
                 const dayMatch = dailyStats.find(d => d._id === dateString);

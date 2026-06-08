@@ -775,8 +775,44 @@ class InterviewController {
             while (isDuplicateQuestion(questionText, previousQuestions) && regenerateAttempts < 2) {
                 regenerateAttempts++;
                 console.warn(`[DUPLICATE DETECTED - REGEN ATTEMPT ${regenerateAttempts}] Forcing regeneration to get unique question`);
-                questionText = ""; // Clear and force fallback
-                break;
+                try {
+                    result = await n8nInterviewService.generateQuestion({
+                        sessionId,
+                        position: session.jobTitle || position,
+                        level: cvLevel,
+                        cv: cvString,
+                        skills: cvSkills,
+                        experienceLevel: cvLevel,
+                        recommendedTopics: cvTopics,
+                        cvStrengths,
+                        cvWeaknesses,
+                        answer,
+                        previousQuestions,
+                        previousAnswers,
+                        previousScores,
+                        previousTopics,
+                        interviewStage,
+                        averageScore,
+                        recentScores,
+                        coveredDomains,
+                        weakTopics,
+                        strongTopics,
+                        failureStreak,
+                        successStreak,
+                        targetDifficulty,
+                        targetDomain,
+                        interviewType: session.interviewType || 'Mixed'
+                    });
+                    aiResponse = extractQuestionData(result);
+                    if (Array.isArray(aiResponse)) {
+                        aiResponse = aiResponse[0] || {};
+                    }
+                    questionText = aiResponse.questionText || aiResponse.question || "";
+                } catch (regenErr) {
+                    console.error("[REGEN ERROR] Failed to regenerate question:", regenErr.message);
+                    questionText = "";
+                    break;
+                }
             }
 
             // Check if N8N returned mock/templated question or failed completely
@@ -840,8 +876,21 @@ Trả về JSON THUẦN TUY (không markdown, không text ngoài):
                         
                         // Re-check for duplicates after Groq generation
                         if (isDuplicateQuestion(questionText, previousQuestions)) {
-                            console.warn(`[GROQ DUPE CHECK FAILED] Groq still returned duplicate, forcing Gemini fallback`);
-                            questionText = ""; // Force Gemini
+                            console.warn(`[GROQ DUPE CHECK FAILED] Groq still returned duplicate, retrying once with explicit unique requirement...`);
+                            try {
+                                const groqRawRetry = await req.groqClient.generateWithPrompt(prompt + "\nCHÚ Ý: Câu hỏi trước đó bị trùng lặp. Hãy tạo câu hỏi HOÀN TOÀN khác biệt về chủ đề hoặc cách hỏi.");
+                                const parsedQuestionRetry = req.groqClient.parseJsonResponse(groqRawRetry) || JSON.parse(groqRawRetry);
+                                if (parsedQuestionRetry && (parsedQuestionRetry.questionText || parsedQuestionRetry.question)) {
+                                    questionText = parsedQuestionRetry.questionText || parsedQuestionRetry.question;
+                                    aiResponse.questionText = questionText;
+                                    aiResponse.question = questionText;
+                                    aiResponse.questionType = parsedQuestionRetry.questionType || 'Technical';
+                                    aiResponse.topic = parsedQuestionRetry.topic || targetDomain;
+                                }
+                            } catch (retryErr) {
+                                console.error("[GROQ RETRY ERROR] Groq retry failed:", retryErr.message);
+                                questionText = "";
+                            }
                         } else {
                             aiResponse.questionText = questionText;
                             aiResponse.question = questionText;

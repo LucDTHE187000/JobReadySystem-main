@@ -85,7 +85,7 @@ export default function Pricing() {
             style={{ backgroundImage: `url(${siteImages.guestBg})` }}
         >
             {/* Premium backdrop-blur and dark-gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#030a21]/85 via-[#051336]/80 to-[#030a21]/90 backdrop-blur-[3px] pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-zinc-950/70 to-black/90 backdrop-blur-[3px] pointer-events-none" />
 
             <Header />
 
@@ -142,8 +142,8 @@ export default function Pricing() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 items-stretch">
                         {plans.map((plan, i) => {
                             const Icon = plan.icon;
-                            const displayPrice = billing === 'yearly' && plan.price !== '0' && plan.price !== 'Liên hệ'
-                                ? Math.round(Number.parseInt(plan.price.replaceAll(',', ''), 10) * 0.8).toLocaleString('vi-VN')
+                            const displayPrice = billing === 'yearly' && plan.price !== '0 ' && plan.price !== 'Liên hệ'
+                                ? Math.round(Number.parseInt(plan.price.replaceAll(',', ''), 10) * 0.8).toLocaleString('en-US')
                                 : plan.price;
                             let ctaLink = '/about';
                             if (plan.id === 'pro') {

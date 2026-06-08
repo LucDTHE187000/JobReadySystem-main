@@ -217,8 +217,8 @@ export default function InterviewResult() {
                                         className="w-full p-6 flex items-center justify-between hover:bg-white/10 transition-colors"
                                     >
                                         <div className="text-left flex-1">
-                                            <p className="text-sm font-semibold text-white/60 mb-1">Question {index + 1} ({q.questionType})</p>
-                                            <p className="font-semibold text-white">{q.questionText}</p>
+                                            <p className="text-sm font-semibold text-[#F5C518] mb-1">Question {index + 1} ({q.questionType})</p>
+                                            <p className="font-bold text-white">{q.questionText}</p>
                                         </div>
                                         <div className="flex items-center gap-4 ml-4">
                                             <div className={`px-4 py-2 rounded-lg font-bold ${
@@ -235,14 +235,14 @@ export default function InterviewResult() {
                                     {expandedQuestions[q._id] && (
                                         <div className="px-6 pb-6 space-y-4 bg-white/5">
                                             <div>
-                                                <p className="text-xs font-bold text-white/60 mb-2 uppercase">Candidate Answer</p>
-                                                <p className="text-white/60 bg-white/10 border border-white/10 rounded-lg p-4">{q.userAnswer}</p>
+                                                <p className="text-xs font-bold text-[#F5C518] mb-2 uppercase">Candidate Answer</p>
+                                                <p className="text-white bg-black/40 border border-white/10 rounded-lg p-4 font-medium">{q.userAnswer}</p>
                                             </div>
 
                                             {q.keyPoints?.length > 0 && (
                                                 <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 rounded-lg p-4">
                                                     <p className="text-xs font-bold text-emerald-300 mb-2">✓ Strengths</p>
-                                                    <ul className="space-y-1 text-sm text-white/60">
+                                                    <ul className="space-y-1 text-sm text-white font-medium">
                                                         {q.keyPoints.map((p, i) => <li key={i}>• {p}</li>)}
                                                     </ul>
                                                 </div>
@@ -251,7 +251,7 @@ export default function InterviewResult() {
                                             {q.missedPoints?.length > 0 && (
                                                 <div className="bg-amber-500/10 border border-amber-500/20 text-amber-300 rounded-lg p-4">
                                                     <p className="text-xs font-bold text-amber-300 mb-2">→ Areas for Improvement</p>
-                                                    <ul className="space-y-1 text-sm text-white/60">
+                                                    <ul className="space-y-1 text-sm text-white font-medium">
                                                         {q.missedPoints.map((p, i) => <li key={i}>• {p}</li>)}
                                                     </ul>
                                                 </div>
@@ -259,8 +259,8 @@ export default function InterviewResult() {
 
                                             {q.suggestions?.length > 0 && (
                                                 <div className="bg-blue-500/10 border border-blue-500/20 text-blue-300 rounded-lg p-4">
-                                                    <p className="text-xs font-bold text-blue-700 mb-2">� Suggested Better Answer</p>
-                                                    <ul className="space-y-1 text-sm text-white/60">
+                                                    <p className="text-xs font-bold text-blue-300 mb-2">💡 Suggested Better Answer</p>
+                                                    <ul className="space-y-1 text-sm text-white font-medium">
                                                         {q.suggestions.map((p, i) => <li key={i}>• {p}</li>)}
                                                     </ul>
                                                 </div>
@@ -268,8 +268,8 @@ export default function InterviewResult() {
 
                                             {q.aiFeedback && (
                                                 <div className="bg-purple-500/10 border border-purple-500/20 text-purple-300 rounded-lg p-4">
-                                                    <p className="text-xs font-bold text-purple-700 mb-2">💬 AI Feedback</p>
-                                                    <p className="text-sm text-white/60">{q.aiFeedback}</p>
+                                                    <p className="text-xs font-bold text-purple-300 mb-2">💬 AI Feedback</p>
+                                                    <p className="text-sm text-white font-medium">{q.aiFeedback}</p>
                                                 </div>
                                             )}
                                         </div>
@@ -294,11 +294,11 @@ export default function InterviewResult() {
                             {(session.strengths || []).map((strength, i) => (
                                 <li key={i} className="flex gap-3 items-start">
                                     <span className="text-emerald-400 font-bold mt-1">✓</span>
-                                    <span className="text-white/60">{strength}</span>
+                                    <span className="text-white font-medium">{strength}</span>
                                 </li>
                             ))}
                             {(!session.strengths || session.strengths.length === 0) && (
-                                <p className="text-white/60 italic">Chưa có dữ liệu</p>
+                                <p className="text-white font-medium italic">Chưa có dữ liệu</p>
                             )}
                         </ul>
                     </div>
@@ -313,11 +313,11 @@ export default function InterviewResult() {
                             {(session.improvements || []).map((improvement, i) => (
                                 <li key={i} className="flex gap-3 items-start">
                                     <span className="text-amber-400 font-bold mt-1">→</span>
-                                    <span className="text-white/60">{improvement}</span>
+                                    <span className="text-white font-medium">{improvement}</span>
                                 </li>
                             ))}
                             {(!session.improvements || session.improvements.length === 0) && (
-                                <p className="text-white/60 italic">Chưa có dữ liệu</p>
+                                <p className="text-white font-medium italic">Chưa có dữ liệu</p>
                             )}
                         </ul>
                     </div>
@@ -327,11 +327,11 @@ export default function InterviewResult() {
                 {session.overallFeedback && (
                     <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-3xl p-8 shadow-xl">
                         <h3 className="text-xl font-bold text-white mb-4">Final Summary</h3>
-                        <p className="text-white/60 leading-relaxed">{session.overallFeedback}</p>
+                        <p className="text-white leading-relaxed font-bold text-base">{session.overallFeedback}</p>
                         {session.nextSteps && session.nextSteps.length > 0 && (
                             <div className="mt-4">
-                                <p className="text-sm font-bold text-white mb-2">Next Steps:</p>
-                                <ul className="space-y-1 text-sm text-white/60">
+                                <p className="text-sm font-bold text-[#F5C518] mb-2">Next Steps:</p>
+                                <ul className="space-y-1 text-sm text-white font-medium">
                                     {session.nextSteps.map((step, i) => <li key={i}>• {step}</li>)}
                                 </ul>
                             </div>

@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Send, Loader2, Mic, MicOff, Video, PhoneOff, Bot, User, AlertCircle, Mic2} from 'lucide-react';
 import SeekerLayout from '../components/layout/SeekerLayout';
+import { siteImages } from '../config/siteImages';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -339,8 +340,19 @@ export default function InterviewSession() {
     }
 
     return (
-        <div style={{ height: '100vh', overflow: 'hidden' }} className="bg-[#0A2463] flex flex-col">
-            <header className="flex items-center justify-between px-4 py-3 bg-[#071A4A] text-white border-b border-white/10 flex-shrink-0">
+        <div
+            style={{
+                height: '100vh',
+                overflow: 'hidden',
+                backgroundImage: `url(${siteImages.guestBg})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+            }}
+            className="flex flex-col relative"
+        >
+            <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-zinc-950/70 to-black/90 pointer-events-none z-0" />
+            <header className="relative z-10 flex items-center justify-between px-4 py-3 bg-black/45 backdrop-blur-md text-white border-b border-white/10 flex-shrink-0">
                 <div className="flex items-center gap-2">
                     <span className="font-bold">JOB<span className="text-[#F5C518]">READY</span></span>
                     <span className="text-white/50 text-sm hidden sm:inline">| Phòng phỏng vấn AI</span>
@@ -351,12 +363,12 @@ export default function InterviewSession() {
                 </div>
             </header>
 
-            <div className="flex-1 flex flex-col lg:flex-row gap-0 overflow-hidden">
+            <div className="relative z-10 flex-1 flex flex-col lg:flex-row gap-0 overflow-hidden">
                 {/* Camera Section - Fixed Height, No Scroll */}
                 <div className="w-full lg:w-1/2 h-full lg:h-screen sticky top-0 flex flex-col p-4 overflow-hidden">
-                    <div className="flex-1 relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#1A3A7C] to-[#0A2463] border border-white/10 flex items-center justify-center">
+                    <div className="flex-1 relative rounded-2xl overflow-hidden bg-black/20 border border-white/10 flex items-center justify-center">
                         {cameraError && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-[#0A2463]/80 backdrop-blur z-10">
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur z-10">
                                 <div className="text-center text-white max-w-xs">
                                     <AlertCircle className="w-12 h-12 mx-auto mb-3 text-red-400" />
                                     <p className="text-sm">{cameraError}</p>
@@ -373,7 +385,7 @@ export default function InterviewSession() {
                             />
                         ) : (
                             <div className="text-center">
-                                <div className={`w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center ${camOn ? 'bg-[#0A2463]/80 ring-4 ring-[#F5C518]/40' : 'bg-gray-700'}`}>
+                                <div className={`w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center ${camOn ? 'bg-zinc-800/80 ring-4 ring-[#F5C518]/40' : 'bg-gray-700'}`}>
                                     {camOn ? (
                                         <User className="w-16 h-16 text-white/80" />
                                     ) : (
@@ -399,9 +411,9 @@ export default function InterviewSession() {
                 </div>
 
                 {/* Chat Section - Scrollable */}
-                <div className="w-full lg:w-1/2 h-full lg:h-screen flex flex-col bg-white/95 border-t lg:border-t-0 lg:border-l border-slate-200 text-slate-800 shadow-xl overflow-hidden">
-                    <div className="px-4 py-3 border-b border-slate-200 flex items-center gap-2 flex-shrink-0 bg-white/5">
-                        <Bot className="text-white" size={20} />
+                <div className="w-full lg:w-1/2 h-full lg:h-screen flex flex-col bg-black/35 backdrop-blur-md border-t lg:border-t-0 lg:border-l border-white/10 text-white shadow-xl overflow-hidden">
+                    <div className="px-4 py-3 border-b border-white/10 flex items-center gap-2 flex-shrink-0 bg-white/5">
+                        <Bot className="text-[#F5C518]" size={20} />
                         <span className="font-semibold text-white text-sm">Trò chuyện phỏng vấn</span>
                     </div>
                     <div className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -410,10 +422,10 @@ export default function InterviewSession() {
                                 <div
                                     className={`max-w-[90%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap ${
                                         m.role === 'user'
-                                            ? 'bg-[#0A2463] text-white rounded-br-md'
+                                            ? 'bg-zinc-800 text-white rounded-br-md border border-white/10'
                                             : m.isFeedback
                                             ? 'bg-[#F5C518]/15 text-white border border-[#F5C518]/30 rounded-bl-md'
-                                            : 'bg-white/10 text-white rounded-bl-md'
+                                            : 'bg-white/10 text-white rounded-bl-md border border-white/5'
                                     }`}
                                 >
                                     {m.text}
@@ -434,7 +446,7 @@ export default function InterviewSession() {
                                 onChange={(e) => setUserAnswer(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
                                 placeholder="Nhập hoặc nói câu trả lời..."
-                                className="flex-1 px-3 py-2.5 rounded-xl border-white/10 bg-white/5 text-white placeholder:text-white/30 text-sm focus:ring-2 focus:ring-[#0A2463] outline-none"
+                                className="flex-1 px-3 py-2.5 rounded-xl border-white/10 bg-white/5 text-white placeholder:text-white/30 text-sm focus:ring-2 focus:ring-[#F5C518]/50 outline-none"
                                 disabled={submitting}
                             />
                             <button
@@ -443,7 +455,7 @@ export default function InterviewSession() {
                                 onPointerUp={stopListening}
                                 onPointerLeave={stopListening}
                                 style={{ touchAction: 'none' }}
-                                className={`px-3 py-2.5 rounded-xl transition-all ${isListening ? 'bg-red-500 text-white scale-105 animate-pulse' : 'bg-[#F5C518] text-white hover:bg-[#D4A800] font-bold'} disabled:opacity-40`}
+                                className={`px-3 py-2.5 rounded-xl transition-all ${isListening ? 'bg-red-500 text-white scale-105 animate-pulse' : 'bg-[#F5C518] text-black hover:bg-[#D4A800] font-black'} disabled:opacity-40`}
                                 title="Nhấn và giữ để nói"
                                 disabled={submitting}
                             >
@@ -454,7 +466,7 @@ export default function InterviewSession() {
                             type="button"
                             onClick={handleSend}
                             disabled={submitting || !userAnswer.trim()}
-                            className="p-2.5 bg-[#0A2463] text-white rounded-xl hover:bg-[#071A4A] disabled:opacity-40 transition-all"
+                            className="p-2.5 bg-[#F5C518] text-black rounded-xl hover:bg-[#D4A800] disabled:opacity-40 transition-all"
                         >
                             <Send size={20} />
                         </button>
