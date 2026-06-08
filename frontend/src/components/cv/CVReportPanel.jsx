@@ -5,10 +5,10 @@ function MetricBar({ label, value, color }) {
     return (
         <div className="mb-3">
             <div className="flex justify-between text-xs mb-1">
-                <span className="text-white/60">{label}</span>
-                <span className="font-semibold text-white">{value}%</span>
+                <span className="text-slate-500">{label}</span>
+                <span className="font-semibold text-slate-800">{value}%</span>
             </div>
-            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+            <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                 <div className={`h-full rounded-full ${color}`} style={{ width: `${Math.min(100, value)}%` }} />
             </div>
         </div>
@@ -37,7 +37,7 @@ function RadarVisual({ scores }) {
                             return `${cx + rad * Math.cos(angle)},${cy + rad * Math.sin(angle)}`;
                         }).join(' ')}
                         fill="none"
-                        stroke="rgba(255,255,255,0.1)"
+                        stroke="rgba(10,36,99,0.1)"
                         strokeWidth="1"
                     />
                 ))}
@@ -63,19 +63,19 @@ function RadarVisual({ scores }) {
                             <text x={lx} y={ly} fontSize="10" fill="#F5C518" textAnchor={anchor} alignmentBaseline="middle">
                                 {labels[i]}
                             </text>
-                            <text x={lx} y={ly + 10} fontSize="9" fill="rgba(255,255,255,0.6)" textAnchor={anchor} alignmentBaseline="hanging">
+                            <text x={lx} y={ly + 10} fontSize="9" fill="rgba(10,36,99,0.6)" textAnchor={anchor} alignmentBaseline="hanging">
                                 {v}%
                             </text>
                         </g>
                     );
                 })}
             </svg>
-            <p className="text-center text-sm font-bold text-white mt-2">
+            <p className="text-center text-sm font-bold text-slate-800 mt-2">
                 {Math.round(values.reduce((a, b) => a + b, 0) / values.length)}% Tỷ lệ khớp
             </p>
             <div className="grid grid-cols-1 gap-1 mt-3 w-full text-xs">
                 {labels.map((l, i) => (
-                    <div key={l} className="flex justify-between text-white/60">
+                    <div key={l} className="flex justify-between text-slate-500">
                         <span>{l}</span>
                         <span className="font-semibold">{values[i]}%</span>
                     </div>
@@ -147,57 +147,57 @@ export default function CVReportPanel({ analysis, fileName, onClose }) {
         <div className="space-y-6">
             <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                    <p className="text-xs text-white/60 mb-1">Activity Hub › CV Marking Report</p>
-                    <h2 className="text-2xl font-bold text-white">Kết quả phân tích CV</h2>
-                    <p className="text-sm text-white/60">{fileName}</p>
+                    <p className="text-xs text-slate-500 mb-1">Activity Hub › CV Marking Report</p>
+                    <h2 className="text-2xl font-bold text-slate-800">Kết quả phân tích CV</h2>
+                    <p className="text-sm text-slate-500">{fileName}</p>
                 </div>
                 <div className="text-right">
                     <p className="text-5xl font-extrabold text-emerald-600">{score}%</p>
-                    <p className="text-sm text-white/60">Điểm ATS tổng quát</p>
+                    <p className="text-sm text-slate-500">Điểm ATS tổng quát</p>
                 </div>
             </div>
 
             <div className="flex flex-wrap gap-3">
-                <Link to="/interview" className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#F5C518] text-white rounded-xl text-sm font-bold hover:bg-[#D4A800] transition">
+                <Link to="/interview" className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#F5C518] text-slate-800 rounded-xl text-sm font-bold hover:bg-[#D4A800] transition">
                     <BrainCircuit size={18} /> Luyện phỏng vấn AI
                 </Link>
-                <button type="button" className="px-4 py-2.5 border border-[#DDE3F0] rounded-xl text-sm text-white font-medium hover:bg-white">
+                <button type="button" className="px-4 py-2.5 border border-[#DDE3F0] rounded-xl text-sm text-slate-800 font-medium hover:bg-white">
                     Xuất kết quả
                 </button>
                 {onClose && (
-                    <button type="button" onClick={onClose} className="px-4 py-2.5 text-white/60 text-sm">
+                    <button type="button" onClick={onClose} className="px-4 py-2.5 text-slate-500 text-sm">
                         Phân tích CV khác
                     </button>
                 )}
             </div>
 
             <div className="grid lg:grid-cols-2 gap-6">
-                <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white">
-                    <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
+                <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
+                    <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
                         <FileText size={18} /> Xem trước CV
                     </h3>
-                    <div className="bg-[#F4F6FB] rounded-xl p-4 text-xs text-white/60 max-h-64 overflow-y-auto leading-relaxed">
+                    <div className="bg-[#F4F6FB] rounded-xl p-4 text-xs text-slate-500 max-h-64 overflow-y-auto leading-relaxed">
                         {analysis.rawPreview || 'CV đã được phân tích. Xem chi tiết bên phải.'}
                     </div>
                 </div>
 
-                <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white space-y-4">
+                <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md space-y-4">
                     <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                            <p className="text-2xl font-bold text-white">{score}</p>
-                            <p className="text-xs text-white/60">Điểm ATS</p>
+                        <div className="bg-slate-50 rounded-xl p-4 text-center border border-slate-200/60">
+                            <p className="text-2xl font-bold text-slate-800">{score}</p>
+                            <p className="text-xs text-slate-500">Điểm ATS</p>
                         </div>
-                        <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                            <p className="text-2xl font-bold text-white">{analysis.keywordMatch ?? '1/8'}</p>
-                            <p className="text-xs text-white/60">Từ khóa phù hợp</p>
+                        <div className="bg-slate-50 rounded-xl p-4 text-center border border-slate-200/60">
+                            <p className="text-2xl font-bold text-slate-800">{analysis.keywordMatch ?? '1/8'}</p>
+                            <p className="text-xs text-slate-500">Từ khóa phù hợp</p>
                         </div>
                     </div>
                     {score >= 60 ? (
-                        <div className="flex items-center gap-2 text-sm text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3 backdrop-blur-md">
+                        <div className="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg p-3 shadow-sm">
                             <CheckCircle2 size={18} /> Ngữ pháp và định dạng tốt — đủ điều kiện luyện phỏng vấn
                         </div>
                     ) : (
-                        <div className="flex items-center gap-2 text-sm text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 backdrop-blur-md">
+                        <div className="flex items-center gap-2 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-3 shadow-sm">
                             <AlertTriangle size={18} /> Cần cải thiện CV (≥60 điểm) để mở khóa phỏng vấn AI
                         </div>
                     )}
@@ -205,22 +205,22 @@ export default function CVReportPanel({ analysis, fileName, onClose }) {
             </div>
 
             <div className="grid lg:grid-cols-2 gap-6">
-                <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white">
-                    <h3 className="font-semibold text-white mb-4">Bảng điểm kỹ năng</h3>
+                <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
+                    <h3 className="font-semibold text-slate-800 mb-4">Bảng điểm kỹ năng</h3>
                     <RadarVisual scores={skillScores} />
                 </div>
-                <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white">
-                    <h3 className="font-semibold text-white mb-4">Phân tích ATS</h3>
+                <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
+                    <h3 className="font-semibold text-slate-800 mb-4">Phân tích ATS</h3>
                     <div className="flex items-center justify-center mb-6">
                         <div className="relative w-28 h-28 rounded-full border-8 border-[#F5C518] flex items-center justify-center">
-                            <span className="text-xl font-bold text-white">{Math.min(92, score + 10)}%</span>
+                            <span className="text-xl font-bold text-slate-800">{Math.min(92, score + 10)}%</span>
                         </div>
                     </div>
                     <MetricBar label="Keyword density" value={95} color="bg-emerald-500" />
                     <MetricBar label="Format compliance" value={breakdown.structure || 98} color="bg-[#0A2463]" />
                     <MetricBar label="Content relevance" value={breakdown.relevance || 85} color="bg-[#F5C518]" />
                     {analysis.overallFeedback && (
-                        <p className="text-sm text-white/60 mt-4 pt-4 border-t border-white/10">{analysis.overallFeedback}</p>
+                        <p className="text-sm text-slate-500 mt-4 pt-4 border-t border-slate-200">{analysis.overallFeedback}</p>
                     )}
                 </div>
             </div>
@@ -228,17 +228,17 @@ export default function CVReportPanel({ analysis, fileName, onClose }) {
             {(analysis.strengths?.length > 0 || analysis.suggestions?.length > 0) && (
                 <div className="grid md:grid-cols-2 gap-6">
                     {strengthsList.length > 0 && (
-                        <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white">
+                        <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
                             <h4 className="font-semibold text-green-700 mb-3">Điểm mạnh</h4>
-                            <ul className="space-y-2 text-sm text-white/60">
+                            <ul className="space-y-2 text-sm text-slate-500">
                                 {strengthsList.map((s, i) => <li key={i}>✓ {s}</li>)}
                             </ul>
                         </div>
                     )}
                     {analysis.suggestions?.length > 0 && (
-                        <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white">
-                            <h4 className="font-semibold text-white mb-3">Gợi ý cải thiện</h4>
-                            <ul className="space-y-2 text-sm text-white/60">
+                        <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
+                            <h4 className="font-semibold text-slate-800 mb-3">Gợi ý cải thiện</h4>
+                            <ul className="space-y-2 text-sm text-slate-500">
                                 {suggestionsList.map((s, i) => <li key={i}>→ {s}</li>)}
                             </ul>
                         </div>

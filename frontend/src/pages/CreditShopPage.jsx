@@ -170,10 +170,10 @@ export default function CreditShopPage() {
     <SeekerLayout title="Nạp credit" breadcrumb="Credit › PayOS QR">
       <div className="max-w-5xl mx-auto space-y-10">
         <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-          <div className="rounded-[32px] bg-white/10 border border-white/10 backdrop-blur-md p-8 shadow-xl text-white">
+          <div className="rounded-[32px] bg-white/80 border border-slate-200/60 backdrop-blur-md p-8 shadow-md text-slate-800">
             <div className="flex items-center justify-between gap-4 mb-8">
               <div>
-                <p className="text-sm text-white/60 uppercase tracking-[0.18em]">Chọn gói credit</p>
+                <p className="text-sm text-slate-500 uppercase tracking-[0.18em]">Chọn gói credit</p>
                 <h2 className="mt-3 text-3xl font-bold text-white">PayOS QR </h2>
               </div>
               <span className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500/20 border border-emerald-500/20 px-4 py-2 text-sm font-semibold text-emerald-300">
@@ -187,19 +187,19 @@ export default function CreditShopPage() {
                   key={pack.id}
                   type="button"
                   onClick={() => handleChoosePackage(pack)}
-                  className={`rounded-3xl border p-5 text-left transition ${selectedPackage.id === pack.id ? 'border-[#F5C518] bg-white/20 shadow-sm' : 'border-white/10 bg-white/5 hover:border-white/25'}`}
+                  className={`rounded-3xl border p-5 text-left transition ${selectedPackage.id === pack.id ? 'border-[#F5C518] bg-[#F5C518]/10 shadow-sm text-slate-900 font-bold' : 'border-slate-200 bg-white hover:border-[#F5C518]/40 text-slate-700'}`}
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <p className="text-sm font-semibold text-white/80">{pack.label}</p>
+                      <p className="text-sm font-semibold text-slate-600">{pack.label}</p>
                       <h3 className="mt-2 text-2xl font-bold text-white">{pack.credits.toLocaleString()} credit</h3>
                     </div>
                     <div className="text-right">
                       <p className="text-2xl font-extrabold text-white">{formatCurrency(pack.price)}</p>
-                      <p className="text-sm text-white/60">/ gói</p>
+                      <p className="text-sm text-slate-500">/ gói</p>
                     </div>
                   </div>
-                  <p className="mt-4 text-sm text-white/60">{pack.description}</p>
+                  <p className="mt-4 text-sm text-slate-500">{pack.description}</p>
                 </button>
               ))}
             </div>
@@ -216,18 +216,18 @@ export default function CreditShopPage() {
               <button
                 type="button"
                 onClick={() => navigate('/pricing')}
-                className="inline-flex items-center gap-2 rounded-3xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-3xl border border-slate-200 bg-slate-100 px-6 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-200"
               >
                 Quay về bảng giá <ArrowRight className="h-4 w-4" />
               </button>
             </div>
           </div>
 
-          <div className="rounded-[32px] bg-white/10 border border-white/10 backdrop-blur-md p-8 text-white shadow-xl">
-            <div className="mb-6 bg-white/5 border border-white/10 p-6">
+          <div className="rounded-[32px] bg-white/80 border border-slate-200/60 backdrop-blur-md p-8 text-slate-800 shadow-md">
+            <div className="mb-6 bg-slate-50 border border-slate-200 p-6">
               <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Hướng dẫn thanh toán</p>
               <h3 className="mt-3 text-2xl font-bold">4 bước thanh toán</h3>
-              <ol className="mt-5 space-y-3 text-sm leading-6 text-white/70">
+              <ol className="mt-5 space-y-3 text-sm leading-6 text-slate-600">
                 <li>1. Chọn gói credit phù hợp.</li>
                 <li>2. Nhấn "Tạo mã QR" — mã hiện ngay trong trang.</li>
                 <li>3. Mở app ngân hàng, quét QR và xác nhận.</li>
@@ -235,7 +235,7 @@ export default function CreditShopPage() {
               </ol>
             </div>
 
-            <div className="space-y-4 text-sm text-white/70">
+            <div className="space-y-4 text-sm text-slate-600">
               <p><span className="font-semibold text-white">Gói đang chọn:</span> {selectedPackage.title}</p>
               <p><span className="font-semibold text-white">Credit nhận:</span> {selectedPackage.credits.toLocaleString()}</p>
               <p><span className="font-semibold text-white">Giá:</span> {formatCurrency(selectedPackage.price)}</p>
@@ -244,29 +244,29 @@ export default function CreditShopPage() {
         </section>
 
         {payment && (
-          <section className="rounded-[32px] bg-white/10 border border-white/10 backdrop-blur-md p-8 shadow-xl text-white">
-            <div className="mb-6 rounded-3xl bg-white/10 border border-white/10 p-6 text-white">
+          <section className="rounded-[32px] bg-white/80 border border-slate-200/60 backdrop-blur-md p-8 shadow-md text-slate-800">
+            <div className="mb-6 rounded-3xl bg-slate-50 border border-slate-200 p-6 text-slate-700">
               <p className="text-sm uppercase tracking-[0.18em] text-slate-400">Thanh toán PayOS</p>
               <h2 className="mt-3 text-3xl font-bold">Quét mã QR để thanh toán</h2>
-              <p className="mt-3 text-sm leading-6 text-white/70">
+              <p className="mt-3 text-sm leading-6 text-slate-600">
                 Mở app ngân hàng hỗ trợ VietQR, quét mã và hoàn tất thanh toán.
               </p>
             </div>
 
             <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
               {/* ─── CỘT TRÁI: QR ─── */}
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-                <div className="flex items-center gap-3 rounded-3xl bg-white/5 p-4 border border-white/10 mb-6">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#F5C518] text-[#0A2463] text-sm font-bold flex-shrink-0">
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+                <div className="flex items-center gap-3 rounded-3xl bg-white p-4 border border-slate-200 mb-6 shadow-sm">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#F5C518] text-[#0A2463] font-bold font-bold text-sm font-bold flex-shrink-0">
                     QR
                   </div>
-                  <p className="text-sm text-white/80">
+                  <p className="text-sm text-slate-600">
                     Mở app ngân hàng → Quét QR → Kiểm tra số tiền <strong>{formatCurrency(payment.amount)}</strong> và xác nhận.
                   </p>
                 </div>
 
                 {/* ─── QR IMAGE ─── */}
-                <div className="rounded-3xl bg-white p-6 flex items-center justify-center border border-white/10">
+                <div className="rounded-3xl bg-white p-6 flex items-center justify-center border border-slate-200 shadow-sm">
                   {payment.qrCode ? (
                     <QRCodeImage value={payment.qrCode} size={260} />
                   ) : (
@@ -288,19 +288,19 @@ export default function CreditShopPage() {
                 </div>
 
                 <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                  <div className="bg-white/5 border border-white/10 rounded-3xl p-5 text-left">
-                    <p className="text-xs uppercase text-white/60">Mã đơn hàng</p>
+                  <div className="bg-white border border-slate-200 rounded-3xl p-5 text-left shadow-sm">
+                    <p className="text-xs uppercase text-slate-500">Mã đơn hàng</p>
                     <p className="mt-2 text-lg font-semibold text-white">{payment.orderCode}</p>
                   </div>
-                  <div className="bg-white/5 border border-white/10 rounded-3xl p-5 text-left">
-                    <p className="text-xs uppercase text-white/60">Số tiền</p>
+                  <div className="bg-white border border-slate-200 rounded-3xl p-5 text-left shadow-sm">
+                    <p className="text-xs uppercase text-slate-500">Số tiền</p>
                     <p className="mt-2 text-lg font-bold text-emerald-300">{formatCurrency(payment.amount)}</p>
                   </div>
                 </div>
               </div>
 
               {/* ─── CỘT PHẢI: Thông tin chuyển khoản thủ công ─── */}
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
                 <p className="font-semibold text-white mb-5 text-sm">Hoặc chuyển khoản thủ công</p>
                 <div className="space-y-4">
                   {[
@@ -310,9 +310,9 @@ export default function CreditShopPage() {
                     { label: 'Số tiền', value: formatCurrency(payment.amount) },
                     { label: 'Nội dung', value: paymentDescription },
                   ].map(({ label, value }) => (
-                    <div key={label} className="flex items-center justify-between rounded-3xl bg-white/5 border border-white/10 p-4">
+                    <div key={label} className="flex items-center justify-between rounded-3xl bg-white border border-slate-200 p-4 shadow-sm">
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs uppercase text-white/60">{label}</p>
+                        <p className="text-xs uppercase text-slate-500">{label}</p>
                         <p className="mt-1 font-semibold text-white break-words text-sm">{value}</p>
                       </div>
                       <button
@@ -327,7 +327,7 @@ export default function CreditShopPage() {
                   ))}
                 </div>
 
-                <div className="mt-5 rounded-3xl bg-amber-500/10 border border-amber-500/20 p-4 text-sm text-amber-300">
+                <div className="mt-5 rounded-3xl bg-amber-50 border border-amber-200 p-4 text-sm text-amber-800 shadow-sm">
                   <p className="font-semibold mb-1">⚠️ Lưu ý</p>
                   <p>Nhập <strong>chính xác</strong> số tiền và nội dung chuyển khoản để hệ thống tự động ghi nhận.</p>
                 </div>
@@ -367,15 +367,15 @@ export default function CreditShopPage() {
               <button
                 type="button"
                 onClick={() => { setPayment(null); setVerifyState('idle'); setVerifyMessage(''); }}
-                className="inline-flex items-center justify-center gap-2 rounded-3xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-white/60 hover:border-slate-400"
+                className="inline-flex items-center justify-center gap-2 rounded-3xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-500 hover:border-slate-400"
               >
                 Tạo QR mới
               </button>
             </div>
 
             {/* ─── STATUS MESSAGE ─── */}
-            <div className="mt-5 rounded-3xl bg-white/5 border border-white/10 p-5">
-              <div className="flex items-center gap-3 text-sm text-white/60 mb-3">
+            <div className="mt-5 rounded-3xl bg-slate-50 border border-slate-200 p-5">
+              <div className="flex items-center gap-3 text-sm text-slate-500 mb-3">
                 <Clock3 className="h-4 w-4 flex-shrink-0" />
                 <span>Credit được cộng <strong>ngay lập tức</strong> sau khi PayOS xác nhận thành công.</span>
               </div>
@@ -383,7 +383,7 @@ export default function CreditShopPage() {
                 <p className={`text-sm font-medium ${
                   verifyState === 'success' ? 'text-emerald-300' :
                   verifyState === 'failed' || verifyState === 'error' ? 'text-red-400' :
-                  'text-white/80'
+                  'text-slate-600'
                 }`}>
                   {verifyMessage}
                 </p>

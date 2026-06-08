@@ -399,8 +399,8 @@ export default function InterviewSession() {
                 </div>
 
                 {/* Chat Section - Scrollable */}
-                <div className="w-full lg:w-1/2 h-full lg:h-screen flex flex-col bg-[#030A21]/75 backdrop-blur-md border-t lg:border-t-0 lg:border-l border-white/10 text-white overflow-hidden">
-                    <div className="px-4 py-3 border-b border-white/10 flex items-center gap-2 flex-shrink-0 bg-white/5">
+                <div className="w-full lg:w-1/2 h-full lg:h-screen flex flex-col bg-white/95 border-t lg:border-t-0 lg:border-l border-slate-200 text-slate-800 shadow-xl overflow-hidden">
+                    <div className="px-4 py-3 border-b border-slate-200 flex items-center gap-2 flex-shrink-0 bg-white/5">
                         <Bot className="text-white" size={20} />
                         <span className="font-semibold text-white text-sm">Trò chuyện phỏng vấn</span>
                     </div>

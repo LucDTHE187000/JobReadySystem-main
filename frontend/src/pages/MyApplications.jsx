@@ -16,7 +16,7 @@ const STATUS_CONFIG = {
     pending:   { label: 'Đang xem xét', color: 'bg-blue-500/25 text-blue-300 border border-blue-500/25',   dot: 'bg-blue-400' },
     interview: { label: 'Hẹn phỏng vấn', color: 'bg-purple-100 text-purple-700', dot: 'bg-purple-500' },
     accepted:  { label: 'Đã nhận', color: 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/25',  dot: 'bg-emerald-400' },
-    rejected:  { label: 'Đã kết thúc', color: 'bg-gray-100 text-white/60',    dot: 'bg-gray-400' },
+    rejected:  { label: 'Đã kết thúc', color: 'bg-gray-100 text-slate-500',    dot: 'bg-gray-400' },
 };
 
 const TABS = [
@@ -89,7 +89,7 @@ function ProgressStepper({ status }) {
             {STEPS.map((step, i) => {
                 const done = i <= activeStep;
                 const active = i === activeStep;
-                const stepColor = isRejected && i === activeStep ? 'bg-red-500 border-red-500' : done ? 'bg-[#F5C518] border-[#F5C518]' : 'bg-white/10 border-white/20';
+                const stepColor = isRejected && i === activeStep ? 'bg-red-500 border-red-500' : done ? 'bg-[#F5C518] border-[#F5C518]' : 'bg-slate-200 border-slate-300';
                 const textColor = active ? (isRejected ? 'text-red-600 font-semibold' : 'text-white font-semibold') : done ? 'text-[#1A3A7C] font-medium' : 'text-gray-400';
                 const lineColor = i < activeStep ? 'bg-[#0A2463]' : 'bg-gray-200';
                 return (
@@ -118,7 +118,7 @@ function ApplicationCard({ app }) {
     const city = job.location?.city || '';
 
     return (
-        <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-5 hover:bg-white/15 transition-all text-white shadow-xl">
+        <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-5 hover:bg-white transition-all text-slate-800 shadow-md">
             <div className="flex items-start gap-4">
                 <CompanyLogo company={companyName} avatar={recruiter.avatarUrl || recruiter.avatar} />
                 <div className="flex-1 min-w-0">
@@ -130,7 +130,7 @@ function ApplicationCard({ app }) {
                             >
                                 {job.title || 'Vị trí không xác định'}
                             </Link>
-                            <p className="text-sm text-white/60 mt-0.5 flex items-center gap-1">
+                            <p className="text-sm text-slate-500 mt-0.5 flex items-center gap-1">
                                 <Building2 className="w-3.5 h-3.5 flex-shrink-0" />
                                 <span className="truncate">{companyName}</span>
                                 {city && <><span className="text-white/30 mx-1">•</span><MapPin className="w-3.5 h-3.5 flex-shrink-0" /><span className="truncate">{city}</span></>}
@@ -172,7 +172,7 @@ function ApplicationCard({ app }) {
             {/* Rejected message */}
             {app.status === 'rejected' && (
                 <div className="mt-4 p-3 bg-white/5 rounded-xl border border-white/10 text-white">
-                    <p className="text-xs text-white/60 italic">
+                    <p className="text-xs text-slate-500 italic">
                         Cảm ơn bạn đã quan tâm. Vị trí này hiện đã được lấp đầy hoặc tạm dừng tuyển dụng. Chúng tôi sẽ lưu hồ sơ của bạn cho các cơ hội sắp tới.
                     </p>
                 </div>
@@ -280,7 +280,7 @@ export default function MyApplications() {
                         className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all ${
                             activeParentTab === 'applications'
                                 ? 'border-[#F5C518] text-white font-bold'
-                                : 'border-transparent text-white/60 hover:text-white'
+                                : 'border-transparent text-slate-500 hover:text-white'
                         }`}
                     >
                         💼 Đơn ứng tuyển
@@ -290,7 +290,7 @@ export default function MyApplications() {
                         className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all ${
                             activeParentTab === 'saved'
                                 ? 'border-[#F5C518] text-white font-bold'
-                                : 'border-transparent text-white/60 hover:text-white'
+                                : 'border-transparent text-slate-500 hover:text-white'
                         }`}
                     >
                         ⭐ Việc làm đã lưu
@@ -300,7 +300,7 @@ export default function MyApplications() {
                 {/* Sub Tab: Applications */}
                 {activeParentTab === 'applications' && (
                     <>
-                        <p className="text-sm text-white/60 -mt-2">
+                        <p className="text-sm text-slate-500 -mt-2">
                             Theo dõi trạng thái từ {applications.length} đơn ứng tuyển.
                         </p>
 
@@ -313,13 +313,13 @@ export default function MyApplications() {
                                     value={search}
                                     onChange={e => { setSearch(e.target.value); setPage(1); }}
                                     placeholder="Tìm theo tên công việc, công ty..."
-                                    className="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#F5C518]"
+                                    className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0A2463]"
                                 />
                             </div>
                         </div>
 
                         {/* Tabs */}
-                        <div className="flex gap-1 bg-white/5 border border-white/10 rounded-xl p-1 shadow-sm overflow-x-auto">
+                        <div className="flex gap-1 bg-slate-200/50 border border-slate-300/60 rounded-xl p-1 shadow-sm overflow-x-auto">
                             {TABS.map(tab => (
                                 <button
                                     key={tab.key}
@@ -327,12 +327,12 @@ export default function MyApplications() {
                                     className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
                                         activeTab === tab.key
                                             ? 'bg-[#F5C518] text-[#0A2463] font-bold shadow-sm'
-                                            : 'text-white/60 hover:text-white hover:bg-white/10'
+                                            : 'text-slate-500 hover:text-white hover:bg-white/10'
                                     }`}
                                 >
                                     {tab.label}
                                     <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                                        activeTab === tab.key ? 'bg-[#0A2463]/15 text-[#0A2463]' : 'bg-white/10 text-white/60'
+                                        activeTab === tab.key ? 'bg-[#0A2463]/15 text-[#0A2463]' : 'bg-white/10 text-slate-500'
                                     }`}>
                                         {tabCounts[tab.key]}
                                     </span>
@@ -346,9 +346,9 @@ export default function MyApplications() {
                                 <Loader2 className="w-8 h-8 animate-spin text-white" />
                             </div>
                         ) : paginated.length === 0 ? (
-                            <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-12 text-center text-white shadow-xl">
+                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-12 text-center text-slate-700 shadow-md">
                                 <ClipboardList className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-                                <p className="text-white/60 font-medium">Chưa có đơn ứng tuyển nào</p>
+                                <p className="text-slate-500 font-medium">Chưa có đơn ứng tuyển nào</p>
                                 <p className="text-sm text-gray-400 mt-1">Hãy ứng tuyển để bắt đầu hành trình sự nghiệp!</p>
                                 <Link to="/jobs" className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-[#F5C518] text-[#0A2463] rounded-xl text-sm font-bold hover:bg-[#D4A800] transition-colors">
                                     <Briefcase className="w-4 h-4" /> Tìm việc làm
@@ -368,7 +368,7 @@ export default function MyApplications() {
                                 <button
                                     onClick={() => setPage(p => Math.max(1, p - 1))}
                                     disabled={page === 1}
-                                    className="p-2 rounded-lg border border-white/10 text-white disabled:opacity-40 hover:bg-white/10 transition-colors"
+                                    className="p-2 rounded-lg border border-slate-300 text-slate-700 disabled:opacity-40 hover:bg-slate-100 transition-colors"
                                 >
                                     <ChevronLeft className="w-4 h-4 text-white" />
                                 </button>
@@ -386,7 +386,7 @@ export default function MyApplications() {
                                 <button
                                     onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                                     disabled={page === totalPages}
-                                    className="p-2 rounded-lg border border-white/10 text-white disabled:opacity-40 hover:bg-white/10 transition-colors"
+                                    className="p-2 rounded-lg border border-slate-300 text-slate-700 disabled:opacity-40 hover:bg-slate-100 transition-colors"
                                 >
                                     <ChevronRight className="w-4 h-4 text-white" />
                                 </button>
@@ -398,7 +398,7 @@ export default function MyApplications() {
                 {/* Sub Tab: Saved Jobs */}
                 {activeParentTab === 'saved' && (
                     <div className="space-y-4">
-                        <p className="text-sm text-white/60 -mt-2">
+                        <p className="text-sm text-slate-500 -mt-2">
                             Bạn đã lưu {savedJobs.length} công việc quan tâm.
                         </p>
                         
@@ -407,10 +407,10 @@ export default function MyApplications() {
                                 <Loader2 className="w-8 h-8 animate-spin text-white" />
                             </div>
                         ) : savedJobs.length === 0 ? (
-                            <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-12 text-center text-white shadow-xl">
+                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-12 text-center text-slate-700 shadow-md">
                                 <Heart className="w-12 h-12 text-white/20 mx-auto mb-3" />
-                                <p className="text-white/60 font-medium">Chưa có việc làm nào được lưu</p>
-                                <p className="text-sm text-white/60 mt-1">Lưu các việc làm yêu thích khi xem tin tuyển dụng để nộp đơn ứng tuyển sau!</p>
+                                <p className="text-slate-500 font-medium">Chưa có việc làm nào được lưu</p>
+                                <p className="text-sm text-slate-500 mt-1">Lưu các việc làm yêu thích khi xem tin tuyển dụng để nộp đơn ứng tuyển sau!</p>
                                 <Link to="/jobs" className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-[#F5C518] text-[#0A2463] rounded-xl text-sm font-bold hover:bg-[#D4A800] transition-colors">
                                     <Briefcase className="w-4 h-4" /> Khám phá việc làm
                                 </Link>
@@ -421,7 +421,7 @@ export default function MyApplications() {
                                     const companyName = job.recruiterId?.companyName || job.recruiterId?.name || 'Công ty';
                                     const city = job.location?.city || '';
                                     return (
-                                        <div key={job._id} className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-5 hover:bg-white/15 transition-all text-white shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                        <div key={job._id} className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-5 hover:bg-white transition-all text-slate-800 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                             <div className="flex items-start gap-4">
                                                 <CompanyLogo company={companyName} avatar={job.recruiterId?.avatarUrl || job.recruiterId?.avatar} />
                                                 <div className="min-w-0 text-left">
@@ -431,7 +431,7 @@ export default function MyApplications() {
                                                     >
                                                         {job.title}
                                                     </Link>
-                                                    <p className="text-sm text-white/60 mt-0.5 flex items-center gap-1 flex-wrap">
+                                                    <p className="text-sm text-slate-500 mt-0.5 flex items-center gap-1 flex-wrap">
                                                         <Building2 className="w-3.5 h-3.5 flex-shrink-0" />
                                                         <span>{companyName}</span>
                                                         {city && <><span className="text-gray-300">•</span><MapPin className="w-3.5 h-3.5 flex-shrink-0" /><span>{city}</span></>}

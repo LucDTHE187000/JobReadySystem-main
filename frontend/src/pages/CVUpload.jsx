@@ -501,16 +501,16 @@ export default function CVUpload() {
         <SeekerLayout breadcrumb="Activity Hub › Chấm CV" title={showAnalysis ? '' : 'Chấm & phân tích CV'}>
             {!showAnalysis && (
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 -mt-4">
-                    <p className="text-white/80">Phân tích ATS, kỹ năng và mở khóa luyện phỏng vấn AI (500 credit/lần)</p>
+                    <p className="text-slate-700 font-semibold">Phân tích ATS, kỹ năng và mở khóa luyện phỏng vấn AI (500 credit/lần)</p>
                     
                     {/* Tabs Selector */}
-                    <div className="flex bg-white/5 p-1 rounded-xl border border-white/10 self-start sm:self-auto shadow-sm">
+                    <div className="flex bg-slate-200/50 p-1 rounded-xl border border-slate-300/60 self-start sm:self-auto shadow-sm">
                         <button
                             onClick={() => setActiveTab('upload')}
                             className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition ${
                                 activeTab === 'upload'
                                     ? 'bg-[#F5C518] text-[#0A2463] font-bold shadow-sm'
-                                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                                    : 'text-slate-600 hover:text-slate-800 hover:bg-slate-200/40'
                             }`}
                         >
                             📁 Tải lên CV
@@ -520,7 +520,7 @@ export default function CVUpload() {
                             className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition ${
                                 activeTab === 'builder'
                                     ? 'bg-[#F5C518] text-[#0A2463] font-bold shadow-sm'
-                                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                                    : 'text-slate-600 hover:text-slate-800 hover:bg-slate-200/40'
                             }`}
                         >
                             ✏️ Tự thiết kế CV
@@ -542,8 +542,8 @@ export default function CVUpload() {
                 {message && (
                     <div className={`mb-8 flex items-center gap-3 p-4 rounded-xl ${
                         message.type === 'success'
-                            ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 backdrop-blur-md'
-                            : 'bg-red-500/10 border border-red-500/20 text-red-300 backdrop-blur-md'
+                            ? 'bg-emerald-50 border border-emerald-200 text-emerald-700 shadow-sm'
+                            : 'bg-red-50 border border-red-200 text-red-700 shadow-sm'
                     }`}>
                         {message.type === 'success'
                             ? <CheckCircle className="w-5 h-5 flex-shrink-0" />
@@ -568,8 +568,8 @@ export default function CVUpload() {
                                     onDrop={handleDrop}
                                     className={`relative rounded-3xl border-3 border-dashed p-16 cursor-pointer transition-all shadow-2xl ${
                                         dragActive
-                                            ? 'border-[#F5C518] bg-white/20 scale-105'
-                                            : 'border-white/20 hover:border-[#F5C518] bg-white/20 hover:bg-white/15'
+                                            ? 'border-[#F5C518] bg-white scale-105 shadow-xl'
+                                            : 'border-slate-300 hover:border-[#F5C518] bg-white/80 hover:bg-white shadow-md'
                                     }`}
                                 >
                                     {/* AI Bot Animation */}
@@ -581,14 +581,14 @@ export default function CVUpload() {
                                         {uploading ? (
                                             <>
                                                 <Loader2 className="w-8 h-8 animate-spin text-cyan-500 mx-auto mb-3" />
-                                                <p className="text-white font-semibold">Đang tải lên...</p>
+                                                <p className="text-slate-700 font-semibold">Đang tải lên...</p>
                                             </>
                                         ) : analyzing ? (
                                             <>
                                                 <Loader2 className="w-8 h-8 animate-spin text-orange-500 mx-auto mb-3" />
-                                                <p className="text-white font-semibold text-lg">🤖 AI đang phân tích chi tiết CV...</p>
-                                                <p className="text-sm text-white/70 mt-3">Đang kiểm tra: Kinh nghiệm • Kỹ năng • Thành tích • Ngôn ngữ</p>
-                                                <div className="w-48 h-1 bg-white/10 rounded-full mx-auto mt-3 overflow-hidden">
+                                                <p className="text-slate-800 font-semibold text-lg">🤖 AI đang phân tích chi tiết CV...</p>
+                                                <p className="text-sm text-slate-600 mt-3">Đang kiểm tra: Kinh nghiệm • Kỹ năng • Thành tích • Ngôn ngữ</p>
+                                                <div className="w-48 h-1 bg-slate-200 rounded-full mx-auto mt-3 overflow-hidden">
                                                     <div className="h-full bg-gradient-to-r from-orange-500 to-cyan-500 animate-pulse"></div>
                                                 </div>
                                             </>
@@ -598,8 +598,8 @@ export default function CVUpload() {
                                                     <Upload className="w-6 h-6 text-cyan-500" />
                                                     <Sparkles className="w-6 h-6 text-orange-500" />
                                                 </div>
-                                                <p className="text-xl font-bold text-white mb-2">Kéo thả CV của bạn vào đây</p>
-                                                <p className="text-sm text-white/60">hoặc click để chọn file (PDF, max 5MB)</p>
+                                                <p className="text-xl font-bold text-slate-800 mb-2">Kéo thả CV của bạn vào đây</p>
+                                                <p className="text-sm text-slate-500">hoặc click để chọn file (PDF, max 5MB)</p>
                                             </>
                                         )}
                                     </div>
@@ -615,12 +615,12 @@ export default function CVUpload() {
                             </div>
 
                             {/* Features - 1 column */}
-                            <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-3xl p-8 shadow-lg text-white">
-                                <h3 className="font-bold text-white mb-4 flex items-center gap-2 text-lg">
+                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-3xl p-8 shadow-lg text-slate-800">
+                                <h3 className="font-bold text-[#0A2463] mb-4 flex items-center gap-2 text-lg">
                                     <CheckCircle className="w-5 h-5 text-emerald-400" />
                                     Tính Năng
                                 </h3>
-                                <ul className="space-y-3 text-sm text-white/80">
+                                <ul className="space-y-3 text-sm text-slate-600">
                                     <li className="flex items-center gap-2"><span className="text-emerald-400 font-bold">✨</span> Upload nhiều CV cùng lúc</li>
                                     <li className="flex items-center gap-2"><span className="text-emerald-400 font-bold">📊</span> Đánh giá chi tiết theo tiêu chí</li>
                                     <li className="flex items-center gap-2"><span className="text-emerald-400 font-bold">🎯</span> Gợi ý cụ thể cải thiện</li>
@@ -633,17 +633,17 @@ export default function CVUpload() {
                         {/* CVs List */}
                         {!loading && cvs.length > 0 && (
                             <div className="mb-12">
-                                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                                <h2 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
                                     <FileText className="w-7 h-7 text-[#F5C518]" />
                                     CV Của Bạn ({cvs.length})
                                 </h2>
                                 <div className="grid gap-4">
                                     {cvs.map((cv) => (
-                                        <div key={cv._id} className="bg-white/10 border border-white/10 backdrop-blur-md rounded-xl p-6 border-l-4 border-l-cyan-500 hover:bg-white/15 hover:shadow-lg transition-all duration-300 text-white">
+                                        <div key={cv._id} className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-xl p-6 border-l-4 border-l-cyan-500 hover:bg-white/95 hover:shadow-lg transition-all duration-300 text-slate-800 shadow-md">
                                             <div className="flex items-start justify-between mb-4">
                                                 <div className="flex-1">
-                                                    <h3 className="font-semibold text-white text-lg mb-2">{cv.fileName}</h3>
-                                                    <div className="flex items-center gap-4 text-sm text-white/60">
+                                                    <h3 className="font-semibold text-slate-800 text-lg mb-2">{cv.fileName}</h3>
+                                                    <div className="flex items-center gap-4 text-sm text-slate-500">
                                                         <span>📅 {formatDate(cv.uploadedAt)}</span>
                                                         <span>💾 {formatFileSize(cv.fileSize)}</span>
                                                     </div>
@@ -671,9 +671,9 @@ export default function CVUpload() {
                                                                         'language': 'Chất lượng'
                                                                     };
                                                                     return (
-                                                                        <div key={key} className="bg-white/5 px-3 py-2 rounded-lg text-xs border border-white/10 text-white">
-                                                                            <div className="font-semibold text-white/80">{labels[key] || key}</div>
-                                                                            <div className="text-white/60 font-bold">{val} pts</div>
+                                                                        <div key={key} className="bg-slate-50 px-3 py-2 rounded-lg text-xs border border-slate-200 text-slate-700">
+                                                                            <div className="font-semibold text-slate-600">{labels[key] || key}</div>
+                                                                            <div className="text-slate-500 font-bold">{val} pts</div>
                                                                         </div>
                                                                     );
                                                                 })}
@@ -716,10 +716,10 @@ export default function CVUpload() {
 
                         {/* Empty State */}
                         {!loading && cvs.length === 0 && (
-                            <div className="text-center py-12 bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl text-white">
+                            <div className="text-center py-12 bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl text-slate-700 shadow-md">
                                 <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                                <p className="text-lg text-white/60">Bạn chưa tải lên CV nào</p>
-                                <p className="text-sm text-white/60 mt-2">Tải lên CV từ phần trên hoặc chuyển sang tab "Tự thiết kế CV" để bắt đầu</p>
+                                <p className="text-lg text-slate-500">Bạn chưa tải lên CV nào</p>
+                                <p className="text-sm text-slate-500 mt-2">Tải lên CV từ phần trên hoặc chuyển sang tab "Tự thiết kế CV" để bắt đầu</p>
                             </div>
                         )}
                     </>
@@ -731,59 +731,59 @@ export default function CVUpload() {
                         {/* Form input - 2 columns */}
                         <div className="lg:col-span-2 space-y-6">
                             {/* Personal Info */}
-                            <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white">
-                                <h3 className="text-lg font-bold text-white mb-4 border-b pb-2 flex items-center gap-2">
+                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
+                                <h3 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 flex items-center gap-2">
                                     <span className="p-1 rounded-lg bg-white/10 text-white">👤</span>
                                     Thông tin cá nhân
                                 </h3>
                                 <div className="grid md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-xs font-semibold text-white/60 mb-1 uppercase">Họ và Tên</label>
+                                        <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Họ và Tên</label>
                                         <input
                                             type="text"
                                             value={cvForm.name}
                                             onChange={(e) => setCvForm({ ...cvForm, name: e.target.value })}
-                                            className="w-full px-3 py-2 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F5C518]"
+                                            className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
                                             placeholder="Nguyễn Văn A"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-semibold text-white/60 mb-1 uppercase">Vị trí ứng tuyển</label>
+                                        <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Vị trí ứng tuyển</label>
                                         <input
                                             type="text"
                                             value={cvForm.title}
                                             onChange={(e) => setCvForm({ ...cvForm, title: e.target.value })}
-                                            className="w-full px-3 py-2 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F5C518]"
+                                            className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
                                             placeholder="VD: Frontend Developer, Sales Manager..."
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-semibold text-white/60 mb-1 uppercase">Email</label>
+                                        <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Email</label>
                                         <input
                                             type="email"
                                             value={cvForm.email}
                                             onChange={(e) => setCvForm({ ...cvForm, email: e.target.value })}
-                                            className="w-full px-3 py-2 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F5C518]"
+                                            className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
                                             placeholder="email@example.com"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-semibold text-white/60 mb-1 uppercase">Số điện thoại</label>
+                                        <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Số điện thoại</label>
                                         <input
                                             type="text"
                                             value={cvForm.phone}
                                             onChange={(e) => setCvForm({ ...cvForm, phone: e.target.value })}
-                                            className="w-full px-3 py-2 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F5C518]"
+                                            className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
                                             placeholder="0901234567"
                                         />
                                     </div>
                                     <div className="md:col-span-2">
-                                        <label className="block text-xs font-semibold text-white/60 mb-1 uppercase">Địa chỉ</label>
+                                        <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Địa chỉ</label>
                                         <input
                                             type="text"
                                             value={cvForm.address}
                                             onChange={(e) => setCvForm({ ...cvForm, address: e.target.value })}
-                                            className="w-full px-3 py-2 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F5C518]"
+                                            className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
                                             placeholder="VD: Quận 1, TP. Hồ Chí Minh"
                                         />
                                     </div>
@@ -791,8 +791,8 @@ export default function CVUpload() {
                             </div>
 
                             {/* Summary */}
-                            <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white">
-                                <h3 className="text-lg font-bold text-white mb-4 border-b pb-2 flex items-center gap-2">
+                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
+                                <h3 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 flex items-center gap-2">
                                     <span className="p-1 rounded-lg bg-white/10 text-white">📝</span>
                                     Giới thiệu bản thân
                                 </h3>
@@ -800,13 +800,13 @@ export default function CVUpload() {
                                     value={cvForm.summary}
                                     onChange={(e) => setCvForm({ ...cvForm, summary: e.target.value })}
                                     rows={4}
-                                    className="w-full px-3 py-2 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F5C518] resize-none"
+                                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463] resize-none"
                                     placeholder="Tóm tắt ngắn gọn về kinh nghiệm, thế mạnh và mục tiêu nghề nghiệp của bạn..."
                                 />
                             </div>
 
                             {/* Experience */}
-                            <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white">
+                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
                                 <div className="flex justify-between items-center mb-4 border-b pb-2">
                                     <h3 className="text-lg font-bold text-white flex items-center gap-2">
                                         <span className="p-1 rounded-lg bg-white/10 text-white">💼</span>
@@ -815,14 +815,14 @@ export default function CVUpload() {
                                     <button
                                         type="button"
                                         onClick={handleAddExperience}
-                                        className="px-3 py-1.5 bg-white/10 text-[#F5C518] border border-white/10 hover:bg-white/15 text-xs font-semibold rounded-lg transition"
+                                        className="px-3 py-1.5 bg-slate-100 text-[#0A2463] border border-white/10 hover:bg-white/15 text-xs font-semibold rounded-lg transition"
                                     >
                                         + Thêm kinh nghiệm
                                     </button>
                                 </div>
                                 <div className="space-y-6">
                                     {cvForm.experience.map((exp, index) => (
-                                        <div key={index} className="p-4 rounded-xl border border-white/10 bg-white/5 relative">
+                                        <div key={index} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 relative">
                                             {cvForm.experience.length > 1 && (
                                                 <button
                                                     type="button"
@@ -834,42 +834,42 @@ export default function CVUpload() {
                                             )}
                                             <div className="grid md:grid-cols-2 gap-4">
                                                 <div>
-                                                    <label className="block text-xs font-semibold text-white/60 mb-1 uppercase">Tên công ty</label>
+                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Tên công ty</label>
                                                     <input
                                                         type="text"
                                                         value={exp.company}
                                                         onChange={(e) => handleExperienceChange(index, 'company', e.target.value)}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F5C518]"
+                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
                                                         placeholder="Google, FPT..."
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-xs font-semibold text-white/60 mb-1 uppercase">Vị trí/Chức danh</label>
+                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Vị trí/Chức danh</label>
                                                     <input
                                                         type="text"
                                                         value={exp.role}
                                                         onChange={(e) => handleExperienceChange(index, 'role', e.target.value)}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F5C518]"
+                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
                                                         placeholder="VD: Senior Developer, Sales Executive..."
                                                     />
                                                 </div>
                                                 <div className="md:col-span-2">
-                                                    <label className="block text-xs font-semibold text-white/60 mb-1 uppercase">Khoảng thời gian</label>
+                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Khoảng thời gian</label>
                                                     <input
                                                         type="text"
                                                         value={exp.duration}
                                                         onChange={(e) => handleExperienceChange(index, 'duration', e.target.value)}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F5C518]"
+                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
                                                         placeholder="VD: 09/2023 - Hiện tại, 2021 - 2023..."
                                                     />
                                                 </div>
                                                 <div className="md:col-span-2">
-                                                    <label className="block text-xs font-semibold text-white/60 mb-1 uppercase">Mô tả công việc</label>
+                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Mô tả công việc</label>
                                                     <textarea
                                                         value={exp.desc}
                                                         onChange={(e) => handleExperienceChange(index, 'desc', e.target.value)}
                                                         rows={3}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F5C518] resize-none"
+                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463] resize-none"
                                                         placeholder="Nêu chi tiết công việc, nhiệm vụ chính và các thành tích nổi bật của bạn..."
                                                     />
                                                 </div>
@@ -880,7 +880,7 @@ export default function CVUpload() {
                             </div>
 
                             {/* Education */}
-                            <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white">
+                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
                                 <div className="flex justify-between items-center mb-4 border-b pb-2">
                                     <h3 className="text-lg font-bold text-white flex items-center gap-2">
                                         <span className="p-1 rounded-lg bg-white/10 text-white">🎓</span>
@@ -889,14 +889,14 @@ export default function CVUpload() {
                                     <button
                                         type="button"
                                         onClick={handleAddEducation}
-                                        className="px-3 py-1.5 bg-white/10 text-[#F5C518] border border-white/10 hover:bg-white/15 text-xs font-semibold rounded-lg transition"
+                                        className="px-3 py-1.5 bg-slate-100 text-[#0A2463] border border-white/10 hover:bg-white/15 text-xs font-semibold rounded-lg transition"
                                     >
                                         + Thêm học vấn
                                     </button>
                                 </div>
                                 <div className="space-y-6">
                                     {cvForm.education.map((edu, index) => (
-                                        <div key={index} className="p-4 rounded-xl border border-white/10 bg-white/5 relative">
+                                        <div key={index} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 relative">
                                             {cvForm.education.length > 1 && (
                                                 <button
                                                     type="button"
@@ -908,42 +908,42 @@ export default function CVUpload() {
                                             )}
                                             <div className="grid md:grid-cols-2 gap-4">
                                                 <div>
-                                                    <label className="block text-xs font-semibold text-white/60 mb-1 uppercase">Tên trường học</label>
+                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Tên trường học</label>
                                                     <input
                                                         type="text"
                                                         value={edu.school}
                                                         onChange={(e) => handleEducationChange(index, 'school', e.target.value)}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F5C518]"
+                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
                                                         placeholder="Đại học Bách Khoa, FPT University..."
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-xs font-semibold text-white/60 mb-1 uppercase">Chuyên ngành</label>
+                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Chuyên ngành</label>
                                                     <input
                                                         type="text"
                                                         value={edu.major}
                                                         onChange={(e) => handleEducationChange(index, 'major', e.target.value)}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F5C518]"
+                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
                                                         placeholder="VD: Khoa học Máy tính, Quản trị Kinh doanh..."
                                                     />
                                                 </div>
                                                 <div className="md:col-span-2">
-                                                    <label className="block text-xs font-semibold text-white/60 mb-1 uppercase">Khoảng thời gian</label>
+                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Khoảng thời gian</label>
                                                     <input
                                                         type="text"
                                                         value={edu.duration}
                                                         onChange={(e) => handleEducationChange(index, 'duration', e.target.value)}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F5C518]"
+                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
                                                         placeholder="VD: 2019 - 2023..."
                                                     />
                                                 </div>
                                                 <div className="md:col-span-2">
-                                                    <label className="block text-xs font-semibold text-white/60 mb-1 uppercase">Mô tả bổ sung (Tùy chọn)</label>
+                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Mô tả bổ sung (Tùy chọn)</label>
                                                     <input
                                                         type="text"
                                                         value={edu.desc}
                                                         onChange={(e) => handleEducationChange(index, 'desc', e.target.value)}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F5C518]"
+                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
                                                         placeholder="VD: GPA: 3.6/4.0, Học bổng khuyến học..."
                                                     />
                                                 </div>
@@ -954,23 +954,23 @@ export default function CVUpload() {
                             </div>
 
                             {/* Skills */}
-                            <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white">
-                                <h3 className="text-lg font-bold text-white mb-4 border-b pb-2 flex items-center gap-2">
+                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
+                                <h3 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 flex items-center gap-2">
                                     <span className="p-1 rounded-lg bg-white/10 text-white">🛠️</span>
                                     Kỹ năng chuyên môn
                                 </h3>
-                                <label className="block text-xs font-semibold text-white/60 mb-1 uppercase font-semibold text-white/80">Danh sách kỹ năng (ngăn cách bằng dấu phẩy)</label>
+                                <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase font-semibold text-slate-600">Danh sách kỹ năng (ngăn cách bằng dấu phẩy)</label>
                                 <input
                                     type="text"
                                     value={cvForm.skills}
                                     onChange={(e) => setCvForm({ ...cvForm, skills: e.target.value })}
-                                    className="w-full px-3 py-2 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F5C518]"
+                                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
                                     placeholder="VD: ReactJS, NodeJS, JavaScript, Git, Communication..."
                                 />
                             </div>
 
                             {/* Projects */}
-                            <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white">
+                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
                                 <div className="flex justify-between items-center mb-4 border-b pb-2">
                                     <h3 className="text-lg font-bold text-white flex items-center gap-2">
                                         <span className="p-1 rounded-lg bg-white/10 text-white">📂</span>
@@ -979,14 +979,14 @@ export default function CVUpload() {
                                     <button
                                         type="button"
                                         onClick={handleAddProject}
-                                        className="px-3 py-1.5 bg-white/10 text-[#F5C518] border border-white/10 hover:bg-white/15 text-xs font-semibold rounded-lg transition"
+                                        className="px-3 py-1.5 bg-slate-100 text-[#0A2463] border border-white/10 hover:bg-white/15 text-xs font-semibold rounded-lg transition"
                                     >
                                         + Thêm dự án
                                     </button>
                                 </div>
                                 <div className="space-y-6">
                                     {cvForm.projects.map((p, index) => (
-                                        <div key={index} className="p-4 rounded-xl border border-white/10 bg-white/5 relative">
+                                        <div key={index} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 relative">
                                             <button
                                                 type="button"
                                                 onClick={() => handleRemoveProject(index)}
@@ -996,22 +996,22 @@ export default function CVUpload() {
                                             </button>
                                             <div className="grid gap-4">
                                                 <div>
-                                                    <label className="block text-xs font-semibold text-white/60 mb-1 uppercase">Tên dự án</label>
+                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Tên dự án</label>
                                                     <input
                                                         type="text"
                                                         value={p.name}
                                                         onChange={(e) => handleProjectChange(index, 'name', e.target.value)}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F5C518]"
+                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
                                                         placeholder="VD: Website Bán Hàng E-Commerce, Ứng Dụng Chat realtime..."
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-xs font-semibold text-white/60 mb-1 uppercase">Mô tả dự án</label>
+                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Mô tả dự án</label>
                                                     <textarea
                                                         value={p.desc}
                                                         onChange={(e) => handleProjectChange(index, 'desc', e.target.value)}
                                                         rows={2}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F5C518] resize-none"
+                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463] resize-none"
                                                         placeholder="Nêu công nghệ sử dụng và kết quả của dự án..."
                                                     />
                                                 </div>
@@ -1024,7 +1024,7 @@ export default function CVUpload() {
 
                         {/* Sidebar templates & download */}
                         <div className="space-y-6">
-                            <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white">
+                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
                                 <h3 className="font-bold text-lg mb-4 text-[#F5C518]">🎨 Chọn Giao Diện</h3>
                                 <div className="space-y-3">
                                     {[
@@ -1037,12 +1037,12 @@ export default function CVUpload() {
                                             onClick={() => setCvForm({ ...cvForm, template: tpl.id })}
                                             className={`p-4 rounded-xl border-2 cursor-pointer text-left transition ${
                                                 cvForm.template === tpl.id
-                                                    ? 'border-[#F5C518] bg-white/20'
-                                                    : 'border-white/10 hover:border-[#F5C518]/30 hover:bg-white/5'
+                                                    ? 'border-[#F5C518] bg-[#F5C518]/10 text-slate-900'
+                                                    : 'border-slate-200 hover:border-[#F5C518]/30 hover:bg-slate-50'
                                             }`}
                                         >
                                             <p className="font-semibold text-sm">{tpl.name}</p>
-                                            <p className="text-xs text-white/70 mt-1">{tpl.desc}</p>
+                                            <p className="text-xs text-slate-500 mt-1">{tpl.desc}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -1056,11 +1056,11 @@ export default function CVUpload() {
                                 </button>
                             </div>
 
-                            <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-6 text-white">
+                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
                                 <h3 className="font-bold text-white mb-3 flex items-center gap-2">
                                     <span>💡</span> Hướng dẫn tải lên
                                 </h3>
-                                <p className="text-xs text-white/60 leading-relaxed text-justify">
+                                <p className="text-xs text-slate-500 leading-relaxed text-justify">
                                     Sau khi tải xuống CV dạng PDF, bạn hãy chuyển sang tab <strong>"Tải lên CV"</strong> ở phía trên để nộp file và tiến hành <strong>AI CV Scan & Analysis</strong> để nhận phản hồi chi tiết từ AI.
                                 </p>
                             </div>

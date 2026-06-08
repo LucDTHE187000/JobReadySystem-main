@@ -1,24 +1,15 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const createTransporter = () => {
-    const emailConfig = {
-        host: process.env.EMAIL_HOST || "smtp.gmail.com",
-        port: parseInt(process.env.EMAIL_PORT || "587"),
-        secure: process.env.EMAIL_SECURE === "true",
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        },
-        tls: {
-            rejectUnauthorized: false
-        }
-    };
-
-    if (!emailConfig.auth.user || !emailConfig.auth.pass) {
-        throw new Error("Email credentials (EMAIL_USER and EMAIL_PASS) are required to send emails. Please configure them in your .env file.");
+const getResendInstance = () => {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+        throw new Error("Resend API key (RESEND_API_KEY) is required. Please configure it in your environment / .env file.");
     }
+    return new Resend(apiKey);
+};
 
-    return nodemailer.createTransport(emailConfig);
+const getSender = () => {
+    return process.env.RESEND_SENDER || "onboarding@resend.dev";
 };
 
 /**
@@ -30,10 +21,10 @@ const createTransporter = () => {
  */
 export const sendOTPEmail = async (to, otp, name = "User") => {
     // Check if email credentials are configured
-    const hasEmailConfig = process.env.EMAIL_USER && process.env.EMAIL_PASS;
+    const hasResendConfig = !!process.env.RESEND_API_KEY;
 
     // Only use dev mode if explicitly set OR if no email config is available
-    const isDevModeOnly = process.env.EMAIL_DEV_MODE === "true" || !hasEmailConfig;
+    const isDevModeOnly = process.env.EMAIL_DEV_MODE === "true" || !hasResendConfig;
 
     if (isDevModeOnly) {
         console.log("\n" + "=".repeat(60));
@@ -48,10 +39,11 @@ export const sendOTPEmail = async (to, otp, name = "User") => {
     }
 
     try {
-        const transporter = createTransporter();
+        const resendInstance = getResendInstance();
+        const sender = getSender();
 
         const mailOptions = {
-            from: `"JobReady System" <${process.env.EMAIL_USER || "noreply@jobready.com"}>`,
+            from: `JobReady <${sender}>`,
             to: to,
             subject: "Verify Your Email - JobReady System",
             html: `
@@ -107,12 +99,17 @@ export const sendOTPEmail = async (to, otp, name = "User") => {
             `
         };
 
-        const info = await transporter.sendMail(mailOptions);
-        return { success: true, messageId: info.messageId };
+        const { data, error } = await resendInstance.emails.send(mailOptions);
+        
+        if (error) {
+            throw new Error(error.message || JSON.stringify(error));
+        }
+
+        return { success: true, messageId: data.id };
     } catch (error) {
         console.error("❌ Error sending OTP email:", error.message);
         console.log("\n" + "=".repeat(60));
-        console.log("⚠️  Email không gửi được, nhưng OTP đã được tạo:");
+        console.log("⚠️  Email không gửi được qua Resend, nhưng OTP đã được tạo:");
         console.log(`📧 Email: ${to}`);
         console.log(`🔑 OTP Code: ${otp}`);
         console.log("=".repeat(60) + "\n");
@@ -129,8 +126,8 @@ export const sendOTPEmail = async (to, otp, name = "User") => {
  * @returns {Promise<Object>} Send result
  */
 export const sendResetPasswordEmail = async (to, otp, name = "User") => {
-    const hasEmailConfig = process.env.EMAIL_USER && process.env.EMAIL_PASS;
-    const isDevModeOnly = process.env.EMAIL_DEV_MODE === "true" || !hasEmailConfig;
+    const hasResendConfig = !!process.env.RESEND_API_KEY;
+    const isDevModeOnly = process.env.EMAIL_DEV_MODE === "true" || !hasResendConfig;
 
     if (isDevModeOnly) {
         console.log("\n" + "=".repeat(60));
@@ -145,10 +142,11 @@ export const sendResetPasswordEmail = async (to, otp, name = "User") => {
     }
 
     try {
-        const transporter = createTransporter();
+        const resendInstance = getResendInstance();
+        const sender = getSender();
 
         const mailOptions = {
-            from: `"JobReady System" <${process.env.EMAIL_USER || "noreply@jobready.com"}>`,
+            from: `JobReady <${sender}>`,
             to: to,
             subject: "Reset Your Password - JobReady System",
             html: `
@@ -208,9 +206,14 @@ export const sendResetPasswordEmail = async (to, otp, name = "User") => {
             `
         };
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log("Reset password OTP email sent:", info.messageId);
-        return { success: true, messageId: info.messageId };
+        const { data, error } = await resendInstance.emails.send(mailOptions);
+        
+        if (error) {
+            throw new Error(error.message || JSON.stringify(error));
+        }
+
+        console.log("Reset password OTP email sent:", data.id);
+        return { success: true, messageId: data.id };
     } catch (error) {
         console.error("❌ Error sending reset password OTP email:", error.message);
         console.log("\n" + "=".repeat(60));
@@ -232,8 +235,8 @@ export const sendResetPasswordEmail = async (to, otp, name = "User") => {
  * @returns {Promise<Object>} Send result
  */
 export const sendContactEmail = async (to, subject, body, recruiterName = "Recruiter") => {
-    const hasEmailConfig = process.env.EMAIL_USER && process.env.EMAIL_PASS;
-    const isDevModeOnly = process.env.EMAIL_DEV_MODE === "true" || !hasEmailConfig;
+    const hasResendConfig = !!process.env.RESEND_API_KEY;
+    const isDevModeOnly = process.env.EMAIL_DEV_MODE === "true" || !hasResendConfig;
 
     if (isDevModeOnly) {
         console.log("\n" + "=".repeat(60));
@@ -248,19 +251,25 @@ export const sendContactEmail = async (to, subject, body, recruiterName = "Recru
     }
 
     try {
-        const transporter = createTransporter();
+        const resendInstance = getResendInstance();
+        const sender = getSender();
 
         const mailOptions = {
-            from: `"${recruiterName} (via JobReady)" <${process.env.EMAIL_USER}>`,
+            from: `"${recruiterName} (via JobReady)" <${sender}>`,
             to: to,
-            replyTo: process.env.EMAIL_USER,
+            reply_to: sender,
             subject: subject,
             text: body,
             html: body.replace(/\n/g, '<br/>')
         };
 
-        const info = await transporter.sendMail(mailOptions);
-        return { success: true, messageId: info.messageId };
+        const { data, error } = await resendInstance.emails.send(mailOptions);
+        
+        if (error) {
+            throw new Error(error.message || JSON.stringify(error));
+        }
+
+        return { success: true, messageId: data.id };
     } catch (error) {
         console.error("❌ Error sending contact email:", error.message);
         return { success: false, error: error.message };

@@ -47,8 +47,8 @@ export default function InterviewAnalytics() {
         return (
             <SeekerLayout title="Phân tích phỏng vấn">
                 <div className="flex items-center justify-center py-20">
-                    <Loader2 className="w-12 h-12 animate-spin text-white mx-auto mb-4" />
-                    <p className="text-white/60 ml-4">Đang tải...</p>
+                    <Loader2 className="w-12 h-12 animate-spin text-slate-800 mx-auto mb-4" />
+                    <p className="text-slate-500 ml-4">Đang tải...</p>
                 </div>
             </SeekerLayout>
         );
@@ -58,23 +58,23 @@ export default function InterviewAnalytics() {
         <div
             className={`rounded-2xl shadow-sm border p-6 ${
                 highlight
-                    ? 'bg-[#F5C518]/25 border-[#F5C518]/30 text-white'
-                    : 'bg-white/10 border-white/10 backdrop-blur-md text-white shadow-xl'
+                    ? 'bg-[#F5C518]/15 border-[#F5C518]/35 text-slate-800 shadow-md'
+                    : 'bg-white/80 border border-slate-200/60 backdrop-blur-md text-slate-800 shadow-md'
             }`}
         >
             <div className="flex items-center justify-between mb-4">
-                <p className={`text-sm font-semibold ${highlight ? 'text-white/80' : 'text-white/60'}`}>{label}</p>
-                <Icon className={`w-6 h-6 ${highlight ? 'text-[#F5C518] font-bold font-bold' : 'text-white'}`} />
+                <p className={`text-sm font-semibold ${highlight ? 'text-slate-700' : 'text-slate-500'}`}>{label}</p>
+                <Icon className={`w-6 h-6 ${highlight ? 'text-[#0A2463] font-bold' : 'text-[#0A2463]'}`} />
             </div>
             <div className="flex items-baseline gap-2">
-                <p className={`font-heading text-4xl ${highlight ? 'text-[#F5C518] font-bold font-bold' : 'text-white'}`}>
+                <p className={`font-heading text-4xl ${highlight ? 'text-[#0A2463] font-bold' : 'text-[#0A2463]'}`}>
                     {Math.round(score)}
                 </p>
-                <p className={highlight ? 'text-white/50' : 'text-white/60'}>/100</p>
+                <p className={highlight ? 'text-slate-500' : 'text-slate-550'}>/100</p>
             </div>
-            <div className={`mt-4 w-full rounded-full h-2 ${highlight ? 'bg-white/20' : 'bg-white/10'}`}>
+            <div className={`mt-4 w-full rounded-full h-2 ${highlight ? 'bg-slate-200' : 'bg-slate-100'}`}>
                 <div
-                    className={`h-2 rounded-full transition-all ${highlight ? 'bg-[#F5C518]' : 'bg-gradient-to-r from-[#F5C518] to-emerald-400'}`}
+                    className={`h-2 rounded-full transition-all ${highlight ? 'bg-[#0A2463]' : 'bg-gradient-to-r from-[#0A2463] to-emerald-500'}`}
                     style={{ width: `${Math.min(100, score)}%` }}
                 />
             </div>
@@ -84,7 +84,7 @@ export default function InterviewAnalytics() {
     return (
         <SeekerLayout title="Phân tích phỏng vấn" breadcrumb="Phỏng vấn › Analytics">
             <div className="max-w-6xl mx-auto w-full">
-                <p className="text-white/60 mb-8 -mt-2">Theo dõi tiến độ luyện tập — mô hình HR Advisor</p>
+                <p className="text-slate-500 mb-8 -mt-2">Theo dõi tiến độ luyện tập — mô hình HR Advisor</p>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     {[
@@ -93,12 +93,12 @@ export default function InterviewAnalytics() {
                         { label: 'Câu hỏi làm', value: analytics.totalQuestionsAnswered, icon: Zap },
                         { label: 'Cải thiện', value: `+${analytics.scoreImprovement.toFixed(1)}`, icon: TrendingUp },
                     ].map((stat, i) => (
-                        <div key={i} className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-4 text-white shadow-xl">
+                        <div key={i} className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-4 text-slate-800 shadow-md">
                             <div className="flex items-center justify-between mb-2">
-                                <p className="text-xs font-semibold text-white/60">{stat.label}</p>
-                                <stat.icon className="w-4 h-4 text-white" />
+                                <p className="text-xs font-semibold text-slate-500">{stat.label}</p>
+                                <stat.icon className="w-4 h-4 text-slate-800" />
                             </div>
-                            <p className="font-heading text-2xl text-white">{stat.value}</p>
+                            <p className="font-heading text-2xl text-slate-800">{stat.value}</p>
                         </div>
                     ))}
                 </div>
@@ -109,8 +109,8 @@ export default function InterviewAnalytics() {
                     <ScoreCard label="Câu hỏi hành vi" score={analytics.behavioralScore} icon={Target} />
                 </div>
 
-                <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-8 text-white shadow-xl mb-8">
-                    <h2 className="font-heading text-2xl text-white mb-6 flex items-center gap-2">
+                <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-8 text-slate-800 shadow-xl mb-8">
+                    <h2 className="font-heading text-2xl text-slate-800 mb-6 flex items-center gap-2">
                         <BarChart3 className="w-6 h-6" />
                         Tiến trình điểm số theo lĩnh vực
                     </h2>
@@ -119,12 +119,12 @@ export default function InterviewAnalytics() {
                         {Object.entries(analytics.categoryScores || {}).map(([category, score]) => (
                             <div key={category}>
                                 <div className="flex justify-between mb-2">
-                                    <p className="font-semibold text-white">{category}</p>
-                                    <p className="font-bold text-white">{score.toFixed(0)}</p>
+                                    <p className="font-semibold text-slate-800">{category}</p>
+                                    <p className="font-bold text-slate-800">{score.toFixed(0)}</p>
                                 </div>
-                                <div className="w-full bg-white/10 rounded-full h-3 border border-white/5">
+                                <div className="w-full bg-slate-100 rounded-full h-3 border border-slate-200">
                                     <div
-                                        className="h-3 rounded-full bg-gradient-to-r from-[#F5C518] to-emerald-400 transition-all"
+                                        className="h-3 rounded-full bg-gradient-to-r from-[#0A2463] to-emerald-500 transition-all"
                                         style={{ width: `${score}%` }}
                                     />
                                 </div>
@@ -135,15 +135,15 @@ export default function InterviewAnalytics() {
 
                 <div className="grid md:grid-cols-2 gap-6 mb-8">
                     {analytics.strongestCategories?.length > 0 && (
-                        <div className="bg-white/10 border border-white/10 border-l-4 border-l-emerald-400 backdrop-blur-md rounded-2xl p-8 text-white">
-                            <h3 className="font-heading text-xl text-white mb-4 flex items-center gap-2">
-                                <Award className="w-6 h-6 text-emerald-400" />
+                        <div className="bg-white/10 border border-white/10 border-l-4 border-l-emerald-400 backdrop-blur-md rounded-2xl p-8 text-slate-800">
+                            <h3 className="font-heading text-xl text-slate-800 mb-4 flex items-center gap-2">
+                                <Award className="w-6 h-6 text-emerald-600" />
                                 Điểm mạnh
                             </h3>
                             <ul className="space-y-2">
                                 {analytics.strongestCategories.map((cat, i) => (
-                                    <li key={i} className="flex items-center gap-2 text-white/60">
-                                        <span className="text-emerald-400">✓</span>
+                                    <li key={i} className="flex items-center gap-2 text-slate-800/60">
+                                        <span className="text-emerald-600">✓</span>
                                         <span className="font-medium">{cat}</span>
                                     </li>
                                 ))}
@@ -152,15 +152,15 @@ export default function InterviewAnalytics() {
                     )}
 
                     {analytics.weakestCategories?.length > 0 && (
-                        <div className="bg-white/10 border border-white/10 border-l-4 border-l-[#F5C518] backdrop-blur-md rounded-2xl p-8 text-white">
-                            <h3 className="font-heading text-xl text-white mb-4 flex items-center gap-2">
+                        <div className="bg-white/10 border border-white/10 border-l-4 border-l-[#F5C518] backdrop-blur-md rounded-2xl p-8 text-slate-800">
+                            <h3 className="font-heading text-xl text-slate-800 mb-4 flex items-center gap-2">
                                 <AlertCircle className="w-6 h-6 text-[#F5C518] font-bold font-bold" />
                                 Cần cải thiện
                             </h3>
                             <ul className="space-y-2">
                                 {analytics.weakestCategories.map((cat, i) => (
-                                    <li key={i} className="flex items-center gap-2 text-white/60">
-                                        <span className="text-white">→</span>
+                                    <li key={i} className="flex items-center gap-2 text-slate-800/60">
+                                        <span className="text-slate-800">→</span>
                                         <span className="font-medium">{cat}</span>
                                     </li>
                                 ))}
@@ -170,8 +170,8 @@ export default function InterviewAnalytics() {
                 </div>
 
                 {analytics.aiRecommendations?.length > 0 && (
-                    <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-8 text-white shadow-xl mb-8">
-                        <h2 className="font-heading text-2xl text-white mb-6">Gợi ý từ AI</h2>
+                    <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-8 text-slate-800 shadow-xl mb-8">
+                        <h2 className="font-heading text-2xl text-slate-800 mb-6">Gợi ý từ AI</h2>
                         <div className="space-y-4">
                             {analytics.aiRecommendations.map((rec, i) => (
                                 <div
@@ -181,16 +181,16 @@ export default function InterviewAnalytics() {
                                             ? 'bg-red-500/10 border border-red-500/20 text-red-300'
                                             : rec.priority === 'medium'
                                             ? 'bg-[#F5C518]/10 border border-[#F5C518]/20 text-[#F5C518] font-bold'
-                                            : 'bg-white/5 border border-white/10 text-white/80'
+                                            : 'bg-white/5 border border-white/10 text-slate-800/80'
                                     }`}
                                 >
                                     <div className="flex items-start justify-between mb-2">
-                                        <p className="font-semibold text-white">{rec.category}</p>
-                                        <span className="text-xs font-semibold text-white/60">
+                                        <p className="font-semibold text-slate-800">{rec.category}</p>
+                                        <span className="text-xs font-semibold text-slate-500">
                                             {rec.priority === 'high' ? 'Cao' : rec.priority === 'medium' ? 'Trung bình' : 'Thấp'}
                                         </span>
                                     </div>
-                                    <p className="text-white/60 text-sm">{rec.recommendation}</p>
+                                    <p className="text-slate-800/60 text-sm">{rec.recommendation}</p>
                                 </div>
                             ))}
                         </div>
@@ -198,15 +198,15 @@ export default function InterviewAnalytics() {
                 )}
 
                 {analytics.firstInterviewDate && (
-                    <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-8 text-white mb-8 shadow-xl">
+                    <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-8 text-slate-800 mb-8 shadow-xl">
                         <h2 className="font-heading text-xl mb-4">Thống kê thời gian</h2>
                         <div className="grid md:grid-cols-3 gap-6">
                             <div>
-                                <p className="text-white/60 text-sm mb-1">Lần đầu</p>
+                                <p className="text-slate-800/60 text-sm mb-1">Lần đầu</p>
                                 <p className="font-bold">{new Date(analytics.firstInterviewDate).toLocaleDateString('vi-VN')}</p>
                             </div>
                             <div>
-                                <p className="text-white/60 text-sm mb-1">Lần cuối</p>
+                                <p className="text-slate-800/60 text-sm mb-1">Lần cuối</p>
                                 <p className="font-bold">
                                     {analytics.lastInterviewDate
                                         ? new Date(analytics.lastInterviewDate).toLocaleDateString('vi-VN')
@@ -214,8 +214,8 @@ export default function InterviewAnalytics() {
                                 </p>
                             </div>
                             <div>
-                                <p className="text-white/60 text-sm mb-1">Thời gian TB / câu</p>
-                                <p className="font-bold text-[#F5C518] font-bold font-bold">{Math.round(analytics.averageResponseTime)}s</p>
+                                <p className="text-slate-800/60 text-sm mb-1">Thời gian TB / câu</p>
+                                <p className="font-bold text-[#0A2463] font-bold font-bold">{Math.round(analytics.averageResponseTime)}s</p>
                             </div>
                         </div>
                     </div>
@@ -224,7 +224,7 @@ export default function InterviewAnalytics() {
                 <div className="text-center">
                     <button
                         onClick={() => navigate('/interview')}
-                        className="px-8 py-3 bg-[#F5C518] text-white font-bold rounded-lg hover:bg-[#D4A800] transition-colors"
+                        className="px-8 py-3 bg-[#F5C518] text-slate-800 font-bold rounded-lg hover:bg-[#D4A800] transition-colors"
                     >
                         Luyện tập thêm
                     </button>

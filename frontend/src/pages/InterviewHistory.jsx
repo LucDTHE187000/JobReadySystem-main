@@ -24,10 +24,10 @@ const accentColor = (status) => {
 
 const getStatusBadge = (status) => {
     switch (status) {
-        case 'completed': return 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/20';
-        case 'ongoing': return 'bg-[#F5C518]/20 text-[#F5C518] border border-[#F5C518]/20';
-        case 'paused': return 'bg-white/10 text-white/60 border border-white/10';
-        default: return 'bg-white/10 text-white/60 border border-white/10';
+        case 'completed': return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+        case 'ongoing': return 'bg-[#F5C518]/20 text-[#0A2463] border border-[#F5C518]/30';
+        case 'paused': return 'bg-slate-100 text-slate-600 border border-slate-200';
+        default: return 'bg-slate-100 text-slate-600 border border-slate-200';
     }
 };
 
@@ -77,17 +77,17 @@ export default function InterviewHistory() {
     return (
         <SeekerLayout title="Lịch sử phỏng vấn" breadcrumb="Phỏng vấn › Lịch sử">
             <div className="max-w-5xl mx-auto w-full">
-                <p className="text-white/60 mb-6 -mt-2">Xem các phiên phỏng vấn trước đây của bạn</p>
+                <p className="text-slate-500 mb-6 -mt-2">Xem các phiên phỏng vấn trước đây của bạn</p>
 
-                <div className="inline-flex bg-white/5 rounded-xl p-1 shadow-sm border border-white/10 mb-8 flex-wrap gap-1">
+                <div className="inline-flex bg-slate-200/50 rounded-xl p-1 shadow-sm border border-slate-300/60 mb-8 flex-wrap gap-1">
                     {FILTER_TABS.map(({ id, label }) => (
                         <button
                             key={id}
                             onClick={() => setFilter(id)}
                             className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
                                 filter === id
-                                    ? 'bg-[#F5C518] text-[#0A2463]'
-                                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                                    ? 'bg-[#F5C518] text-[#0A2463] font-bold shadow-sm'
+                                    : 'text-slate-600 hover:text-slate-800 hover:bg-slate-200/40'
                             }`}
                         >
                             {label}
@@ -97,13 +97,13 @@ export default function InterviewHistory() {
 
                 {loading ? (
                     <div className="text-center py-12">
-                        <Loader2 className="w-12 h-12 animate-spin text-[#F5C518] mx-auto mb-4" />
-                        <p className="text-white/60">Đang tải lịch sử...</p>
+                        <Loader2 className="w-12 h-12 animate-spin text-[#0A2463] mx-auto mb-4" />
+                        <p className="text-slate-500">Đang tải lịch sử...</p>
                     </div>
                 ) : sessions.length === 0 ? (
                     <div className="text-center py-12">
-                        <Briefcase className="w-16 h-16 text-white/20 mx-auto mb-4" />
-                        <p className="text-white/60 mb-4">Chưa có phiên phỏng vấn nào</p>
+                        <Briefcase className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                        <p className="text-slate-500 mb-4">Chưa có phiên phỏng vấn nào</p>
                         <button
                             onClick={() => navigate('/interview')}
                             className="px-6 py-3 bg-[#F5C518] text-[#0A2463] font-bold rounded-lg hover:bg-[#D4A800] transition-colors"
@@ -121,19 +121,19 @@ export default function InterviewHistory() {
                                         ? navigate(`/interview/${session._id}/result`)
                                         : navigate(`/interview/${session._id}`)
                                 }
-                                className="group w-full flex bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl hover:bg-white/15 hover:border-[#F5C518]/30 overflow-hidden text-left text-white shadow-xl transition-all"
+                                className="group w-full flex bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl hover:bg-white hover:border-[#F5C518]/30 overflow-hidden text-left text-slate-800 shadow-md transition-all"
                             >
                                 <div className={`w-1 flex-shrink-0 ${accentColor(session.status)}`} />
 
                                 <div className="flex-1 p-6 flex items-start justify-between gap-4">
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-3 mb-3 flex-wrap">
-                                            <div className="w-10 h-10 bg-white/10 border border-white/10 rounded-full flex items-center justify-center flex-shrink-0">
-                                                <Briefcase className="w-5 h-5 text-[#F5C518]" />
+                                            <div className="w-10 h-10 bg-slate-100 border border-slate-200 rounded-full flex items-center justify-center flex-shrink-0">
+                                                <Briefcase className="w-5 h-5 text-[#0A2463]" />
                                             </div>
                                             <div>
-                                                <p className="font-bold text-white">{session.jobTitle}</p>
-                                                <span className="inline-block mt-1 bg-[#F5C518]/20 text-[#F5C518] border border-[#F5C518]/20 rounded-full px-3 py-0.5 text-xs font-semibold">
+                                                <p className="font-bold text-slate-800">{session.jobTitle}</p>
+                                                <span className="inline-block mt-1 bg-[#F5C518]/25 text-[#0A2463] border border-[#F5C518]/30 rounded-full font-semibold px-3 py-0.5 text-xs font-semibold">
                                                     {session.jobCategory}
                                                 </span>
                                             </div>
@@ -141,26 +141,26 @@ export default function InterviewHistory() {
 
                                         <div className="flex gap-6 flex-wrap mb-3">
                                             <div>
-                                                <p className="text-xs text-white/60">Thời gian</p>
-                                                <p className="font-bold text-white text-sm">
+                                                <p className="text-xs text-slate-500">Thời gian</p>
+                                                <p className="font-bold text-slate-800 text-sm">
                                                     {Math.floor(session.duration / 60)}m {session.duration % 60}s
                                                 </p>
                                             </div>
                                             <div>
-                                                <p className="text-xs text-white/60">Câu hỏi</p>
-                                                <p className="font-bold text-white text-sm">
+                                                <p className="text-xs text-slate-500">Câu hỏi</p>
+                                                <p className="font-bold text-slate-800 text-sm">
                                                     {session.answeredQuestions}/{session.totalQuestions}
                                                 </p>
                                             </div>
                                             {session.status === 'completed' && (
                                                 <div>
-                                                    <p className="text-xs text-white/60">Điểm</p>
-                                                    <p className="font-bold text-white text-sm">{session.averageScore}/100</p>
+                                                    <p className="text-xs text-slate-500">Điểm</p>
+                                                    <p className="font-bold text-slate-800 text-sm">{session.averageScore}/100</p>
                                                 </div>
                                             )}
                                         </div>
 
-                                        <div className="text-xs text-white/60 flex items-center gap-1">
+                                        <div className="text-xs text-slate-500 flex items-center gap-1">
                                             <Calendar className="w-3.5 h-3.5" />
                                             {new Date(session.createdAt).toLocaleDateString('vi-VN')}
                                         </div>
@@ -172,12 +172,12 @@ export default function InterviewHistory() {
                                         </span>
 
                                         {session.status === 'completed' && (
-                                            <div className="w-14 h-14 rounded-full bg-white/10 border border-white/10 backdrop-blur-md flex items-center justify-center">
+                                            <div className="w-14 h-14 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center">
                                                 <span className="text-xl font-bold text-[#F5C518]">{session.averageScore}</span>
                                             </div>
                                         )}
 
-                                        <ChevronRight className="w-5 h-5 text-white/40 group-hover:text-white transition-colors" />
+                                        <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-slate-700 transition-colors" />
                                     </div>
                                 </div>
                             </button>

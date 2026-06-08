@@ -350,14 +350,14 @@ export default function InterviewResult() {
                     </button>
                     <button
                         onClick={() => {/* Download logic */}}
-                        className="py-4 px-6 bg-white border-2 border-[#0A2463] text-white font-bold rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                        className="py-4 px-6 bg-white border-2 border-[#0A2463] text-[#0A2463] font-bold rounded-2xl hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
                     >
                         <Download className="w-5 h-5" />
                         Download Report
                     </button>
                     <button
                         onClick={() => navigate('/dashboard')}
-                        className="py-4 px-6 bg-[#F5C518] text-white font-bold rounded-2xl hover:bg-[#D4A800] transition-all flex items-center justify-center gap-2"
+                        className="py-4 px-6 bg-[#F5C518] text-[#0A2463] font-bold rounded-2xl hover:bg-[#D4A800] transition-all flex items-center justify-center gap-2"
                     >
                         <ArrowRight className="w-5 h-5" />
                         Back to Dashboard
