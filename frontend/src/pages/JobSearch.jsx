@@ -369,7 +369,7 @@ export default function JobSearch() {
             const res = await axios.get(`${API_URL}/api/jobs/saved`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            const ids = (res.data.data || []).filter(j => j).map(j => j._id);
+            const ids = (res.data.data || []).filter(j => j && typeof j === 'object' && j._id).map(j => j._id);
             setSavedJobs(ids);
         } catch (err) {
             console.error("Error fetching saved jobs ids:", err);

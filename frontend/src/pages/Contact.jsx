@@ -1,23 +1,47 @@
 import Header from '../components/ui/Header';
 import Footer from '../components/ui/Footer';
-import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import { ScrollReveal } from '../components/ui/ScrollAnimations';
 import { siteImages } from '../config/siteImages';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export default function Contact() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
-    const [sent, setSent] = useState(false);
+    const [status, setStatus] = useState(null); // null | 'loading' | 'success' | 'error'
+    const [errorMsg, setErrorMsg] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setSent(true);
-        setName('');
-        setEmail('');
-        setMessage('');
-        setTimeout(() => setSent(false), 5000);
+        setStatus('loading');
+        setErrorMsg('');
+
+        try {
+            const res = await fetch(`${API_URL}/api/contact`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name.trim(), email: email.trim(), message: message.trim() }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
+            }
+
+            setStatus('success');
+            setName('');
+            setEmail('');
+            setMessage('');
+            setTimeout(() => setStatus(null), 6000);
+        } catch (err) {
+            setStatus('error');
+            setErrorMsg(err.message || 'Không thể gửi tin nhắn. Vui lòng thử lại sau.');
+            setTimeout(() => setStatus(null), 6000);
+        }
     };
 
     return (
@@ -59,7 +83,7 @@ export default function Contact() {
                                         </div>
                                         <div>
                                             <p className="text-white/40 text-xs">Email hỗ trợ</p>
-                                            <p className="font-semibold text-white">duongtrongluc31072004@gmail.com</p>
+                                            <p className="font-semibold text-white">he187000duongtrongluc@gmail.com</p>
                                         </div>
                                     </div>
                                     
@@ -90,9 +114,16 @@ export default function Contact() {
                         <ScrollReveal delay={250} type="scale">
                             <div className="border border-white/10 bg-white/5 backdrop-blur-md p-8 rounded-3xl hover:bg-white/10 transition-all duration-300">
                                 <h3 className="text-xl font-bold text-white mb-6">Gửi tin nhắn cho chúng tôi</h3>
-                                {sent && (
-                                    <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 text-green-400 rounded-xl text-sm">
-                                        Tin nhắn của bạn đã được gửi thành công! Chúng tôi sẽ phản hồi sớm nhất.
+                                {status === 'success' && (
+                                    <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 text-green-400 rounded-xl text-sm flex items-center gap-3">
+                                        <CheckCircle size={18} className="shrink-0" />
+                                        <span>Tin nhắn đã được gửi thành công! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.</span>
+                                    </div>
+                                )}
+                                {status === 'error' && (
+                                    <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-sm flex items-center gap-3">
+                                        <AlertCircle size={18} className="shrink-0" />
+                                        <span>{errorMsg}</span>
                                     </div>
                                 )}
                                 <form onSubmit={handleSubmit} className="space-y-5">
@@ -104,7 +135,8 @@ export default function Contact() {
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
                                             placeholder="Nguyễn Văn A"
-                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F5C518] text-white placeholder:text-white/30 text-sm"
+                                            disabled={status === 'loading'}
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F5C518] text-white placeholder:text-white/30 text-sm disabled:opacity-50"
                                         />
                                     </div>
                                     
@@ -116,7 +148,8 @@ export default function Contact() {
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             placeholder="example@email.com"
-                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F5C518] text-white placeholder:text-white/30 text-sm"
+                                            disabled={status === 'loading'}
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F5C518] text-white placeholder:text-white/30 text-sm disabled:opacity-50"
                                         />
                                     </div>
                                     
@@ -128,15 +161,21 @@ export default function Contact() {
                                             value={message}
                                             onChange={(e) => setMessage(e.target.value)}
                                             placeholder="Nhập nội dung cần hỗ trợ hoặc hợp tác..."
-                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F5C518] text-white placeholder:text-white/30 text-sm"
+                                            disabled={status === 'loading'}
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F5C518] text-white placeholder:text-white/30 text-sm disabled:opacity-50"
                                         />
                                     </div>
                                     
                                     <button
                                         type="submit"
-                                        className="w-full py-3.5 bg-gradient-to-r from-[#F5C518] to-[#D4A800] text-[#0A2463] font-black rounded-xl hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer text-sm"
+                                        disabled={status === 'loading'}
+                                        className="w-full py-3.5 bg-gradient-to-r from-[#F5C518] to-[#D4A800] text-[#0A2463] font-black rounded-xl hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer text-sm disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
                                     >
-                                        Gửi liên hệ <Send size={16} />
+                                        {status === 'loading' ? (
+                                            <><Loader2 size={16} className="animate-spin" /> Đang gửi...</>
+                                        ) : (
+                                            <>Gửi liên hệ <Send size={16} /></>
+                                        )}
                                     </button>
                                 </form>
                             </div>

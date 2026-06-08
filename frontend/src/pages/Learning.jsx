@@ -125,7 +125,7 @@ export default function Learning() {
                             <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-3">
                                 Đột phá sự nghiệp cùng JobReady Academy
                             </h2>
-                            <p className="text-white/80 text-sm sm:text-base leading-relaxed">
+                            <p className="text-gray-500 text-sm sm:text-base leading-relaxed">
                                 Nâng cao chuyên môn và kỹ năng phỏng vấn theo từng lĩnh vực. Mỗi bài học được tối ưu hóa cho ứng viên giúp bạn tăng 85% cơ hội vượt qua vòng phỏng vấn chuyên sâu.
                             </p>
                         </div>
@@ -157,7 +157,7 @@ export default function Learning() {
                     ) : filteredCourses.length === 0 ? (
                         <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-12 text-center shadow-md text-slate-700">
                             <BookMarked className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-                            <p className="text-white/60 font-medium">Chưa có khóa học nào thuộc lĩnh vực này</p>
+                            <p className="text-gray-500 font-medium">Chưa có khóa học nào thuộc lĩnh vực này</p>
                             <p className="text-sm text-slate-500 mt-1">Vui lòng chọn các danh mục khác hoặc quay lại sau.</p>
                         </div>
                     ) : (
@@ -240,7 +240,7 @@ export default function Learning() {
                                         <div className="px-5 pb-5 bg-transparent">
                                             <button
                                                 onClick={() => handleSelectCourse(course._id)}
-                                                className="w-full py-2.5 bg-white/10 border border-white/10 text-white text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group-hover:bg-[#F5C518] group-hover:text-[#0A2463] hover:bg-[#F5C518] hover:text-[#0A2463] hover:shadow-md"
+                                                className="w-full py-2.5 bg-white/10 border border-white/10 text-gray-500 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group-hover:bg-[#F5C518] group-hover:text-[#0A2463] hover:bg-[#F5C518] hover:text-[#0A2463] hover:shadow-md"
                                             >
                                                 <PlayCircle className="w-4 h-4" /> Bắt đầu học
                                             </button>

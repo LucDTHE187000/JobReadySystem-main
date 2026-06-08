@@ -135,118 +135,127 @@ function CreateJob() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      <SideBar profile={user} />
+    <div 
+      className="min-h-screen flex bg-cover bg-center bg-no-repeat bg-fixed relative"
+      style={{ backgroundImage: `url('/background3.jpg')` }}
+    >
+      {/* Premium backdrop-blur and dark-gradient overlay */}
+      <div className="absolute inset-0 bg-slate-950/30 backdrop-blur-[1px] pointer-events-none" />
 
-      <div className="w-full max-w-5xl ml-10 p-6">
-        <h1 className="text-2xl font-semibold mb-1">
-          {isEdit ? "Cập nhật Tin Tuyển Dụng" : "Đăng Tin Tuyển Dụng"}
-        </h1>
+      <div className="relative z-10 flex w-full">
+        <SideBar profile={user} />
 
-        <p className="text-gray-500 mb-6">
-          {isEdit ? "Chỉnh sửa thông tin bên dưới và lưu lại thay đổi" : "Hoàn thành thông tin bên dưới để đăng tin tuyển dụng"}
-        </p>
+        <div className="flex-1 p-6 space-y-6 overflow-y-auto">
+          {/* HEADER */}
+          <div className="bg-white/60 backdrop-blur-md p-6 rounded-2xl border border-white/50 shadow-xl shadow-slate-900/5">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-800 mb-1">
+              {isEdit ? "Cập nhật Tin Tuyển Dụng" : "Đăng Tin Tuyển Dụng"}
+            </h1>
+            <p className="text-sm text-slate-500 font-medium">
+              {isEdit ? "Chỉnh sửa thông tin bên dưới và lưu lại thay đổi" : "Hoàn thành thông tin bên dưới để đăng tin tuyển dụng"}
+            </p>
+          </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-
-          <Section title="Thông tin cơ bản">
-            <Input
-              label="Tiêu đề công việc"
-              name="title"
-              value={form.title}
-              required
-              onChange={handleChange}
-            />
-
-            <Select
-              label="Loại hình công việc"
-              name="jobType"
-              value={form.jobType}
-              onChange={handleChange}
-              options={[
-                { value: "full-time", label: "Toàn thời gian" },
-                { value: "part-time", label: "Bán thời gian" },
-                { value: "internship", label: "Thực tập" },
-                { value: "remote", label: "Remote" },
-                { value: "contract", label: "Hợp đồng" },
-              ]}
-            />
-          </Section>
-
-          <Section title="Chi tiết công việc">
-            <Textarea
-              label="Mô tả công việc"
-              name="description"
-              value={form.description}
-              onChange={handleChange}
-            />
-
-            <Textarea
-              label="Yêu cầu ứng viên"
-              name="requirements"
-              value={form.requirements}
-              onChange={handleChange}
-            />
-          </Section>
-
-          <Section title="Lương">
-            <div className="grid grid-cols-3 gap-4">
+          <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
+            <Section title="Thông tin cơ bản">
               <Input
-                label="Lương từ"
-                name="salaryMin"
-                type="number"
-                value={form.salaryMin}
-                onChange={handleChange}
-              />
-
-              <Input
-                label="Đến"
-                name="salaryMax"
-                type="number"
-                value={form.salaryMax}
+                label="Tiêu đề công việc"
+                name="title"
+                value={form.title}
+                required
                 onChange={handleChange}
               />
 
               <Select
-                label="Tiền tệ"
-                name="currency"
-                value={form.currency}
+                label="Loại hình công việc"
+                name="jobType"
+                value={form.jobType}
                 onChange={handleChange}
                 options={[
-                  { value: "VND", label: "VND" },
-                  { value: "USD", label: "USD" },
+                  { value: "full-time", label: "Toàn thời gian" },
+                  { value: "part-time", label: "Bán thời gian" },
+                  { value: "internship", label: "Thực tập" },
+                  { value: "remote", label: "Remote" },
+                  { value: "contract", label: "Hợp đồng" },
                 ]}
               />
+            </Section>
+
+            <Section title="Chi tiết công việc">
+              <Textarea
+                label="Mô tả công việc"
+                name="description"
+                value={form.description}
+                onChange={handleChange}
+              />
+
+              <Textarea
+                label="Yêu cầu ứng viên"
+                name="requirements"
+                value={form.requirements}
+                onChange={handleChange}
+              />
+            </Section>
+
+            <Section title="Lương">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Input
+                  label="Lương từ"
+                  name="salaryMin"
+                  type="number"
+                  value={form.salaryMin}
+                  onChange={handleChange}
+                />
+
+                <Input
+                  label="Đến"
+                  name="salaryMax"
+                  type="number"
+                  value={form.salaryMax}
+                  onChange={handleChange}
+                />
+
+                <Select
+                  label="Tiền tệ"
+                  name="currency"
+                  value={form.currency}
+                  onChange={handleChange}
+                  options={[
+                    { value: "VND", label: "VND" },
+                    { value: "USD", label: "USD" },
+                  ]}
+                />
+              </div>
+            </Section>
+
+            <Section title="Địa điểm làm việc">
+              <Input
+                label="Tỉnh / Thành phố"
+                name="city"
+                value={form.city}
+                onChange={handleChange}
+              />
+            </Section>
+
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                className="px-6 py-2.5 border border-slate-200 bg-white/80 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl shadow-sm transition-all"
+                onClick={() => navigate(-1)}
+              >
+                Hủy
+              </button>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-6 py-2.5 rounded-xl text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 disabled:opacity-50 font-semibold shadow-lg shadow-indigo-100/30 transition-all duration-300"
+              >
+                {loading ? (isEdit ? "Đang cập nhật..." : "Đang đăng...") : (isEdit ? "Lưu thay đổi" : "Đăng tin ngay →")}
+              </button>
             </div>
-          </Section>
-
-          <Section title="Địa điểm làm việc">
-            <Input
-              label="Tỉnh / Thành phố"
-              name="city"
-              value={form.city}
-              onChange={handleChange}
-            />
-          </Section>
-
-          <div className="flex justify-end gap-3">
-            <button
-              type="button"
-              className="px-6 py-2 border rounded-lg"
-              onClick={() => navigate(-1)}
-            >
-              Hủy
-            </button>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
-            >
-              {loading ? (isEdit ? "Đang cập nhật..." : "Đang đăng...") : (isEdit ? "Lưu thay đổi" : "Đăng tin ngay →")}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );
@@ -255,30 +264,30 @@ function CreateJob() {
 /* ======================== */
 
 const Section = ({ title, children }) => (
-  <div className="bg-white p-6 rounded-xl shadow-sm space-y-4">
-    <h2 className="font-semibold text-lg">{title}</h2>
+  <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-white/60 shadow-xl shadow-slate-900/5 space-y-4">
+    <h2 className="font-bold text-lg text-slate-800 border-b border-slate-100 pb-2">{title}</h2>
     {children}
   </div>
 );
 
 const Input = ({ label, ...props }) => (
-  <div className="space-y-1">
-    <label className="text-sm font-medium">{label}</label>
-    <input {...props} className="w-full border rounded-lg p-2" />
+  <div className="space-y-1 text-left">
+    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{label}</label>
+    <input {...props} className="w-full bg-white/70 border border-slate-200 focus:border-indigo-500 focus:bg-white rounded-xl p-2.5 text-slate-800 placeholder-slate-400 font-medium transition-all shadow-inner focus:ring-0 outline-none" />
   </div>
 );
 
 const Textarea = ({ label, ...props }) => (
-  <div className="space-y-1">
-    <label className="text-sm font-medium">{label}</label>
-    <textarea {...props} rows={4} className="w-full border rounded-lg p-2" />
+  <div className="space-y-1 text-left">
+    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{label}</label>
+    <textarea {...props} rows={5} className="w-full bg-white/70 border border-slate-200 focus:border-indigo-500 focus:bg-white rounded-xl p-2.5 text-slate-850 placeholder-slate-400 font-medium transition-all shadow-inner focus:ring-0 outline-none" />
   </div>
 );
 
 const Select = ({ label, options, ...props }) => (
-  <div className="space-y-1">
-    <label className="text-sm font-medium">{label}</label>
-    <select {...props} className="w-full border rounded-lg p-2">
+  <div className="space-y-1 text-left">
+    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{label}</label>
+    <select {...props} className="w-full bg-white/70 border border-slate-200 focus:border-indigo-500 focus:bg-white rounded-xl p-2.5 text-slate-700 font-semibold transition-all shadow-inner focus:ring-0 outline-none">
       {options.map((o) => (
         <option key={o.value} value={o.value}>
           {o.label}

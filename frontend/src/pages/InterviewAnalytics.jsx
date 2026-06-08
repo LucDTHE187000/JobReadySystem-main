@@ -84,7 +84,7 @@ export default function InterviewAnalytics() {
     return (
         <SeekerLayout title="Phân tích phỏng vấn" breadcrumb="Phỏng vấn › Analytics">
             <div className="max-w-6xl mx-auto w-full">
-                <p className="text-slate-500 mb-8 -mt-2">Theo dõi tiến độ luyện tập — mô hình HR Advisor</p>
+                <p className="text-slate-800 mb-8 -mt-2">Theo dõi tiến độ luyện tập — mô hình HR Advisor</p>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     {[

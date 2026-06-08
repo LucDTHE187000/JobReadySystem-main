@@ -281,251 +281,259 @@ export default function Dashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
-        <div className="flex h-screen bg-[#F4F6FB]">
+        <div 
+            className="min-h-screen flex bg-cover bg-center bg-no-repeat bg-fixed relative"
+            style={{ backgroundImage: `url('/background3.jpg')` }}
+        >
+            {/* Premium backdrop-blur and dark-gradient overlay */}
+            <div className="absolute inset-0 bg-slate-950/30 backdrop-blur-[1px] pointer-events-none" />
+
             {/* Mobile Sidebar Overlay */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-20 lg:hidden"
+                    className="fixed inset-0 bg-black/50 z-30 lg:hidden"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
 
-            <SideBar
-                sidebarOpen={sidebarOpen}
-                setSidebarOpen={setSidebarOpen}
-                activeMenu={activeMenu}
-                setActiveMenu={setActiveMenu}
-                profile={profile}
-            />
+            <div className="relative z-10 flex w-full">
+                <SideBar
+                    sidebarOpen={sidebarOpen}
+                    setSidebarOpen={setSidebarOpen}
+                    activeMenu={activeMenu}
+                    setActiveMenu={setActiveMenu}
+                    profile={profile}
+                />
 
-            <main className="flex-1 overflow-auto w-full relative">
-                <header className="sticky top-0 z-20 bg-white border-b border-[#DDE3F0] px-4 lg:px-8 py-4 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-4 flex-1 lg:max-w-xl">
-                        <button
-                            className="lg:hidden text-gray-500"
-                            onClick={() => setSidebarOpen(true)}
-                        >
-                            <Briefcase size={24} />
-                        </button>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                            <input
-                                type="text"
-                                placeholder="Tìm kiếm..."
-                                className="w-full pl-10 pr-4 py-2 bg-[#F4F6FB] border border-[#DDE3F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A2463] text-sm"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-2 lg:gap-4">
-                        <div className="relative">
+                <main className="flex-1 overflow-auto w-full relative">
+                    <header className="sticky top-0 z-20 bg-white/70 border-b border-white/45 backdrop-blur-md px-4 lg:px-8 py-4 flex items-center justify-between gap-4 shadow-sm">
+                        <div className="flex items-center gap-4 flex-1 lg:max-w-xl">
                             <button
-                                ref={bellRef}
-                                onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                                className={`relative p-2 rounded-lg hidden sm:block transition-colors ${isNotificationOpen ? 'bg-[#0A2463]/10 text-[#0A2463]' : 'text-gray-600 hover:bg-gray-100'}`}
+                                className="lg:hidden text-slate-600 hover:text-slate-800"
+                                onClick={() => setSidebarOpen(true)}
                             >
-                                <Bell size={22} className={isNotificationOpen ? "fill-[#0A2463]" : ""} />
-                                {notifications.some(n => !n.isRead) && (
-                                    <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full animate-pulse"></span>
-                                )}
+                                <Briefcase size={24} />
                             </button>
-
-                            {isNotificationOpen && (
-                                <div ref={notificationRef}>
-                                    <NotificationDropdown onClose={() => setIsNotificationOpen(false)} />
-                                </div>
-                            )}
-                        </div>
-                        <button className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg hidden sm:block">
-                            <MessageSquare size={22} />
-                        </button>
-                        <button
-                            onClick={() => signOut()}
-                            className="px-3 py-2 lg:px-4 bg-[#0A2463] text-white rounded-lg hover:bg-[#071A4A] transition-colors text-xs lg:text-sm font-medium whitespace-nowrap"
-                        >
-                            Đăng xuất
-                        </button>
-                    </div>
-                </header>
-
-                <div className="p-4 lg:p-8">
-                    <div className="mb-8">
-                        <h1 className="font-heading text-2xl lg:text-3xl text-[#0A2463] mb-1">CHÀO MỪNG TRỞ LẠI!</h1>
-                        <p className="text-sm lg:text-base text-[#5A6482]">Hôm nay có 45 ứng viên mới đang chờ bạn xem xét</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
-                        {stats.map((stat, index) => (
-                            <div key={index} className="bg-white rounded-2xl p-6 border border-[#DDE3F0] shadow-sm hover:shadow-md transition-shadow">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="bg-[#0A2463]/10 p-3 rounded-xl">
-                                        <stat.icon className="text-[#0A2463]" size={24} />
-                                    </div>
-                                    <span className="text-green-600 text-sm font-medium">{stat.change}</span>
-                                </div>
-                                <p className="text-[#5A6482] text-sm mb-1">{stat.label}</p>
-                                <p className="font-heading text-3xl text-[#0A2463]">{stat.value}</p>
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                                <input
+                                    type="text"
+                                    placeholder="Tìm kiếm..."
+                                    className="w-full pl-10 pr-4 py-2 bg-white/60 border border-slate-200 focus:border-indigo-500 focus:bg-white text-sm text-slate-800 placeholder-slate-400 font-medium transition-all shadow-inner rounded-xl focus:ring-0 outline-none"
+                                />
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                        <div className="flex items-center gap-2 lg:gap-4">
+                            <div className="relative">
+                                <button
+                                    ref={bellRef}
+                                    onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                                    className={`relative p-2 rounded-xl hidden sm:block transition-all ${isNotificationOpen ? 'bg-indigo-50 text-indigo-650 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800'}`}
+                                >
+                                    <Bell size={22} className={isNotificationOpen ? "fill-indigo-600 text-indigo-600" : ""} />
+                                    {notifications.some(n => !n.isRead) && (
+                                        <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full animate-pulse"></span>
+                                    )}
+                                </button>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div className="lg:col-span-2 space-y-6">
-                            <div className="bg-white rounded-xl p-6 border border-gray-100">
-                                <div className="flex items-center justify-between mb-6">
-                                    <h2 className="text-lg font-bold text-gray-900">Quản lý quảng cáo</h2>
-                                    <button className="text-[#0A2463] hover:text-[#F5C518] text-sm font-medium">
-                                        Tất cả chiến dịch
-                                    </button>
-                                </div>
+                                {isNotificationOpen && (
+                                    <div ref={notificationRef}>
+                                        <NotificationDropdown onClose={() => setIsNotificationOpen(false)} />
+                                    </div>
+                                )}
+                            </div>
+                            <button className="relative p-2 text-slate-650 hover:bg-slate-100 hover:text-slate-800 rounded-xl hidden sm:block transition-all">
+                                <MessageSquare size={22} />
+                            </button>
+                            <button
+                                onClick={() => signOut()}
+                                className="px-3 py-2 lg:px-4 bg-white/80 border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold rounded-xl shadow-sm transition-all text-xs lg:text-sm whitespace-nowrap"
+                            >
+                                Đăng xuất
+                            </button>
+                        </div>
+                    </header>
 
-                                <div className="space-y-4">
-                                    <div
-                                        className="bg-[#0A2463]/5 border border-[#DDE3F0] rounded-lg p-6 text-center cursor-pointer hover:bg-[#0A2463]/10 transition-colors"
-                                        onClick={() => document.getElementById('ad-upload').click()}
-                                    >
-                                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
-                                            <ImageIcon className="text-[#0A2463]" size={24} />
+                    <div className="p-4 lg:p-8">
+                        <div className="mb-8 bg-white/60 backdrop-blur-md p-6 rounded-2xl border border-white/50 shadow-xl shadow-slate-900/5 inline-block">
+                            <h1 className="text-2xl lg:text-3xl text-slate-800 font-bold tracking-tight mb-1">CHÀO MỪNG TRỞ LẠI!</h1>
+                            <p className="text-sm text-slate-600 font-medium">Hôm nay có 45 ứng viên mới đang chờ bạn xem xét</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+                            {stats.map((stat, index) => (
+                                <div key={index} className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-white/60 shadow-xl shadow-slate-900/5 hover:bg-white hover:-translate-y-0.5 transition-all text-slate-800">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="bg-indigo-50 p-3 rounded-xl">
+                                            <stat.icon className="text-indigo-600" size={24} />
                                         </div>
-                                        <h3 className="font-bold text-gray-900 text-sm mb-1">
-                                            {campaignFileName ? `Đã chọn: ${campaignFileName}` : 'Tải lên Banner / Poster quảng cáo mới'}
-                                        </h3>
-                                        <p className="text-xs text-gray-500 mb-3">PNG, JPEG, GIF (Tối đa 5MB, tỷ lệ 16:9)</p>
-                                        <button 
-                                            type="button" 
-                                            className="px-4 py-1.5 bg-[#F5C518] text-[#0A2463] font-bold rounded-lg hover:bg-[#D4A800] transition-colors text-xs"
-                                        >
-                                            {campaignFileName ? 'Thay đổi tệp' : 'Chọn tệp tin'}
+                                        <span className="text-emerald-600 text-xs font-bold">{stat.change}</span>
+                                    </div>
+                                    <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">{stat.label}</p>
+                                    <p className="text-3xl font-bold tracking-tight text-slate-800">{stat.value}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div className="lg:col-span-2 space-y-6">
+                                <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-white/60 shadow-xl shadow-slate-900/5">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h2 className="text-lg font-bold text-slate-800">Quản lý quảng cáo</h2>
+                                        <button className="text-indigo-600 hover:text-indigo-700 text-sm font-semibold transition-colors">
+                                            Tất cả chiến dịch
                                         </button>
-                                        <input
-                                            type="file"
-                                            id="ad-upload"
-                                            className="hidden"
-                                            accept="image/png, image/jpeg, image/gif"
-                                            onChange={handleFileChange}
-                                            onClick={(e) => e.stopPropagation()}
-                                        />
                                     </div>
 
-                                    {campaignImage && (
-                                        <form onSubmit={handleCreateCampaign} className="p-4 bg-slate-50 border border-[#DDE3F0] rounded-xl space-y-3 animate-in fade-in slide-in-from-top-2 duration-200 text-left">
-                                            <div className="flex gap-3 items-center">
-                                                <img src={campaignImage} className="w-16 h-10 rounded object-cover border" alt="Preview" />
-                                                <div className="flex-1">
-                                                    <label className="block text-xs font-semibold text-gray-700 mb-1">Tên chiến dịch quảng cáo</label>
-                                                    <input
-                                                        type="text"
-                                                        value={campaignTitle}
-                                                        onChange={(e) => setCampaignTitle(e.target.value)}
-                                                        placeholder="Ví dụ: Chiến dịch chiêu mộ Software Engineer 2024"
-                                                        className="w-full px-3 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-[#0A2463]"
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="flex justify-end gap-2 pt-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        setCampaignImage('');
-                                                        setCampaignFileName('');
-                                                        setCampaignTitle('');
-                                                    }}
-                                                    className="px-3 py-1.5 border border-gray-200 text-gray-700 text-xs rounded-lg hover:bg-gray-100"
-                                                >
-                                                    Hủy
-                                                </button>
-                                                <button
-                                                    type="submit"
-                                                    disabled={campaignSubmitting}
-                                                    className="px-4 py-1.5 bg-[#0A2463] text-white font-bold text-xs rounded-lg hover:bg-[#071A4A]"
-                                                >
-                                                    {campaignSubmitting ? 'Đang tạo...' : 'Tạo chiến dịch'}
-                                                </button>
-                                            </div>
-                                        </form>
-                                    )}
-
-                                    {campaignError && <p className="text-xs font-semibold text-red-600 bg-red-50 p-2.5 rounded-lg text-left">{campaignError}</p>}
-                                    {campaignSuccess && <p className="text-xs font-semibold text-green-600 bg-green-50 p-2.5 rounded-lg text-left">{campaignSuccess}</p>}
-                                </div>
-
-                                <div className="mt-8">
-                                    <h3 className="text-sm font-semibold text-gray-700 mb-4 text-left">CHIẾN DỊCH ĐANG CHẠY</h3>
                                     <div className="space-y-4">
-                                        {displayCampaigns.map((campaign) => (
-                                            <div key={campaign._id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors text-left">
-                                                <img
-                                                    src={campaign.image}
-                                                    alt={campaign.title}
-                                                    className="w-20 h-20 rounded-lg object-cover"
-                                                />
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
-                                                        <h4 className="font-semibold text-gray-900 truncate">{campaign.title}</h4>
-                                                        <span className={`w-fit px-2 py-0.5 text-xs font-medium rounded ${
-                                                            campaign.tag === 'ĐANG CHẠY' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                                                        }`}>
-                                                            {campaign.tag}
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                                                        <span className="flex items-center gap-1">
-                                                            <Eye size={14} />
-                                                            {campaign.views}
-                                                        </span>
-                                                        <span className="flex items-center gap-1">
-                                                            <Users size={14} />
-                                                            {campaign.applicants}
-                                                        </span>
+                                        <div
+                                            className="bg-slate-55/40 border-2 border-dashed border-slate-200 hover:border-indigo-400 hover:bg-slate-50/50 rounded-xl p-6 text-center cursor-pointer transition-all"
+                                            onClick={() => document.getElementById('ad-upload').click()}
+                                        >
+                                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border border-slate-100">
+                                                <ImageIcon className="text-slate-400" size={24} />
+                                            </div>
+                                            <h3 className="font-semibold text-slate-700 text-sm mb-1">
+                                                {campaignFileName ? `Đã chọn: ${campaignFileName}` : 'Tải lên Banner / Poster quảng cáo mới'}
+                                            </h3>
+                                            <p className="text-xs text-slate-400 font-medium mb-3">PNG, JPEG, GIF (Tối đa 5MB, tỷ lệ 16:9)</p>
+                                            <button 
+                                                type="button" 
+                                                className="px-4 py-1.5 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold rounded-lg shadow-sm transition-all"
+                                            >
+                                                {campaignFileName ? 'Thay đổi tệp' : 'Chọn tệp tin'}
+                                            </button>
+                                            <input
+                                                type="file"
+                                                id="ad-upload"
+                                                className="hidden"
+                                                accept="image/png, image/jpeg, image/gif"
+                                                onChange={handleFileChange}
+                                                onClick={(e) => e.stopPropagation()}
+                                            />
+                                        </div>
+
+                                        {campaignImage && (
+                                            <form onSubmit={handleCreateCampaign} className="p-4 bg-white/60 border border-slate-200/80 rounded-xl space-y-3 animate-in fade-in slide-in-from-top-2 duration-200 text-left">
+                                                <div className="flex gap-3 items-center">
+                                                    <img src={campaignImage} className="w-16 h-10 rounded object-cover border border-slate-200" alt="Preview" />
+                                                    <div className="flex-1">
+                                                        <label className="block text-xs font-semibold text-slate-700 mb-1">Tên chiến dịch quảng cáo</label>
+                                                        <input
+                                                            type="text"
+                                                            value={campaignTitle}
+                                                            onChange={(e) => setCampaignTitle(e.target.value)}
+                                                            placeholder="Ví dụ: Chiến dịch chiêu mộ Software Engineer 2024"
+                                                            className="w-full px-3 py-1.5 border border-slate-200 focus:border-indigo-500 rounded-lg text-xs font-medium text-slate-800 bg-white"
+                                                            required
+                                                        />
                                                     </div>
                                                 </div>
-                                                <button className="text-gray-400 hover:text-gray-600">
-                                                    <ChevronRight size={20} />
-                                                </button>
-                                            </div>
-                                        ))}
+
+                                                <div className="flex justify-end gap-2 pt-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setCampaignImage('');
+                                                            setCampaignFileName('');
+                                                            setCampaignTitle('');
+                                                        }}
+                                                        className="px-3 py-1.5 border border-slate-200 text-slate-650 text-xs font-semibold rounded-lg hover:bg-slate-50 bg-white shadow-sm transition-all"
+                                                    >
+                                                        Hủy
+                                                    </button>
+                                                    <button
+                                                        type="submit"
+                                                        disabled={campaignSubmitting}
+                                                        className="px-4 py-1.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold text-xs rounded-lg shadow-md transition-all"
+                                                    >
+                                                        {campaignSubmitting ? 'Đang tạo...' : 'Tạo chiến dịch'}
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        )}
+
+                                        {campaignError && <p className="text-xs font-semibold text-red-650 bg-red-50 border border-red-100/60 p-2.5 rounded-lg text-left">{campaignError}</p>}
+                                        {campaignSuccess && <p className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100/60 p-2.5 rounded-lg text-left">{campaignSuccess}</p>}
+                                    </div>
+
+                                    <div className="mt-8">
+                                        <h3 className="text-xs font-bold tracking-wider text-slate-500 uppercase mb-4 text-left">CHIẾN DỊCH ĐANG CHẠY</h3>
+                                        <div className="space-y-4">
+                                            {displayCampaigns.map((campaign) => (
+                                                <div key={campaign._id} className="flex items-center gap-4 p-4 bg-white/50 backdrop-blur-sm border border-white/40 rounded-xl hover:bg-white/80 transition-all text-left">
+                                                    <img
+                                                        src={campaign.image}
+                                                        alt={campaign.title}
+                                                        className="w-20 h-20 rounded-lg object-cover border border-slate-200"
+                                                    />
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                                                            <h4 className="font-semibold text-slate-800 truncate">{campaign.title}</h4>
+                                                            <span className={`w-fit px-2 py-0.5 text-xs font-bold rounded-full ${
+                                                                campaign.tag === 'ĐANG CHẠY' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100/60' : 'bg-slate-200 text-slate-700'
+                                                            }`}>
+                                                                {campaign.tag}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-4 text-xs text-slate-500 font-medium">
+                                                            <span className="flex items-center gap-1">
+                                                                <Eye size={14} className="text-slate-400" />
+                                                                {campaign.views}
+                                                            </span>
+                                                            <span className="flex items-center gap-1">
+                                                                <Users size={14} className="text-slate-400" />
+                                                                {campaign.applicants}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <button className="text-slate-400 hover:text-slate-700 transition-colors">
+                                                        <ChevronRight size={20} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="space-y-6">
-                            <div className="bg-white rounded-xl p-6 border border-gray-100">
-                                <h2 className="text-lg font-bold text-gray-900 mb-4">Thông báo hệ thống</h2>
-                                <div className="space-y-4">
-                                    {notifications.length === 0 ? (
-                                        <p className="text-xs text-gray-500 text-center py-6">Không có thông báo mới nào</p>
-                                    ) : (
-                                        notifications.slice(0, 5).map((notification) => {
-                                            const IconComponent = getNotificationIcon(notification.type);
-                                            const { color, bg } = getNotificationColors(notification.type);
-                                            return (
-                                                <div key={notification._id} className="border-b border-gray-100 last:border-0 pb-4 last:pb-0 text-left">
-                                                    <div className="flex gap-3">
-                                                        <div className={`${bg} p-2 rounded-lg h-fit`}>
-                                                            <IconComponent className={color} size={18} />
-                                                        </div>
-                                                        <div className="flex-1">
-                                                            <h4 className="font-semibold text-sm text-gray-900 mb-1">
-                                                                {notification.title}
-                                                            </h4>
-                                                            <p className="text-xs text-gray-600 mb-2 line-clamp-2">
-                                                                {notification.description}
-                                                            </p>
-                                                            <p className="text-xs text-gray-400 mt-2">{formatTimeAgo(notification.createdAt)}</p>
+                            <div className="space-y-6">
+                                <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-white/60 shadow-xl shadow-slate-900/5">
+                                    <h2 className="text-lg font-bold text-slate-800 mb-4">Thông báo hệ thống</h2>
+                                    <div className="space-y-4">
+                                        {notifications.length === 0 ? (
+                                            <p className="text-xs text-slate-400 font-medium text-center py-6">Không có thông báo mới nào</p>
+                                        ) : (
+                                            notifications.slice(0, 5).map((notification) => {
+                                                const IconComponent = getNotificationIcon(notification.type);
+                                                const { color, bg } = getNotificationColors(notification.type);
+                                                return (
+                                                    <div key={notification._id} className="border-b border-slate-100 last:border-0 pb-4 last:pb-0 text-left">
+                                                        <div className="flex gap-3">
+                                                            <div className={`${bg} p-2 rounded-xl h-fit`}>
+                                                                <IconComponent className={color} size={18} />
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <h4 className="font-semibold text-sm text-slate-800 mb-1">
+                                                                    {notification.title}
+                                                                </h4>
+                                                                <p className="text-xs text-slate-500 font-medium mb-1.5 line-clamp-2">
+                                                                    {notification.description}
+                                                                </p>
+                                                                <p className="text-[10px] text-slate-400 font-medium">{formatTimeAgo(notification.createdAt)}</p>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            );
-                                        })
-                                    )}
+                                                );
+                                            })
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </main>
+                </main>
+            </div>
         </div>
     );
 }

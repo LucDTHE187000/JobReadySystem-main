@@ -77,7 +77,7 @@ export default function InterviewHistory() {
     return (
         <SeekerLayout title="Lịch sử phỏng vấn" breadcrumb="Phỏng vấn › Lịch sử">
             <div className="max-w-5xl mx-auto w-full">
-                <p className="text-slate-500 mb-6 -mt-2">Xem các phiên phỏng vấn trước đây của bạn</p>
+                <p className="text-slate-800 mb-6 -mt-2">Xem các phiên phỏng vấn trước đây của bạn</p>
 
                 <div className="inline-flex bg-slate-200/50 rounded-xl p-1 shadow-sm border border-slate-300/60 mb-8 flex-wrap gap-1">
                     {FILTER_TABS.map(({ id, label }) => (
@@ -98,12 +98,12 @@ export default function InterviewHistory() {
                 {loading ? (
                     <div className="text-center py-12">
                         <Loader2 className="w-12 h-12 animate-spin text-[#0A2463] mx-auto mb-4" />
-                        <p className="text-slate-500">Đang tải lịch sử...</p>
+                        <p className="text-slate-900">Đang tải lịch sử...</p>
                     </div>
                 ) : sessions.length === 0 ? (
                     <div className="text-center py-12">
                         <Briefcase className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                        <p className="text-slate-500 mb-4">Chưa có phiên phỏng vấn nào</p>
+                        <p className="text-slate-900 mb-4">Chưa có phiên phỏng vấn nào</p>
                         <button
                             onClick={() => navigate('/interview')}
                             className="px-6 py-3 bg-[#F5C518] text-[#0A2463] font-bold rounded-lg hover:bg-[#D4A800] transition-colors"

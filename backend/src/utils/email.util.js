@@ -227,6 +227,109 @@ export const sendResetPasswordEmail = async (to, otp, name = "User") => {
 };
 
 /**
+ * Send support/contact form email to admin inbox
+ * @param {string} senderName - Name of person submitting the form
+ * @param {string} senderEmail - Email of person submitting the form
+ * @param {string} messageBody - Message content
+ * @returns {Promise<Object>} Send result
+ */
+export const sendSupportContactEmail = async (senderName, senderEmail, messageBody) => {
+    const adminEmail = process.env.EMAIL_USER || process.env.RESEND_SENDER;
+    const hasResendConfig = !!process.env.RESEND_API_KEY;
+    const isDevModeOnly = process.env.EMAIL_DEV_MODE === "true" || !hasResendConfig;
+
+    if (isDevModeOnly) {
+        console.log("\n" + "=".repeat(60));
+        console.log("📧 [DEV MODE] Support Contact Email (Not sent - Development mode)");
+        console.log("=".repeat(60));
+        console.log(`To: ${adminEmail}`);
+        console.log(`From: ${senderName} <${senderEmail}>`);
+        console.log(`Message: ${messageBody}`);
+        console.log("=".repeat(60) + "\n");
+        return { success: true, messageId: "dev-mode", devMode: true };
+    }
+
+    try {
+        const resendInstance = getResendInstance();
+        const sender = getSender();
+
+        const html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; margin: 0; padding: 0; }
+                    .wrapper { max-width: 600px; margin: 30px auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+                    .header { background: linear-gradient(135deg, #0A2463 0%, #1e40af 100%); color: white; padding: 32px 30px; text-align: center; }
+                    .header h1 { margin: 0; font-size: 22px; font-weight: 700; }
+                    .header p { margin: 8px 0 0; font-size: 13px; opacity: 0.8; }
+                    .badge { display: inline-block; background: rgba(245,197,24,0.2); border: 1px solid rgba(245,197,24,0.5); color: #F5C518; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+                    .content { padding: 30px; }
+                    .field { margin-bottom: 20px; }
+                    .field-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; margin-bottom: 6px; }
+                    .field-value { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px; font-size: 14px; color: #111827; }
+                    .message-box { background: #f9fafb; border: 1px solid #e5e7eb; border-left: 4px solid #F5C518; border-radius: 8px; padding: 16px; font-size: 14px; color: #111827; white-space: pre-wrap; line-height: 1.7; }
+                    .footer { background: #f9fafb; padding: 20px 30px; text-align: center; border-top: 1px solid #e5e7eb; font-size: 12px; color: #9ca3af; }
+                    .reply-hint { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px; margin-top: 20px; font-size: 13px; color: #1d4ed8; }
+                </style>
+            </head>
+            <body>
+                <div class="wrapper">
+                    <div class="header">
+                        <div class="badge">📩 Liên hệ mới</div>
+                        <h1>JobReady – Tin nhắn hỗ trợ</h1>
+                        <p>Bạn nhận được một tin nhắn từ form liên hệ trên website</p>
+                    </div>
+                    <div class="content">
+                        <div class="field">
+                            <div class="field-label">Họ và tên</div>
+                            <div class="field-value">${senderName}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Email người gửi</div>
+                            <div class="field-value">${senderEmail}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Nội dung tin nhắn</div>
+                            <div class="message-box">${messageBody}</div>
+                        </div>
+                        <div class="reply-hint">
+                            💡 Để trả lời, hãy gửi email trực tiếp đến: <strong>${senderEmail}</strong>
+                        </div>
+                    </div>
+                    <div class="footer">
+                        <p>© ${new Date().getFullYear()} JobReady System · Gửi lúc ${new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })} (ICT)</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+
+        const mailOptions = {
+            from: `JobReady Contact <${sender}>`,
+            to: adminEmail,
+            reply_to: senderEmail,
+            subject: `[JobReady Liên Hệ] Tin nhắn từ ${senderName}`,
+            html,
+            text: `Tin nhắn từ: ${senderName} <${senderEmail}>\n\n${messageBody}\n\n---\nGửi qua form liên hệ JobReady`
+        };
+
+        const { data, error } = await resendInstance.emails.send(mailOptions);
+
+        if (error) {
+            throw new Error(error.message || JSON.stringify(error));
+        }
+
+        console.log(`📬 Contact email from ${senderEmail} forwarded to admin. ID: ${data.id}`);
+        return { success: true, messageId: data.id };
+    } catch (error) {
+        console.error("❌ Error sending support contact email:", error.message);
+        return { success: false, error: error.message };
+    }
+};
+
+/**
  * Send contact email from Recruiter to Candidate
  * @param {string} to - Candidate email
  * @param {string} subject - Email subject

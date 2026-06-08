@@ -37,112 +37,128 @@ export default function FeedbackReview() {
   }, [API_URL]);
 
   return (
-    <div className="flex h-screen bg-[#F4F6FB]">
-      {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/50 z-20 lg:hidden" onClick={() => setSidebarOpen(false)} />
-      )}
-      <SideBar
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-        activeMenu={activeMenu}
-        setActiveMenu={setActiveMenu}
-        profile={user}
-      />
+    <div 
+      className="min-h-screen flex bg-cover bg-center bg-no-repeat bg-fixed relative"
+      style={{ backgroundImage: "url('/background3.jpg')" }}
+    >
+      {/* Premium backdrop-blur and overlay */}
+      <div className="absolute inset-0 bg-slate-950/35 backdrop-blur-[1px] pointer-events-none" />
 
-      <main className="flex-1 overflow-auto w-full relative">
-        <header className="sticky top-0 z-20 bg-white border-b border-[#DDE3F0] px-4 lg:px-8 py-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4 flex-1 lg:max-w-xl">
+      <div className="relative z-10 flex w-full h-screen">
+        {sidebarOpen && (
+          <div className="fixed inset-0 bg-black/50 z-20 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        )}
+        <SideBar
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          activeMenu={activeMenu}
+          setActiveMenu={setActiveMenu}
+          profile={user}
+        />
+
+        <main className="flex-1 overflow-auto w-full relative">
+          <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-white/60 px-6 lg:px-8 py-4 flex items-center justify-between gap-4 shadow-lg shadow-slate-900/5">
+            <div className="flex items-center gap-4 flex-1 lg:max-w-xl">
+              <button
+                className="lg:hidden text-slate-800"
+                onClick={() => setSidebarOpen(true)}
+              >
+                <MessageSquare size={24} />
+              </button>
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-bold mb-1">Feedback người dùng</p>
+                <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-800">Danh sách phản hồi</h1>
+              </div>
+            </div>
             <button
-              className="lg:hidden text-gray-500"
-              onClick={() => setSidebarOpen(true)}
+              onClick={() => signOut()}
+              className="px-4 py-2 bg-white/80 border border-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 shadow-sm transition-all text-xs lg:text-sm"
             >
-              <MessageSquare size={24} />
+              Đăng xuất
             </button>
-            <div>
-              <p className="text-sm uppercase tracking-[0.2em] text-[#64748B] mb-1">Feedback người dùng</p>
-              <h1 className="text-2xl lg:text-3xl font-bold text-[#0A2463]">Danh sách phản hồi</h1>
-            </div>
-          </div>
-          <button
-            onClick={() => signOut()}
-            className="px-3 py-2 bg-[#0A2463] text-white rounded-lg hover:bg-[#071A4A] transition-colors text-xs lg:text-sm font-medium"
-          >
-            Đăng xuất
-          </button>
-        </header>
+          </header>
 
-        <div className="p-4 lg:p-8">
-          <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-3xl border border-[#DDE3F0] bg-white p-6 shadow-sm">
-              <div className="flex items-center gap-3 mb-4 text-[#0A2463]">
-                <MessageSquare size={20} />
-                <p className="text-sm font-semibold">Tổng feedback</p>
-              </div>
-              <p className="text-4xl font-heading text-[#0A2463]">{feedbacks.length}</p>
-            </div>
-            <div className="rounded-3xl border border-[#DDE3F0] bg-white p-6 shadow-sm">
-              <div className="flex items-center gap-3 mb-4 text-[#0A2463]">
-                <Clock3 size={20} />
-                <p className="text-sm font-semibold">Mới nhất</p>
-              </div>
-              <p className="text-lg text-[#0A2463]">{feedbacks[0] ? new Date(feedbacks[0].createdAt).toLocaleString('vi-VN') : 'Chưa có phản hồi'}</p>
-            </div>
-            <div className="rounded-3xl border border-[#DDE3F0] bg-white p-6 shadow-sm">
-              <div className="flex items-center gap-3 mb-4 text-[#0A2463]">
-                <User size={20} />
-                <p className="text-sm font-semibold">Người dùng</p>
-              </div>
-              <p className="text-lg text-[#0A2463]">{new Set(feedbacks.map((item) => item.userEmail)).size || 0}</p>
-            </div>
-          </div>
-
-          {error && (
-            <div className="rounded-3xl border border-red-100 bg-red-50 p-6 text-sm text-red-700 mb-6">
-              {error}
-            </div>
-          )}
-
-          {loading ? (
-            <div className="flex items-center justify-center h-72 text-[#0A2463]">
-              <Loader2 className="animate-spin mr-3" /> Đang tải feedback...
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {feedbacks.length === 0 ? (
-                <div className="rounded-3xl border border-dashed border-[#CBD5E1] bg-white p-8 text-center text-[#64748B]">
-                  Hiện chưa có phản hồi nào.
+          <div className="p-4 lg:p-8">
+            <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="rounded-2xl border border-white/60 bg-white/80 backdrop-blur-md p-6 shadow-xl shadow-slate-900/5">
+                <div className="flex items-center gap-3 mb-3 text-indigo-600">
+                  <MessageSquare size={20} />
+                  <p className="text-sm font-semibold text-slate-500">Tổng feedback</p>
                 </div>
-              ) : (
-                feedbacks.map((item) => (
-                  <div key={item._id} className="rounded-3xl border border-[#DDE3F0] bg-white p-6 shadow-sm">
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-[#64748B] mb-2">{item.type}</p>
-                        <h2 className="text-xl font-semibold text-[#0A2463]">{item.subject}</h2>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-[#64748B]">{new Date(item.createdAt).toLocaleDateString('vi-VN')}</p>
-                        <p className="text-sm text-[#94A3B8]">{new Date(item.createdAt).toLocaleTimeString('vi-VN')}</p>
-                      </div>
-                    </div>
-                    <div className="grid gap-4 sm:grid-cols-3 mb-4">
-                      <div className="rounded-3xl bg-[#F8FAFC] p-4">
-                        <p className="text-[11px] uppercase tracking-[0.3em] text-[#475569] mb-2">Người gửi</p>
-                        <p className="text-sm text-[#0A2463] font-medium">{item.userEmail}</p>
-                      </div>
-                      <div className="rounded-3xl bg-[#F8FAFC] p-4">
-                        <p className="text-[11px] uppercase tracking-[0.3em] text-[#475569] mb-2">Trạng thái</p>
-                        <span className="inline-flex rounded-full bg-[#F5C518]/15 px-3 py-1 text-xs font-semibold text-[#92400E]">{item.status}</span>
-                      </div>
-                    </div>
-                    <p className="text-sm leading-relaxed text-[#334155] whitespace-pre-line">{item.message}</p>
-                  </div>
-                ))
-              )}
+                <p className="text-3xl font-bold tracking-tight text-slate-800">{feedbacks.length}</p>
+              </div>
+
+              <div className="rounded-2xl border border-white/60 bg-white/80 backdrop-blur-md p-6 shadow-xl shadow-slate-900/5">
+                <div className="flex items-center gap-3 mb-3 text-indigo-600">
+                  <Clock3 size={20} />
+                  <p className="text-sm font-semibold text-slate-500">Mới nhất</p>
+                </div>
+                <p className="text-sm font-semibold text-slate-800 truncate">
+                  {feedbacks[0] ? new Date(feedbacks[0].createdAt).toLocaleString('vi-VN') : 'Chưa có phản hồi'}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-white/60 bg-white/80 backdrop-blur-md p-6 shadow-xl shadow-slate-900/5">
+                <div className="flex items-center gap-3 mb-3 text-indigo-600">
+                  <User size={20} />
+                  <p className="text-sm font-semibold text-slate-500">Người dùng</p>
+                </div>
+                <p className="text-3xl font-bold tracking-tight text-slate-800">
+                  {new Set(feedbacks.map((item) => item.userEmail)).size || 0}
+                </p>
+              </div>
             </div>
-          )}
-        </div>
-      </main>
+
+            {error && (
+              <div className="rounded-2xl border border-red-100 bg-red-50/60 backdrop-blur-sm p-4 text-sm text-red-650 font-semibold mb-6">
+                {error}
+              </div>
+            )}
+
+            {loading ? (
+              <div className="flex items-center justify-center h-72 text-slate-600 font-semibold">
+                <Loader2 className="animate-spin mr-3 text-indigo-600" /> Đang tải feedback...
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {feedbacks.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-slate-300 bg-white/80 backdrop-blur-md p-8 text-center text-slate-500 font-semibold shadow-xl shadow-slate-900/5">
+                    Hiện chưa có phản hồi nào.
+                  </div>
+                ) : (
+                  feedbacks.map((item) => (
+                    <div key={item._id} className="rounded-2xl border border-white/60 bg-white/80 backdrop-blur-md p-6 shadow-xl shadow-slate-900/5 hover:-translate-y-0.5 transition-all duration-300">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-[0.2em] text-indigo-600 font-semibold mb-1">{item.type}</p>
+                          <h2 className="text-lg font-bold text-slate-800">{item.subject}</h2>
+                        </div>
+                        <div className="text-left sm:text-right">
+                          <p className="text-xs text-slate-500 font-semibold">{new Date(item.createdAt).toLocaleDateString('vi-VN')}</p>
+                          <p className="text-[10px] text-slate-400 font-medium mt-0.5">{new Date(item.createdAt).toLocaleTimeString('vi-VN')}</p>
+                        </div>
+                      </div>
+                      <div className="grid gap-4 sm:grid-cols-3 mb-4">
+                        <div className="rounded-xl bg-white/50 border border-white/40 p-3.5">
+                          <p className="text-[9px] uppercase tracking-[0.2em] text-slate-400 font-bold mb-1">Người gửi</p>
+                          <p className="text-xs text-slate-700 font-semibold truncate">{item.userEmail}</p>
+                        </div>
+                        <div className="rounded-xl bg-white/50 border border-white/40 p-3.5">
+                          <p className="text-[9px] uppercase tracking-[0.2em] text-slate-400 font-bold mb-1">Trạng thái</p>
+                          <div>
+                            <span className="inline-flex rounded-full bg-indigo-50 border border-indigo-100 px-3 py-0.5 text-[10px] font-semibold text-indigo-700 shadow-sm">{item.status}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-sm leading-relaxed text-slate-650 font-medium whitespace-pre-line bg-white/40 border border-white/30 rounded-xl p-4">{item.message}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

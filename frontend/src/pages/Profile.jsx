@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { isJobSeekerRole, isEmployerRole } from '../utils/roles';
-import { User, Lock, Briefcase, Camera, Building, Mail, Phone, MapPin, Save } from 'lucide-react';
+import { User, Lock, Briefcase, Camera, Building, Mail, Phone, MapPin, Save, ArrowLeft } from 'lucide-react';
 import axios from 'axios';
 import SeekerLayout from '../components/layout/SeekerLayout';
 
@@ -117,23 +118,71 @@ export default function Profile() {
         }
     };
 
+    const navigate = useNavigate();
+
     const tabBtn = (key) =>
         activeTab === key
-            ? 'bg-[#F5C518]/10 text-[#0A2463] border-l-2 border-[#F5C518] font-bold'
-            : 'text-slate-600 hover:text-slate-800 hover:bg-slate-200/40 border-l-2 border-transparent';
+            ? 'bg-indigo-50 text-indigo-700 border-l-2 border-indigo-500 font-semibold'
+            : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50 border-l-2 border-transparent';
 
     const isEmployer = isEmployerRole(user?.role);
-    const PageWrapper = isEmployer ? ({ children }) => <div className="min-h-screen bg-[#F4F6FB]">{children}</div> : SeekerLayout;
+    const isNotSeeker = user?.role === 'EMPLOYER' || user?.role === 'ADMIN';
+
+    const PageWrapper = isNotSeeker
+        ? ({ children }) => (
+            <div 
+                className="min-h-screen flex bg-cover bg-center bg-no-repeat bg-fixed relative p-6 lg:p-8 justify-center items-start w-full"
+                style={{ backgroundImage: "url('/background3.jpg')" }}
+            >
+                <div className="absolute inset-0 bg-slate-950/35 backdrop-blur-[1px] pointer-events-none" />
+                <div className="relative z-10 w-full max-w-5xl my-4">
+                    {children}
+                </div>
+            </div>
+          )
+        : SeekerLayout;
+
+    const handleBack = () => {
+        if (window.history.length > 1) {
+            navigate(-1);
+        } else if (user?.role === 'ADMIN') {
+            navigate('/admin/dashboard');
+        } else {
+            navigate('/dashboard');
+        }
+    };
 
     return (
         <PageWrapper title="Hồ sơ & Credit" breadcrumb="Tài khoản › Hồ sơ">
-            <div className="max-w-5xl mx-auto w-full">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <div className="md:col-span-2 bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
-                        <p className="text-xs uppercase tracking-wider text-slate-500 mb-1 font-semibold">Số dư credit</p>
-                        <p className="text-4xl font-bold text-[#F5C518]">{credits.toLocaleString('vi-VN')}</p>
+            <div className="max-w-5xl mx-auto w-full space-y-6">
+                {isNotSeeker && (
+                    <div className="bg-white/80 backdrop-blur-md p-5 rounded-2xl border border-white/60 shadow-xl shadow-slate-900/5 flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={handleBack}
+                                className="flex items-center gap-2 px-4 py-2.5 bg-white/85 border border-slate-250/70 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 hover:text-slate-900 shadow-sm transition-all text-sm flex-shrink-0 cursor-pointer"
+                            >
+                                <ArrowLeft size={16} /> Quay lại
+                            </button>
+                            <div>
+                                <h1 className="text-xl font-bold tracking-tight text-slate-800">Thông tin cá nhân</h1>
+                                <p className="text-xs text-slate-500 font-medium mt-0.5">Quản lý và cập nhật thông tin tài khoản của bạn</p>
+                            </div>
+                        </div>
+                        <div className="bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-xl text-indigo-700 font-semibold text-xs shadow-sm">
+                            Vai trò: {user?.role === 'ADMIN' ? 'Quản trị viên' : 'Nhà tuyển dụng'}
+                        </div>
                     </div>
-                </div>
+                )}
+
+                {user?.role !== 'ADMIN' && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="md:col-span-2 bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-xl shadow-slate-900/5">
+                            <p className="text-xs uppercase tracking-wider text-slate-500 mb-1 font-semibold">Số dư credit</p>
+                            <p className="text-4xl font-bold text-indigo-650">{credits.toLocaleString('vi-VN')}</p>
+                        </div>
+                    </div>
+                )}
 
                 {isEmployer && (
                     <div className="mb-6">
@@ -219,10 +268,10 @@ export default function Profile() {
 
                     {/* Content Area */}
                     <div className={isEmployer ? '' : 'md:col-span-3'}>
-                        <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 sm:p-8 text-slate-800 shadow-md">
+                        <div className="bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl p-6 sm:p-8 text-slate-850 shadow-xl shadow-slate-900/5">
 
                             {message.text && (
-                                <div className={`p-4 rounded-xl mb-6 text-sm flex items-center gap-2 backdrop-blur-md ${message.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm' : 'bg-red-50 text-red-700 border border-red-200 shadow-sm'
+                                <div className={`p-4 rounded-xl mb-6 text-sm flex items-center gap-2 backdrop-blur-md ${message.type === 'success' ? 'bg-emerald-50/60 text-emerald-700 border border-emerald-200 shadow-sm' : 'bg-red-50/60 text-red-700 border border-red-200 shadow-sm'
                                     }`}>
                                     <div className={`w-1.5 h-1.5 rounded-full ${message.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}></div>
                                     {message.text}
@@ -241,7 +290,7 @@ export default function Profile() {
                                                     <img src={formData.avatar} alt="Avatar" className="w-full h-full object-cover" />
                                                 </div>
                                             ) : (
-                                                <div className="w-24 h-24 bg-gradient-to-br from-[#0A2463] to-[#1A3A7C] rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-md">
+                                                <div className="w-24 h-24 bg-gradient-to-br from-indigo-650 to-violet-650 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-md">
                                                     {formData.name.charAt(0) || 'U'}
                                                 </div>
                                             )}
@@ -283,7 +332,7 @@ export default function Profile() {
                                             <input
                                                 type="text" name="name"
                                                 value={formData.name} onChange={handleInputChange}
-                                                className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 focus:ring-2 focus:ring-[#0A2463] placeholder:text-slate-400 transition-all outline-none"
+                                                className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
                                                 required
                                             />
                                         </div>
@@ -293,7 +342,7 @@ export default function Profile() {
                                             </label>
                                             <input
                                                 type="email" value={user?.email || ''} readOnly
-                                                className="w-full px-4 py-2.5 !bg-slate-100 !border-slate-200 rounded-xl !text-slate-500 cursor-not-allowed outline-none"
+                                                className="w-full px-4 py-2.5 !bg-slate-100/50 !border-slate-200 rounded-xl !text-slate-500 cursor-not-allowed outline-none font-medium text-sm"
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -303,7 +352,7 @@ export default function Profile() {
                                             <input
                                                 type="tel" name="phone"
                                                 value={formData.phone} onChange={handleInputChange}
-                                                className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 focus:ring-2 focus:ring-[#0A2463] placeholder:text-slate-400 transition-all outline-none"
+                                                className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -313,13 +362,13 @@ export default function Profile() {
                                             <input
                                                 type="text" name="address"
                                                 value={formData.address} onChange={handleInputChange}
-                                                className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 focus:ring-2 focus:ring-[#0A2463] placeholder:text-slate-400 transition-all outline-none"
+                                                className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
                                             />
                                         </div>
                                     </div>
 
                                     <div className="pt-4 flex justify-end">
-                                        <button disabled={loading} type="submit" className="flex items-center gap-2 px-6 py-2.5 bg-[#F5C518] text-[#0A2463] font-bold rounded-xl hover:bg-[#D4A800] transition-colors">
+                                        <button disabled={loading} type="submit" className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-100/30 transition-all cursor-pointer text-sm">
                                             <Save size={18} /> Lưu thay đổi
                                         </button>
                                     </div>
@@ -329,11 +378,11 @@ export default function Profile() {
                             {activeTab === 'professional' && (
                                 <form onSubmit={handleSaveProfile} className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700">Kỹ năng (Cánh nhau bằng dấu phẩy)</label>
+                                        <label className="text-sm font-medium text-slate-700">Kỹ năng (Cách nhau bằng dấu phẩy)</label>
                                         <input
                                             type="text" name="skills" placeholder="React, Node.js, Design..."
                                             value={formData.skills} onChange={handleInputChange}
-                                            className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 focus:ring-2 focus:ring-[#0A2463] placeholder:text-slate-400 transition-all outline-none"
+                                            className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -341,7 +390,7 @@ export default function Profile() {
                                         <textarea
                                             name="experience" rows={4} placeholder="Mô tả kinh nghiệm của bạn..."
                                             value={formData.experience} onChange={handleInputChange}
-                                            className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 focus:ring-2 focus:ring-[#0A2463] placeholder:text-slate-400 transition-all outline-none"
+                                            className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
                                         ></textarea>
                                     </div>
                                     <div className="space-y-2">
@@ -349,12 +398,12 @@ export default function Profile() {
                                         <textarea
                                             name="education" rows={3} placeholder="Trường đại học, chứng chỉ..."
                                             value={formData.education} onChange={handleInputChange}
-                                            className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 focus:ring-2 focus:ring-[#0A2463] placeholder:text-slate-400 transition-all outline-none"
+                                            className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
                                         ></textarea>
                                     </div>
 
                                     <div className="pt-4 flex justify-end">
-                                        <button disabled={loading} type="submit" className="flex items-center gap-2 px-6 py-2.5 bg-[#F5C518] text-[#0A2463] font-bold rounded-xl hover:bg-[#D4A800] transition-colors">
+                                        <button disabled={loading} type="submit" className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-100/30 transition-all cursor-pointer text-sm">
                                             <Save size={18} /> Lưu hồ sơ nghề nghiệp
                                         </button>
                                     </div>
@@ -374,7 +423,7 @@ export default function Profile() {
                                                     <img src={formData.avatar} alt="Logo công ty" className="w-full h-full object-cover" />
                                                 </div>
                                             ) : (
-                                                <div className="w-24 h-24 bg-gradient-to-br from-[#0A2463] to-[#247BA0] rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-md">
+                                                <div className="w-24 h-24 bg-gradient-to-br from-indigo-600 to-violet-650 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-md">
                                                     {formData.companyName?.charAt(0) || 'C'}
                                                 </div>
                                             )}
@@ -413,7 +462,7 @@ export default function Profile() {
                                         <input
                                             type="text" name="companyName" placeholder="Tên doanh nghiệp của bạn"
                                             value={formData.companyName} onChange={handleInputChange}
-                                            className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 focus:ring-2 focus:ring-[#0A2463] placeholder:text-slate-400 transition-all outline-none"
+                                            className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -421,7 +470,7 @@ export default function Profile() {
                                         <input
                                             type="text" name="companyWebsite" placeholder="https://..."
                                             value={formData.companyWebsite} onChange={handleInputChange}
-                                            className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 focus:ring-2 focus:ring-[#0A2463] placeholder:text-slate-400 transition-all outline-none"
+                                            className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -429,12 +478,12 @@ export default function Profile() {
                                         <textarea
                                             name="companyDescription" rows={5} placeholder="Giới thiệu về văn hóa, lĩnh vực hoạt động..."
                                             value={formData.companyDescription} onChange={handleInputChange}
-                                            className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 focus:ring-2 focus:ring-[#0A2463] placeholder:text-slate-400 transition-all outline-none"
+                                            className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
                                         ></textarea>
                                     </div>
 
                                     <div className="pt-4 flex justify-end">
-                                        <button disabled={loading} type="submit" className="flex items-center gap-2 px-6 py-2.5 bg-[#F5C518] text-[#0A2463] font-bold rounded-xl hover:bg-[#D4A800] transition-colors">
+                                        <button disabled={loading} type="submit" className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-100/30 transition-all cursor-pointer text-sm">
                                             <Save size={18} /> Cập nhật công ty
                                         </button>
                                     </div>
@@ -449,7 +498,7 @@ export default function Profile() {
                                             <input
                                                 type="password" name="oldPassword"
                                                 value={passwordData.oldPassword} onChange={handlePasswordChange}
-                                                className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 focus:ring-2 focus:ring-[#0A2463] placeholder:text-slate-400 transition-all outline-none"
+                                                className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
                                                 required
                                             />
                                         </div>
@@ -458,23 +507,23 @@ export default function Profile() {
                                             <input
                                                 type="password" name="newPassword" minLength={6}
                                                 value={passwordData.newPassword} onChange={handlePasswordChange}
-                                                className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 focus:ring-2 focus:ring-[#0A2463] placeholder:text-slate-400 transition-all outline-none"
+                                                className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
                                                 required
                                             />
-                                            <p className="text-xs text-white/60">Yêu cầu tối thiểu 6 ký tự.</p>
+                                            <p className="text-xs text-slate-400 font-medium">Yêu cầu tối thiểu 6 ký tự.</p>
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700">Xác nhận mật khẩu mới</label>
                                             <input
                                                 type="password" name="confirmPassword" minLength={6}
                                                 value={passwordData.confirmPassword} onChange={handlePasswordChange}
-                                                className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 focus:ring-2 focus:ring-[#0A2463] placeholder:text-slate-400 transition-all outline-none"
+                                                className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
                                                 required
                                             />
                                         </div>
 
                                         <div className="pt-4">
-                                            <button disabled={loading} type="submit" className="flex items-center justify-center gap-2 w-full px-6 py-2.5 bg-[#F5C518] text-[#0A2463] font-bold rounded-xl hover:bg-[#D4A800] transition-colors">
+                                            <button disabled={loading} type="submit" className="flex items-center justify-center gap-2 w-full px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-100/30 transition-all cursor-pointer text-sm">
                                                 <Lock size={18} /> Đổi mật khẩu
                                             </button>
                                         </div>

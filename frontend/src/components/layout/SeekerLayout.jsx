@@ -107,10 +107,10 @@ export default function SeekerLayout({ children, title, breadcrumb }) {
 
                 <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
                     {breadcrumb && (
-                        <p className="text-xs text-slate-600 font-semibold mb-2">{breadcrumb}</p>
+                        <p className="text-xs text-slate-800 font-bold mb-2">{breadcrumb}</p>
                     )}
                     {title && (
-                        <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-6">{title}</h1>
+                        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-950 mb-6">{title}</h1>
                     )}
                     {children}
                 </main>

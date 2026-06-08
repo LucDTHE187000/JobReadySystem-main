@@ -31,20 +31,21 @@ const ADMIN_NAV = [
 ];
 
 function AdminSidebar({ active, setActive, user, onLogout, pendingCount }) {
+    const navigate = useNavigate();
     return (
-        <aside className="w-64 min-h-screen bg-[#0A2463] flex flex-col flex-shrink-0 shadow-xl">
+        <aside className="w-64 min-h-screen bg-slate-900/45 border-r border-white/10 backdrop-blur-md flex flex-col flex-shrink-0 shadow-xl relative z-10">
             <div className="p-5 border-b border-white/10">
                 <div className="flex items-center gap-2">
-                    <div className="w-9 h-9 bg-[#F5C518] rounded-lg flex items-center justify-center font-bold text-[#0A2463] text-sm">JR</div>
-                    <span className="font-bold text-white text-lg">JOB<span className="text-[#F5C518]">READY</span></span>
+                    <div className="w-9 h-9 bg-gradient-to-r from-indigo-600 to-violet-600 rounded-lg flex items-center justify-center font-bold text-white text-sm">JR</div>
+                    <span className="font-bold text-white text-lg">JOB<span className="text-indigo-400">READY</span></span>
                 </div>
                 <div className="mt-3 flex items-center gap-2">
-                    <Shield size={14} className="text-[#F5C518]" />
-                    <span className="text-[#F5C518] text-xs font-semibold uppercase tracking-wider">Admin Panel</span>
+                    <Shield size={14} className="text-indigo-400" />
+                    <span className="text-indigo-450 text-xs font-semibold uppercase tracking-wider">Admin Panel</span>
                 </div>
             </div>
 
-            <nav className="flex-1 p-3 space-y-0.5">
+            <nav className="flex-1 p-3 space-y-1">
                 {ADMIN_NAV.map(({ id, label, icon: Icon }) => {
                     const isActive = active === id;
                     const showBadge = id === "employers" && pendingCount > 0;
@@ -52,35 +53,39 @@ function AdminSidebar({ active, setActive, user, onLogout, pendingCount }) {
                         <button
                             key={id}
                             onClick={() => setActive(id)}
-                            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-r-lg text-sm font-medium transition-colors border-l-2 ${isActive
-                                ? 'bg-[#F5C518]/20 text-[#F5C518] border-[#F5C518]'
-                                : 'text-white/70 hover:bg-white/10 hover:text-white border-transparent'
+                            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all border-l-2 ${isActive
+                                ? 'bg-indigo-600/30 text-indigo-200 border-indigo-500 shadow-inner'
+                                : 'text-white/60 hover:bg-white/5 hover:text-white border-transparent'
                                 }`}
                         >
                             <Icon size={18} /> {label}
                             {showBadge && (
-                                <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
+                                <span className="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
                                     {pendingCount > 99 ? '99+' : pendingCount}
                                 </span> 
-                            )}
+                             )}
                         </button>
                     );
                 })}
             </nav>
 
             <div className="p-4 border-t border-white/10">
-                <div className="flex items-center gap-3 mb-3 px-2">
-                    <div className="w-9 h-9 rounded-full bg-[#F5C518] text-[#0A2463] font-bold flex items-center justify-center text-sm">
+                <div 
+                    onClick={() => navigate("/profile")}
+                    className="flex items-center gap-3 mb-3 px-2 cursor-pointer hover:bg-white/5 p-1.5 rounded-xl transition-all"
+                    title="Xem hồ sơ cá nhân"
+                >
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold flex items-center justify-center text-sm shadow-md">
                         {user?.name?.charAt(0) || "A"}
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 text-left">
                         <p className="font-semibold text-white text-sm truncate">{user?.name}</p>
-                        <p className="text-xs text-white/50">Administrator</p>
+                        <p className="text-[10px] text-white/40">Xem hồ sơ</p>
                     </div>
                 </div>
                 <button
                     onClick={onLogout}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-white/60 hover:text-white text-sm rounded-lg hover:bg-white/10 transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-white/50 hover:text-white text-sm rounded-xl hover:bg-white/5 transition-all"
                 >
                     <LogOut size={16} /> Đăng xuất
                 </button>
@@ -103,7 +108,7 @@ function DashboardTab({ onNavigate }) {
             .finally(() => setLoading(false));
     }, []);
 
-    if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#0A2463]" /></div>;
+    if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-650" /></div>;
 
     const cards = [
         { label: "Tổng người dùng", value: stats?.totalUsers, icon: Users, color: "bg-blue-500", light: "bg-blue-50", textColor: "text-blue-600" },
@@ -117,16 +122,16 @@ function DashboardTab({ onNavigate }) {
     ];
 
     return (
-        <div>
-            <div className="mb-8">
-                <h2 className="text-2xl font-bold text-[#0A2463] mb-1">Tổng quan hệ thống</h2>
-                <p className="text-sm text-gray-500">Dữ liệu thống kê realtime từ cơ sở dữ liệu</p>
+        <div className="space-y-6">
+            <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-white/60 shadow-xl shadow-slate-900/5">
+                <h2 className="text-2xl font-bold tracking-tight text-slate-800 mb-1">Tổng quan hệ thống</h2>
+                <p className="text-sm text-slate-500 font-medium">Dữ liệu thống kê realtime từ cơ sở dữ liệu</p>
             </div>
 
             {/* Alert if pending employers */}
             {stats?.pendingEmployers > 0 && (
                 <div
-                    className="mb-6 flex items-center gap-4 p-4 bg-amber-50 border border-amber-200 rounded-xl cursor-pointer hover:bg-amber-100 transition-colors"
+                    className="flex items-center gap-4 p-4 bg-amber-50/65 backdrop-blur-sm border border-amber-200/60 rounded-2xl cursor-pointer hover:bg-amber-100/60 transition-all shadow-md shadow-slate-900/5"
                     onClick={() => onNavigate('employers')}
                 >
                     <div className="bg-amber-100 p-2.5 rounded-xl flex-shrink-0">
@@ -136,34 +141,34 @@ function DashboardTab({ onNavigate }) {
                         <p className="font-semibold text-amber-800 text-sm">
                             Có <span className="font-bold">{stats.pendingEmployers}</span> nhà tuyển dụng đang chờ duyệt
                         </p>
-                        <p className="text-xs text-amber-600 mt-0.5">Nhấn để xem và duyệt ngay</p>
+                        <p className="text-xs text-amber-600 mt-0.5 font-medium">Nhấn để xem và duyệt ngay</p>
                     </div>
                     <ChevronRight size={16} className="text-amber-500 flex-shrink-0" />
                 </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 {cards.map((card, i) => (
-                    <div key={i} className="bg-white rounded-2xl p-5 border border-[#DDE3F0] shadow-sm hover:shadow-md transition-shadow">
+                    <div key={i} className="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-white/60 shadow-xl shadow-slate-900/5 hover:-translate-y-0.5 transition-all duration-300">
                         <div className="flex items-center justify-between mb-3">
                             <div className={`${card.light} p-3 rounded-xl`}>
                                 <card.icon size={22} className={card.textColor} />
                             </div>
                         </div>
-                        <p className="text-sm text-gray-500 mb-1">{card.label}</p>
-                        <p className={`text-3xl font-bold ${card.textColor}`}>{card.value?.toLocaleString() ?? "—"}</p>
+                        <p className="text-xs font-semibold text-slate-500 mb-1">{card.label}</p>
+                        <p className={`text-3xl font-bold tracking-tight ${card.textColor}`}>{card.value?.toLocaleString() ?? "—"}</p>
                     </div>
                 ))}
             </div>
 
-            <div className="bg-[#0A2463] rounded-2xl p-6 text-white">
+            <div className="bg-slate-900/85 backdrop-blur-md rounded-2xl p-6 border border-white/10 text-white shadow-xl shadow-slate-900/5">
                 <div className="flex items-start gap-4">
                     <div className="bg-[#F5C518]/20 p-3 rounded-xl">
                         <Shield size={24} className="text-[#F5C518]" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-lg mb-1">Admin Control Panel</h3>
-                        <p className="text-white/70 text-sm">
+                        <h3 className="font-bold text-lg mb-1 text-white">Admin Control Panel</h3>
+                        <p className="text-slate-300 text-sm leading-relaxed font-medium">
                             Bạn đang truy cập với quyền Admin. Mọi thay đổi đều có hiệu lực ngay lập tức.
                             Hãy thận trọng khi xóa hoặc khóa tài khoản.
                         </p>
@@ -217,35 +222,37 @@ function UsersTab() {
 
     const roleLabel = { ADMIN: "Admin", EMPLOYER: "Nhà tuyển dụng", JOB_SEEKER: "Job Seeker" };
     const roleBadge = {
-        ADMIN: "bg-purple-100 text-purple-700",
-        EMPLOYER: "bg-orange-100 text-orange-700",
-        JOB_SEEKER: "bg-blue-100 text-blue-700",
+        ADMIN: "bg-purple-50 text-purple-700 border-purple-100",
+        EMPLOYER: "bg-orange-50 text-orange-700 border-orange-100",
+        JOB_SEEKER: "bg-blue-50 text-blue-700 border-blue-100",
     };
 
     return (
-        <div>
-            <div className="flex items-center justify-between mb-6">
+        <div className="space-y-6">
+            <div className="flex items-center justify-between bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-white/60 shadow-xl shadow-slate-900/5">
                 <div>
-                    <h2 className="text-2xl font-bold text-[#0A2463]">Quản lý người dùng</h2>
-                    <p className="text-sm text-gray-500">Tổng <span className="font-semibold text-[#0A2463]">{total}</span> người dùng</p>
+                    <h2 className="text-2xl font-bold tracking-tight text-slate-800">Quản lý người dùng</h2>
+                    <p className="text-sm text-slate-500 font-medium mt-1">
+                        Tổng <span className="font-bold text-indigo-650 underline decoration-indigo-500/30">{total}</span> người dùng
+                    </p>
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-[#DDE3F0] p-4 mb-5 flex flex-wrap gap-3">
+            <div className="bg-white/80 backdrop-blur-md border border-white/60 p-4 rounded-2xl shadow-xl shadow-slate-900/5 flex flex-wrap gap-3">
                 <div className="relative flex-1 min-w-[200px]">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                     <input
                         type="text"
                         placeholder="Tìm tên hoặc email..."
                         value={search}
                         onChange={e => { setSearch(e.target.value); setPage(1); }}
-                        className="w-full pl-9 pr-4 py-2 border border-[#DDE3F0] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0A2463]"
+                        className="w-full pl-10 pr-4 py-2 border border-slate-200/80 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 placeholder-slate-400 bg-white/70 font-medium transition-all shadow-inner focus:border-transparent outline-none"
                     />
                 </div>
                 <select
                     value={roleFilter}
                     onChange={e => { setRoleFilter(e.target.value); setPage(1); }}
-                    className="border border-[#DDE3F0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#0A2463]"
+                    className="bg-white/70 border border-slate-200/80 rounded-xl px-3 py-2 text-sm text-slate-705 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
                 >
                     <option value="">Tất cả vai trò</option>
                     <option value="JOB_SEEKER">Job Seeker</option>
@@ -254,60 +261,60 @@ function UsersTab() {
                 </select>
             </div>
 
-            <div className="bg-white rounded-xl border border-[#DDE3F0] overflow-hidden shadow-sm">
+            <div className="bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl overflow-hidden shadow-xl shadow-slate-900/5">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead className="bg-[#0A2463]/5 border-b border-[#DDE3F0]">
+                    <table className="w-full table-fixed text-sm">
+                        <thead className="bg-slate-50/50 border-b border-slate-100 text-slate-500 uppercase text-xs font-bold">
                             <tr>
-                                <th className="text-left px-5 py-3 font-semibold text-gray-600">Người dùng</th>
-                                <th className="text-left px-5 py-3 font-semibold text-gray-600">Vai trò</th>
-                                <th className="text-left px-5 py-3 font-semibold text-gray-600">Credits</th>
-                                <th className="text-left px-5 py-3 font-semibold text-gray-600">Ngày tạo</th>
-                                <th className="text-left px-5 py-3 font-semibold text-gray-600">Trạng thái</th>
-                                <th className="text-left px-5 py-3 font-semibold text-gray-600">Hành động</th>
+                                <th className="text-left p-4 font-semibold w-[32%]">Người dùng</th>
+                                <th className="text-left p-4 font-semibold w-[15%]">Vai trò</th>
+                                <th className="text-left p-4 font-semibold w-[13%]">Credits</th>
+                                <th className="text-left p-4 font-semibold w-[13%]">Ngày tạo</th>
+                                <th className="text-left p-4 font-semibold w-[15%]">Trạng thái</th>
+                                <th className="text-left p-4 font-semibold w-[12%]">Hành động</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="text-slate-750 font-medium">
                             {loading ? (
-                                <tr><td colSpan={6} className="text-center py-10 text-gray-400">Đang tải...</td></tr>
+                                <tr><td colSpan={6} className="text-center p-6 font-bold text-slate-500">Đang tải...</td></tr>
                             ) : users.length === 0 ? (
-                                <tr><td colSpan={6} className="text-center py-10 text-gray-400">Không có dữ liệu</td></tr>
+                                <tr><td colSpan={6} className="text-center p-6 font-bold text-slate-500">Không có dữ liệu</td></tr>
                             ) : users.map(u => (
-                                <tr key={u._id} className="border-t border-[#DDE3F0] hover:bg-gray-50 transition-colors">
-                                    <td className="px-5 py-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 bg-[#0A2463] rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                <tr key={u._id} className="border-t border-slate-100 hover:bg-white/40 transition-colors text-slate-750">
+                                    <td className="p-4">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-sm">
                                                 {u.name?.charAt(0) || "?"}
                                             </div>
-                                            <div>
-                                                <p className="font-medium text-gray-900">{u.name}</p>
-                                                <p className="text-xs text-gray-400">{u.email}</p>
+                                            <div className="min-w-0">
+                                                <p className="font-semibold text-slate-800 truncate">{u.name}</p>
+                                                <p className="text-xs text-slate-500 font-medium truncate">{u.email}</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-5 py-3">
-                                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${roleBadge[u.role] || 'bg-gray-100 text-gray-600'}`}>
+                                    <td className="p-4">
+                                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${roleBadge[u.role] || 'bg-gray-100 text-gray-600'}`}>
                                             {roleLabel[u.role] || u.role}
                                         </span>
                                     </td>
-                                    <td className="px-5 py-3 font-mono text-[#0A2463] font-semibold">
+                                    <td className="p-4 font-mono text-indigo-650 font-bold">
                                         {u.credits?.toLocaleString() ?? "—"}
                                     </td>
-                                    <td className="px-5 py-3 text-gray-500">
+                                    <td className="p-4 text-slate-500 font-medium">
                                         {new Date(u.createdAt).toLocaleDateString("vi-VN")}
                                     </td>
-                                    <td className="px-5 py-3">
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${u.isActive !== false ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                                    <td className="p-4">
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${u.isActive !== false ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-700 border-red-100'}`}>
                                             {u.isActive !== false ? <><CheckCircle size={11} /> Hoạt động</> : <><XCircle size={11} /> Bị khóa</>}
                                         </span>
                                     </td>
-                                    <td className="px-5 py-3">
+                                    <td className="p-4">
                                         <button
                                             onClick={() => toggleActive(u._id, u.isActive !== false)}
                                             disabled={u.role === 'ADMIN'}
-                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${u.isActive !== false
-                                                ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                                                : 'bg-green-50 text-green-600 hover:bg-green-100'
+                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all disabled:opacity-40 disabled:cursor-not-allowed ${u.isActive !== false
+                                                ? 'bg-red-50 text-red-650 hover:bg-red-100/80 border-red-100 shadow-sm'
+                                                : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100/80 border-emerald-100 shadow-sm'
                                                 }`}
                                         >
                                             {u.isActive !== false ? <><Lock size={13} /> Khóa</> : <><Unlock size={13} /> Mở khóa</>}
@@ -320,13 +327,13 @@ function UsersTab() {
                 </div>
 
                 {totalPages > 1 && (
-                    <div className="flex items-center justify-between px-5 py-3 border-t border-[#DDE3F0]">
-                        <p className="text-sm text-gray-500">Trang {page} / {totalPages}</p>
+                    <div className="flex items-center justify-between p-4 border-t border-slate-100">
+                        <p className="text-xs text-slate-500 font-medium">Trang {page} / {totalPages}</p>
                         <div className="flex gap-2">
-                            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-1.5 rounded-lg border border-[#DDE3F0] hover:bg-gray-50 disabled:opacity-40 transition-colors">
+                            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-2 rounded-xl border border-slate-200 bg-white/80 text-slate-700 hover:bg-slate-50 disabled:opacity-40 shadow-sm transition-all">
                                 <ChevronLeft size={16} />
                             </button>
-                            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="p-1.5 rounded-lg border border-[#DDE3F0] hover:bg-gray-50 disabled:opacity-40 transition-colors">
+                            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="p-2 rounded-xl border border-slate-200 bg-white/80 text-slate-700 hover:bg-slate-50 disabled:opacity-40 shadow-sm transition-all">
                                 <ChevronRight size={16} />
                             </button>
                         </div>
@@ -336,8 +343,6 @@ function UsersTab() {
         </div>
     );
 }
-
-// ============================================================
 // EMPLOYERS TAB (Duyệt doanh nghiệp)
 // ============================================================
 function EmployersTab() {
@@ -352,7 +357,7 @@ function EmployersTab() {
     const fetchEmployers = useCallback(async () => {
         setLoading(true);
         try {
-            const params = { page, limit: 15 };
+            const params = { page, limit: 10 };
             if (search) params.search = search;
             if (filter === "pending") params.isApproved = "false";
             else if (filter === "approved") params.isApproved = "true";
@@ -391,108 +396,114 @@ function EmployersTab() {
     ];
 
     return (
-        <div>
-            <div className="mb-6">
-                <h2 className="text-2xl font-bold text-[#0A2463]">Duyệt doanh nghiệp</h2>
-                <p className="text-sm text-gray-500">Kiểm duyệt và phê duyệt tài khoản Nhà tuyển dụng</p>
-            </div>
-
-            {/* Filter tabs */}
-            <div className="flex gap-1 bg-white border border-gray-200 rounded-xl p-1 shadow-sm mb-5 w-fit">
-                {FILTER_TABS.map(tab => (
-                    <button
-                        key={tab.key}
-                        onClick={() => { setFilter(tab.key); setPage(1); }}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${filter === tab.key
-                            ? 'bg-[#0A2463] text-white shadow-sm'
-                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
-                            }`}
-                    >
-                        {tab.label}
-                    </button>
-                ))}
-            </div>
-
-            <div className="bg-white rounded-xl border border-[#DDE3F0] p-4 mb-5">
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                    <input
-                        type="text"
-                        placeholder="Tìm tên, email hoặc tên công ty..."
-                        value={search}
-                        onChange={e => { setSearch(e.target.value); setPage(1); }}
-                        className="w-full pl-9 pr-4 py-2 border border-[#DDE3F0] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0A2463]"
-                    />
+        <div className="space-y-6">
+            <div className="flex items-center justify-between bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-white/60 shadow-xl shadow-slate-900/5">
+                <div>
+                    <h2 className="text-2xl font-bold tracking-tight text-slate-800">Duyệt doanh nghiệp</h2>
+                    <p className="text-sm text-slate-500 font-medium mt-1">
+                        Kiểm duyệt và phê duyệt tài khoản Nhà tuyển dụng
+                    </p>
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-[#DDE3F0] overflow-hidden shadow-sm">
+            {/* Filter & Search Bar */}
+            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                <div className="flex gap-1 bg-white/70 backdrop-blur-md border border-slate-200/80 rounded-xl p-1 shadow-sm w-fit">
+                    {FILTER_TABS.map(tab => (
+                        <button
+                            key={tab.key}
+                            onClick={() => { setFilter(tab.key); setPage(1); }}
+                            className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${filter === tab.key
+                                ? 'bg-indigo-650 text-white shadow-sm'
+                                : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'
+                                }`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+
+                <div className="bg-white/80 backdrop-blur-md border border-white/60 p-3 rounded-2xl shadow-xl shadow-slate-900/5 flex-1 w-full md:max-w-md">
+                    <div className="relative">
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                        <input
+                            type="text"
+                            placeholder="Tìm tên, email hoặc tên công ty..."
+                            value={search}
+                            onChange={e => { setSearch(e.target.value); setPage(1); }}
+                            className="w-full pl-10 pr-4 py-2 border border-slate-200/80 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 placeholder-slate-400 bg-white/70 font-medium transition-all shadow-inner focus:border-transparent outline-none"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl overflow-hidden shadow-xl shadow-slate-900/5">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead className="bg-[#0A2463]/5 border-b border-[#DDE3F0]">
+                    <table className="w-full table-fixed text-sm">
+                        <thead className="bg-slate-50/50 border-b border-slate-100 text-slate-500 uppercase text-xs font-bold">
                             <tr>
-                                <th className="text-left px-5 py-3 font-semibold text-gray-600">Nhà tuyển dụng</th>
-                                <th className="text-left px-5 py-3 font-semibold text-gray-600">Công ty</th>
-                                <th className="text-left px-5 py-3 font-semibold text-gray-600">Ngày đăng ký</th>
-                                <th className="text-left px-5 py-3 font-semibold text-gray-600">Trạng thái</th>
-                                <th className="text-left px-5 py-3 font-semibold text-gray-600">Hành động</th>
+                                <th className="text-left p-4 font-semibold w-[30%]">Nhà tuyển dụng</th>
+                                <th className="text-left p-4 font-semibold w-[22%]">Công ty</th>
+                                <th className="text-left p-4 font-semibold w-[16%]">Ngày đăng ký</th>
+                                <th className="text-left p-4 font-semibold w-[16%]">Trạng thái</th>
+                                <th className="text-left p-4 font-semibold w-[16%]">Hành động</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="text-slate-750 font-medium">
                             {loading ? (
-                                <tr><td colSpan={5} className="text-center py-10 text-gray-400">Đang tải...</td></tr>
+                                <tr><td colSpan={5} className="text-center p-8 font-bold text-slate-500">Đang tải...</td></tr>
                             ) : employers.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="py-16 text-center">
-                                        <Building2 size={40} className="text-gray-200 mx-auto mb-3" />
-                                        <p className="text-gray-400 font-medium">
+                                    <td colSpan={5} className="p-16 text-center">
+                                        <Building2 size={40} className="text-slate-300 mx-auto mb-3" />
+                                        <p className="text-slate-400 font-bold">
                                             {filter === "pending" ? "Không có nhà tuyển dụng nào chờ duyệt" : "Không có dữ liệu"}
                                         </p>
                                     </td>
                                 </tr>
                             ) : employers.map(emp => (
-                                <tr key={emp._id} className="border-t border-[#DDE3F0] hover:bg-gray-50 transition-colors">
-                                    <td className="px-5 py-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 bg-orange-500 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                                <tr key={emp._id} className="border-t border-slate-100 hover:bg-white/40 transition-colors text-slate-750">
+                                    <td className="p-4">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className="w-9 h-9 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 shadow-sm">
                                                 {emp.name?.charAt(0) || "?"}
                                             </div>
-                                            <div>
-                                                <p className="font-medium text-gray-900">{emp.name}</p>
-                                                <p className="text-xs text-gray-400">{emp.email}</p>
+                                            <div className="min-w-0">
+                                                <p className="font-semibold text-slate-800 truncate">{emp.name}</p>
+                                                <p className="text-xs text-slate-500 font-medium truncate">{emp.email}</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-5 py-3 text-gray-700 font-medium">
-                                        {emp.companyName || <span className="text-gray-400 italic">Chưa cập nhật</span>}
+                                    <td className="p-4 text-slate-700 font-medium truncate">
+                                        {emp.companyName || <span className="text-slate-400 italic font-normal">Chưa cập nhật</span>}
                                     </td>
-                                    <td className="px-5 py-3 text-gray-500">
+                                    <td className="p-4 text-slate-500 font-medium">
                                         {new Date(emp.createdAt).toLocaleDateString("vi-VN")}
                                     </td>
-                                    <td className="px-5 py-3">
+                                    <td className="p-4">
                                         {emp.isApproved ? (
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-emerald-50 text-emerald-700 border-emerald-100">
                                                 <CheckCircle2 size={11} /> Đã duyệt
                                             </span>
                                         ) : (
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-amber-50 text-amber-700 border-amber-100">
                                                 <Clock size={11} /> Chờ duyệt
                                             </span>
                                         )}
                                     </td>
-                                    <td className="px-5 py-3">
+                                    <td className="p-4">
                                         <div className="flex items-center gap-2">
                                             {!emp.isApproved ? (
                                                 <>
                                                     <button
                                                         onClick={() => handleApproval(emp._id, true)}
-                                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 hover:bg-green-100 rounded-lg text-xs font-medium transition-colors"
+                                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-750 hover:bg-emerald-100/80 border border-emerald-100 rounded-xl text-xs font-semibold transition-all shadow-sm cursor-pointer"
                                                     >
                                                         <CheckCircle2 size={13} /> Duyệt
                                                     </button>
                                                     <button
                                                         onClick={() => handleApproval(emp._id, false)}
-                                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-medium transition-colors"
+                                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-650 hover:bg-red-100/80 border border-red-105 rounded-xl text-xs font-semibold transition-all shadow-sm cursor-pointer"
                                                     >
                                                         <Ban size={13} /> Từ chối
                                                     </button>
@@ -500,7 +511,7 @@ function EmployersTab() {
                                             ) : (
                                                 <button
                                                     onClick={() => handleApproval(emp._id, false)}
-                                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-600 hover:bg-gray-100 rounded-lg text-xs font-medium transition-colors"
+                                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 text-slate-605 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold transition-all shadow-sm cursor-pointer"
                                                 >
                                                     <Ban size={13} /> Thu hồi
                                                 </button>
@@ -514,13 +525,13 @@ function EmployersTab() {
                 </div>
 
                 {totalPages > 1 && (
-                    <div className="flex items-center justify-between px-5 py-3 border-t border-[#DDE3F0]">
-                        <p className="text-sm text-gray-500">Trang {page} / {totalPages} — Tổng {total} nhà tuyển dụng</p>
+                    <div className="flex items-center justify-between p-4 border-t border-slate-100">
+                        <p className="text-xs text-slate-500 font-medium">Trang {page} / {totalPages} — Tổng {total} nhà tuyển dụng</p>
                         <div className="flex gap-2">
-                            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-1.5 rounded-lg border border-[#DDE3F0] hover:bg-gray-50 disabled:opacity-40">
+                            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-2 rounded-xl border border-slate-200 bg-white/80 text-slate-700 hover:bg-slate-50 disabled:opacity-40 shadow-sm transition-all">
                                 <ChevronLeft size={16} />
                             </button>
-                            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="p-1.5 rounded-lg border border-[#DDE3F0] hover:bg-gray-50 disabled:opacity-40">
+                            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="p-2 rounded-xl border border-slate-200 bg-white/80 text-slate-700 hover:bg-slate-50 disabled:opacity-40 shadow-sm transition-all">
                                 <ChevronRight size={16} />
                             </button>
                         </div>
@@ -531,9 +542,6 @@ function EmployersTab() {
     );
 }
 
-// ============================================================
-// JOBS TAB
-// ============================================================
 function JobsTab() {
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -583,36 +591,36 @@ function JobsTab() {
     };
 
     const statusBadge = {
-        open: "bg-green-100 text-green-700",
-        closed: "bg-gray-100 text-gray-600",
-        pending: "bg-yellow-100 text-yellow-700",
+        open: "bg-emerald-50 text-emerald-700 border-emerald-100",
+        closed: "bg-slate-100 text-slate-600 border-slate-200",
+        pending: "bg-amber-50 text-amber-705 border-amber-100",
     };
     const statusLabel = { open: "Đang mở", closed: "Đã đóng", pending: "Chờ duyệt" };
 
     return (
-        <div>
-            <div className="flex items-center justify-between mb-6">
+        <div className="space-y-6">
+            <div className="flex items-center justify-between bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-white/60 shadow-xl shadow-slate-900/5">
                 <div>
-                    <h2 className="text-2xl font-bold text-[#0A2463]">Quản lý tin tuyển dụng</h2>
-                    <p className="text-sm text-gray-500">Tổng <span className="font-semibold text-[#0A2463]">{total}</span> tin tuyển dụng</p>
+                    <h2 className="text-2xl font-bold tracking-tight text-slate-800">Quản lý tin tuyển dụng</h2>
+                    <p className="text-sm text-slate-500 font-medium mt-1">Tổng <span className="font-bold text-indigo-650 underline decoration-indigo-500/30">{total}</span> tin tuyển dụng</p>
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-[#DDE3F0] p-4 mb-5 flex flex-wrap gap-3">
+            <div className="bg-white/80 backdrop-blur-md border border-white/60 p-4 rounded-2xl shadow-xl shadow-slate-900/5 flex flex-wrap gap-3">
                 <div className="relative flex-1 min-w-[200px]">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                     <input
                         type="text"
                         placeholder="Tìm tiêu đề hoặc địa điểm..."
                         value={search}
                         onChange={e => { setSearch(e.target.value); setPage(1); }}
-                        className="w-full pl-9 pr-4 py-2 border border-[#DDE3F0] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0A2463]"
+                        className="w-full pl-10 pr-4 py-2 border border-slate-200/80 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 placeholder-slate-400 bg-white/70 font-medium transition-all shadow-inner focus:border-transparent outline-none"
                     />
                 </div>
                 <select
                     value={statusFilter}
                     onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-                    className="border border-[#DDE3F0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#0A2463]"
+                    className="bg-white/70 border border-slate-200/80 rounded-xl px-3 py-2 text-sm text-slate-705 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
                 >
                     <option value="">Tất cả trạng thái</option>
                     <option value="open">Đang mở</option>
@@ -621,52 +629,55 @@ function JobsTab() {
                 </select>
             </div>
 
-            <div className="bg-white rounded-xl border border-[#DDE3F0] overflow-hidden shadow-sm">
+            <div className="bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl overflow-hidden shadow-xl shadow-slate-900/5">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead className="bg-[#0A2463]/5 border-b border-[#DDE3F0]">
+                    <table className="w-full table-fixed text-sm">
+                        <thead className="bg-slate-50/50 border-b border-slate-100 text-slate-500 uppercase text-xs font-bold">
                             <tr>
-                                <th className="text-left px-5 py-3 font-semibold text-gray-600">Tiêu đề</th>
-                                <th className="text-left px-5 py-3 font-semibold text-gray-600">Công ty</th>
-                                <th className="text-left px-5 py-3 font-semibold text-gray-600">Địa điểm</th>
-                                <th className="text-left px-5 py-3 font-semibold text-gray-600">Ngày đăng</th>
-                                <th className="text-left px-5 py-3 font-semibold text-gray-600">Trạng thái</th>
-                                <th className="text-left px-5 py-3 font-semibold text-gray-600">Hành động</th>
+                                <th className="text-left p-4 font-semibold w-[26%]">Tiêu đề</th>
+                                <th className="text-left p-4 font-semibold w-[20%]">Công ty</th>
+                                <th className="text-left p-4 font-semibold w-[16%]">Địa điểm</th>
+                                <th className="text-left p-4 font-semibold w-[14%]">Ngày đăng</th>
+                                <th className="text-left p-4 font-semibold w-[12%]">Trạng thái</th>
+                                <th className="text-left p-4 font-semibold w-[12%]">Hành động</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="text-slate-750 font-medium">
                             {loading ? (
-                                <tr><td colSpan={6} className="text-center py-10 text-gray-400">Đang tải...</td></tr>
+                                <tr><td colSpan={6} className="text-center p-8 font-bold text-slate-500">Đang tải...</td></tr>
                             ) : jobs.length === 0 ? (
-                                <tr><td colSpan={6} className="text-center py-10 text-gray-400">Không có dữ liệu</td></tr>
+                                <tr><td colSpan={6} className="text-center p-8 font-bold text-slate-500">Không có dữ liệu</td></tr>
                             ) : jobs.map(j => (
-                                <tr key={j._id} className="border-t border-[#DDE3F0] hover:bg-gray-50 transition-colors">
-                                    <td className="px-5 py-3">
-                                        <p className="font-medium text-gray-900 truncate max-w-[200px]">{j.title}</p>
-                                        <p className="text-xs text-gray-400">{j.jobType}</p>
+                                <tr key={j._id} className="border-t border-slate-100 hover:bg-white/40 transition-colors text-slate-750">
+                                    <td className="p-4">
+                                        <p className="font-semibold text-slate-800 truncate" title={j.title}>{j.title}</p>
+                                        <p className="text-xs text-slate-500 font-medium mt-0.5">{j.jobType}</p>
                                     </td>
-                                    <td className="px-5 py-3 text-gray-600">
+                                    <td className="p-4 text-slate-700 font-medium truncate" title={j.recruiterId?.companyName || j.recruiterId?.name || ""}>
                                         {j.recruiterId?.companyName || j.recruiterId?.name || "—"}
                                     </td>
-                                    <td className="px-5 py-3 text-gray-500">
+                                    <td className="p-4 text-slate-505 truncate">
                                         {j.location?.city
                                             ? `${j.location.city}${j.location.country ? ', ' + j.location.country : ''}`
                                             : "—"}
                                     </td>
-                                    <td className="px-5 py-3 text-gray-500">
+                                    <td className="p-4 text-slate-500 font-medium">
                                         {new Date(j.createdAt).toLocaleDateString("vi-VN")}
                                     </td>
-                                    <td className="px-5 py-3">
-                                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusBadge[j.status] || 'bg-gray-100 text-gray-600'}`}>
+                                    <td className="p-4">
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${statusBadge[j.status] || 'bg-gray-100 text-gray-650'}`}>
+                                            {j.status === 'open' && <CheckCircle size={11} />}
+                                            {j.status === 'closed' && <XCircle size={11} />}
+                                            {j.status === 'pending' && <Clock size={11} />}
                                             {statusLabel[j.status] || j.status}
                                         </span>
                                     </td>
-                                    <td className="px-5 py-3">
+                                    <td className="p-4">
                                         <div className="flex items-center gap-2">
                                             <select
                                                 value={j.status}
                                                 onChange={e => updateStatus(j._id, e.target.value)}
-                                                className="text-xs border border-[#DDE3F0] rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#0A2463] bg-white"
+                                                className="text-xs font-semibold bg-white/80 border border-slate-205 rounded-xl px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
                                             >
                                                 <option value="open">Mở</option>
                                                 <option value="closed">Đóng</option>
@@ -674,7 +685,7 @@ function JobsTab() {
                                             </select>
                                             <button
                                                 onClick={() => deleteJob(j._id)}
-                                                className="p-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                                                className="p-1.5 bg-red-50 text-red-650 hover:bg-red-100/80 border border-red-100 rounded-xl transition-all shadow-sm cursor-pointer"
                                                 title="Xóa tin tuyển dụng"
                                             >
                                                 <Trash2 size={14} />
@@ -688,13 +699,13 @@ function JobsTab() {
                 </div>
 
                 {totalPages > 1 && (
-                    <div className="flex items-center justify-between px-5 py-3 border-t border-[#DDE3F0]">
-                        <p className="text-sm text-gray-500">Trang {page} / {totalPages}</p>
+                    <div className="flex items-center justify-between p-4 border-t border-slate-100">
+                        <p className="text-xs text-slate-500 font-medium">Trang {page} / {totalPages}</p>
                         <div className="flex gap-2">
-                            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-1.5 rounded-lg border border-[#DDE3F0] hover:bg-gray-50 disabled:opacity-40">
+                            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-2 rounded-xl border border-slate-200 bg-white/80 text-slate-700 hover:bg-slate-50 disabled:opacity-40 shadow-sm transition-all">
                                 <ChevronLeft size={16} />
                             </button>
-                            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="p-1.5 rounded-lg border border-[#DDE3F0] hover:bg-gray-50 disabled:opacity-40">
+                            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="p-2 rounded-xl border border-slate-200 bg-white/80 text-slate-700 hover:bg-slate-50 disabled:opacity-40 shadow-sm transition-all">
                                 <ChevronRight size={16} />
                             </button>
                         </div>
@@ -812,8 +823,8 @@ function PaymentsTab() {
                 <svg viewBox={`0 0 ${width} ${height}`} className="w-full min-w-[700px] h-auto overflow-visible select-none">
                     <defs>
                         <linearGradient id="chart-grad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.35"/>
-                            <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.0"/>
+                            <stop offset="0%" stopColor="#4F46E5" stopOpacity="0.35"/>
+                            <stop offset="100%" stopColor="#4F46E5" stopOpacity="0.0"/>
                         </linearGradient>
                     </defs>
 
@@ -825,17 +836,17 @@ function PaymentsTab() {
                                 y1={line.y} 
                                 x2={width - paddingRight} 
                                 y2={line.y} 
-                                stroke="#DDE3F0" 
+                                stroke="rgba(203, 213, 225, 0.4)" 
                                 strokeWidth="1"
                                 strokeDasharray="4 4"
                             />
                             <text 
                                 x={paddingLeft - 8} 
                                 y={line.y + 4} 
-                                fill="#9CA3AF" 
+                                fill="#4B5563" 
                                 fontSize="10" 
                                 textAnchor="end"
-                                className="font-mono font-medium"
+                                className="font-mono font-bold text-slate-700"
                             >
                                 {line.value >= 1000000 ? `${(line.value / 1000000).toFixed(1)}M` : `${(line.value / 1000).toFixed(0)}K`}
                             </text>
@@ -852,7 +863,7 @@ function PaymentsTab() {
                         <path 
                             d={linePath} 
                             fill="none" 
-                            stroke="#3B82F6" 
+                            stroke="#4F46E5" 
                             strokeWidth="3" 
                             strokeLinecap="round" 
                             strokeLinejoin="round" 
@@ -870,10 +881,10 @@ function PaymentsTab() {
                                 key={i} 
                                 x={p.x} 
                                 y={height - paddingBottom + 18} 
-                                fill="#9CA3AF" 
+                                fill="#374151" 
                                 fontSize="10" 
                                 textAnchor="middle"
-                                className="font-semibold"
+                                className="font-bold text-slate-700"
                             >
                                 {label}
                             </text>
@@ -887,7 +898,7 @@ function PaymentsTab() {
                                 cx={p.x} 
                                 cy={p.y} 
                                 r="4" 
-                                fill="#3B82F6" 
+                                fill="#4F46E5" 
                                 stroke="#FFFFFF" 
                                 strokeWidth="2"
                                 className="transition-all duration-150 hover:r-6"
@@ -912,7 +923,7 @@ function PaymentsTab() {
                         className="absolute bg-slate-900/95 text-white px-3 py-2 rounded-xl shadow-lg border border-slate-700 text-xs pointer-events-none z-10 flex flex-col gap-0.5"
                         style={{
                             left: `${(hoveredPoint.x / width) * 100}%`,
-                            top: `${(hoveredPoint.y / height) * 100 - 60}%`,
+                            top: `${((hoveredPoint.y + (hoveredPoint.y < 85 ? 16 : -52)) / height) * 100}%`,
                             transform: "translateX(-50%)"
                         }}
                     >
@@ -932,27 +943,27 @@ function PaymentsTab() {
     };
 
     return (
-        <div>
+        <div className="space-y-6">
             {/* Header */}
-            <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-white/60 shadow-xl shadow-slate-900/5">
                 <div>
-                    <h2 className="text-2xl font-bold text-[#0A2463] mb-1">Quản lý thanh toán</h2>
-                    <p className="text-sm text-gray-500">Giám sát doanh thu và lịch sử giao dịch PayOS thực tế</p>
+                    <h2 className="text-2xl font-bold tracking-tight text-slate-800">Quản lý thanh toán</h2>
+                    <p className="text-sm text-slate-500 font-medium mt-1">Giám sát doanh thu và lịch sử giao dịch PayOS thực tế</p>
                 </div>
                 <button 
                     onClick={fetchPayments} 
-                    className="self-start px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 text-sm font-semibold transition"
+                    className="flex items-center gap-1.5 px-4 py-2.5 bg-white/85 border border-slate-250/70 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 hover:text-slate-900 shadow-sm transition-all text-sm cursor-pointer self-start sm:self-center"
                 >
                     Tải lại dữ liệu
                 </button>
             </div>
 
             {/* Stats Dashboard */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 {/* Doanh thu */}
-                <div className="bg-white rounded-2xl p-5 border border-[#DDE3F0] shadow-sm flex items-center justify-between">
+                <div className="bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl p-5 shadow-xl shadow-slate-900/5 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-between">
                     <div className="space-y-1">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Doanh thu (Paid)</p>
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Doanh thu (Paid)</p>
                         <p className="text-2xl font-bold text-emerald-600">{(stats.totalRevenue || 0).toLocaleString("vi-VN")} đ</p>
                     </div>
                     <div className="bg-emerald-50 p-3 rounded-xl">
@@ -961,22 +972,22 @@ function PaymentsTab() {
                 </div>
 
                 {/* Tổng giao dịch */}
-                <div className="bg-white rounded-2xl p-5 border border-[#DDE3F0] shadow-sm flex items-center justify-between">
+                <div className="bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl p-5 shadow-xl shadow-slate-900/5 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-between">
                     <div className="space-y-1">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tổng đơn hàng</p>
-                        <p className="text-2xl font-bold text-blue-600">{(stats.totalCount || 0).toLocaleString("vi-VN")}</p>
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tổng đơn hàng</p>
+                        <p className="text-2xl font-bold text-indigo-650">{(stats.totalCount || 0).toLocaleString("vi-VN")}</p>
                     </div>
-                    <div className="bg-blue-50 p-3 rounded-xl">
-                        <FileText size={24} className="text-blue-600" />
+                    <div className="bg-indigo-50 p-3 rounded-xl">
+                        <FileText size={24} className="text-indigo-600" />
                     </div>
                 </div>
 
                 {/* Thành công */}
-                <div className="bg-white rounded-2xl p-5 border border-[#DDE3F0] shadow-sm flex items-center justify-between">
+                <div className="bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl p-5 shadow-xl shadow-slate-900/5 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-between">
                     <div className="space-y-1">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Thành công</p>
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Thành công</p>
                         <p className="text-2xl font-bold text-emerald-600">{stats.successCount || 0}</p>
-                        <p className="text-[10px] text-gray-400 font-medium">
+                        <p className="text-[10px] text-slate-400 font-medium">
                             Tỉ lệ: {stats.totalCount ? Math.round((stats.successCount / stats.totalCount) * 100) : 0}%
                         </p>
                     </div>
@@ -986,15 +997,15 @@ function PaymentsTab() {
                 </div>
 
                 {/* Chờ thanh toán / Huỷ */}
-                <div className="bg-white rounded-2xl p-5 border border-[#DDE3F0] shadow-sm flex items-center justify-between">
+                <div className="bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl p-5 shadow-xl shadow-slate-900/5 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-between">
                     <div className="space-y-1">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Chờ / Đã Huỷ</p>
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Chờ / Đã Huỷ</p>
                         <p className="text-2xl font-bold text-slate-700">
-                            {stats.pendingCount || 0} <span className="text-gray-300">/</span> <span className="text-red-500">{stats.cancelledCount || 0}</span>
+                            {stats.pendingCount || 0} <span className="text-slate-300">/</span> <span className="text-red-500">{stats.cancelledCount || 0}</span>
                         </p>
-                        <p className="text-[10px] text-gray-400 font-medium">Chưa thanh toán & Bị hủy bỏ</p>
+                        <p className="text-[10px] text-slate-400 font-medium">Chưa thanh toán & Bị hủy bỏ</p>
                     </div>
-                    <div className="bg-slate-50 p-3 rounded-xl flex gap-1">
+                    <div className="bg-slate-50 p-3 rounded-xl flex gap-1 items-center">
                         <Clock size={16} className="text-amber-500" />
                         <XCircle size={16} className="text-red-500" />
                     </div>
@@ -1002,21 +1013,21 @@ function PaymentsTab() {
             </div>
 
             {/* PayOS Revenue Chart */}
-            <div className="bg-white rounded-2xl p-6 border border-[#DDE3F0] shadow-sm mb-8">
+            <div className="bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl p-6 shadow-xl shadow-slate-900/5">
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h3 className="font-bold text-gray-900">Biểu đồ doanh thu</h3>
-                        <p className="text-xs text-gray-500 mt-0.5">Biến động doanh thu hàng ngày trong 14 ngày qua</p>
+                        <h3 className="font-bold text-slate-800">Biểu đồ doanh thu</h3>
+                        <p className="text-xs text-slate-500 mt-0.5">Biến động doanh thu hàng ngày trong 14 ngày qua</p>
                     </div>
-                    <span className="text-xs bg-blue-50 text-blue-600 font-bold px-2.5 py-1 rounded-lg">PayOS Realtime</span>
+                    <span className="text-xs bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold px-2.5 py-1 rounded-lg">PayOS Realtime</span>
                 </div>
-                {chartData.length > 0 ? renderChart() : <div className="h-48 flex items-center justify-center text-gray-400 text-sm">Chưa có dữ liệu giao dịch thành công</div>}
+                {chartData.length > 0 ? renderChart() : <div className="h-48 flex items-center justify-center text-slate-400 text-sm font-semibold">Chưa có dữ liệu giao dịch thành công</div>}
             </div>
 
             {/* Transactions List */}
-            <div className="bg-white rounded-2xl border border-[#DDE3F0] overflow-hidden shadow-sm">
+            <div className="bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl overflow-hidden shadow-xl shadow-slate-900/5">
                 {/* Filters */}
-                <div className="p-5 border-b border-[#DDE3F0] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex flex-wrap gap-2">
                         {[
                             { value: "", label: "Tất cả giao dịch" },
@@ -1027,10 +1038,10 @@ function PaymentsTab() {
                             <button
                                 key={opt.value}
                                 onClick={() => handleFilterStatus(opt.value)}
-                                className={`px-4 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                                className={`px-4 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-sm ${
                                     statusFilter === opt.value
-                                        ? "bg-[#0A2463] text-white border-[#0A2463] shadow-sm"
-                                        : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                                        ? "bg-indigo-600 text-white border-indigo-650"
+                                        : "bg-white/85 text-slate-605 border-slate-200 hover:bg-white"
                                 }`}
                             >
                                 {opt.label}
@@ -1039,91 +1050,91 @@ function PaymentsTab() {
                     </div>
 
                     <div className="relative w-full md:w-80">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                         <input
                             type="text"
                             placeholder="Tìm kiếm email, gói cước..."
                             value={search}
                             onChange={handleSearchChange}
-                            className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0A2463] focus:border-transparent"
+                            className="w-full pl-10 pr-4 py-2 border border-slate-200/80 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 placeholder-slate-400 bg-white/70 font-medium transition-all shadow-inner focus:border-transparent outline-none"
                         />
                     </div>
                 </div>
 
                 {/* Table */}
                 <div className="overflow-x-auto">
-                    <table className="w-full border-collapse text-left">
-                        <thead>
-                            <tr className="bg-slate-50 border-b border-[#DDE3F0] text-gray-500 font-semibold text-xs uppercase tracking-wider">
-                                <th className="px-6 py-4">Mã đơn hàng</th>
-                                <th className="px-6 py-4">Người dùng</th>
-                                <th className="px-6 py-4">Gói dịch vụ</th>
-                                <th className="px-6 py-4">Số tiền</th>
-                                <th className="px-6 py-4">Trạng thái</th>
-                                <th className="px-6 py-4">Thời gian</th>
+                    <table className="w-full table-fixed text-left text-sm">
+                        <thead className="bg-slate-50/50 border-b border-slate-100 text-slate-505 font-semibold text-xs uppercase tracking-wider">
+                            <tr>
+                                <th className="p-4 font-semibold w-[16%]">Mã đơn hàng</th>
+                                <th className="p-4 font-semibold w-[26%]">Người dùng</th>
+                                <th className="p-4 font-semibold w-[20%]">Gói dịch vụ</th>
+                                <th className="p-4 font-semibold w-[14%]">Số tiền</th>
+                                <th className="p-4 font-semibold w-[12%]">Trạng thái</th>
+                                <th className="p-4 font-semibold w-[12%]">Thời gian</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#DDE3F0] text-sm text-gray-700">
+                        <tbody className="text-slate-750 font-medium">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="6" className="text-center py-10">
+                                    <td colSpan="6" className="text-center p-8 font-bold text-slate-500">
                                         <div className="flex justify-center items-center gap-2">
-                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#0A2463]" />
-                                            <span className="text-xs text-gray-500 font-medium">Đang tải lịch sử giao dịch...</span>
+                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-650" />
+                                            <span className="text-xs text-slate-500 font-semibold">Đang tải lịch sử giao dịch...</span>
                                         </div>
                                     </td>
                                 </tr>
                             ) : payments.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6" className="text-center py-10 text-gray-400 font-medium">Không tìm thấy giao dịch nào</td>
+                                    <td colSpan="6" className="text-center p-8 font-bold text-slate-505">Không tìm thấy giao dịch nào</td>
                                 </tr>
                             ) : (
                                 payments.map(p => (
-                                    <tr key={p._id} className="hover:bg-slate-50/50 transition-colors">
-                                        <td className="px-6 py-4 font-mono text-xs font-bold text-gray-900">
+                                    <tr key={p._id} className="border-t border-slate-100 hover:bg-white/40 transition-colors text-slate-750">
+                                        <td className="p-4 font-mono text-xs font-bold text-slate-800 truncate" title={p.payosOrderCode}>
                                             #{p.payosOrderCode}
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div>
-                                                <p className="font-semibold text-gray-900">{p.user?.name || "Người dùng ẩn"}</p>
-                                                <p className="text-xs text-gray-400">{p.user?.email || "—"}</p>
+                                        <td className="p-4 min-w-0">
+                                            <div className="truncate">
+                                                <p className="font-semibold text-slate-800 truncate" title={p.user?.name}>{p.user?.name || "Người dùng ẩn"}</p>
+                                                <p className="text-xs text-slate-505 font-medium truncate" title={p.user?.email}>{p.user?.email || "—"}</p>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div>
-                                                <p className="font-semibold text-gray-800">{p.packageName}</p>
-                                                <p className="text-xs text-gray-400">+{p.creditAmount?.toLocaleString()} Credits</p>
+                                        <td className="p-4 min-w-0">
+                                            <div className="truncate">
+                                                <p className="font-semibold text-slate-800 truncate" title={p.packageName}>{p.packageName}</p>
+                                                <p className="text-xs text-slate-505 font-medium mt-0.5">+{p.creditAmount?.toLocaleString()} Credits</p>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 font-semibold text-gray-900">
+                                        <td className="p-4 font-semibold text-slate-800 font-mono">
                                             {(p.amount || 0).toLocaleString("vi-VN")} đ
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="p-4">
                                             {p.status === "PAID" && (
-                                                <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-lg border border-emerald-100">
-                                                    <CheckCircle size={12} className="fill-emerald-700 text-white" />
+                                                <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-emerald-100 shadow-sm">
+                                                    <CheckCircle size={11} className="fill-emerald-700 text-white" />
                                                     Thành công
                                                 </span>
                                             )}
                                             {p.status === "PENDING" && (
-                                                <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-lg border border-amber-100">
-                                                    <Clock size={12} />
+                                                <span className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-705 text-xs font-bold px-2.5 py-0.5 rounded-full border border-amber-100 shadow-sm">
+                                                    <Clock size={11} />
                                                     Chờ thanh toán
                                                 </span>
                                             )}
                                             {p.status === "CANCELLED" && (
-                                                <span className="inline-flex items-center gap-1 bg-red-50 text-red-700 text-xs font-bold px-2.5 py-1 rounded-lg border border-red-100">
-                                                    <XCircle size={12} />
+                                                <span className="inline-flex items-center gap-1.5 bg-red-50 text-red-705 text-xs font-bold px-2.5 py-0.5 rounded-full border border-red-100 shadow-sm">
+                                                    <XCircle size={11} />
                                                     Đã hủy
                                                 </span>
                                             )}
                                             {!["PAID", "PENDING", "CANCELLED"].includes(p.status) && (
-                                                <span className="inline-flex items-center gap-1 bg-slate-50 text-slate-700 text-xs font-bold px-2.5 py-1 rounded-lg border border-slate-100">
+                                                <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-slate-200 shadow-sm">
                                                     {p.status}
                                                 </span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 text-xs text-gray-500">
+                                        <td className="p-4 text-xs text-slate-500 font-medium">
                                             {new Date(p.createdAt).toLocaleString("vi-VN")}
                                         </td>
                                     </tr>
@@ -1135,20 +1146,20 @@ function PaymentsTab() {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                    <div className="flex items-center justify-between px-6 py-4 border-t border-[#DDE3F0]">
-                        <p className="text-xs text-gray-500 font-medium">Trang {page} / {totalPages}</p>
+                    <div className="flex items-center justify-between p-4 border-t border-slate-100">
+                        <p className="text-xs text-slate-505 font-medium">Trang {page} / {totalPages}</p>
                         <div className="flex gap-2">
                             <button 
                                 onClick={() => setPage(p => Math.max(1, p - 1))} 
                                 disabled={page === 1} 
-                                className="p-1.5 rounded-lg border border-[#DDE3F0] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="p-2 rounded-xl border border-slate-200 bg-white/80 text-slate-705 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition-all"
                             >
                                 <ChevronLeft size={16} />
                             </button>
                             <button 
                                 onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
                                 disabled={page === totalPages} 
-                                className="p-1.5 rounded-lg border border-[#DDE3F0] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="p-2 rounded-xl border border-slate-200 bg-white/80 text-slate-705 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition-all"
                             >
                                 <ChevronRight size={16} />
                             </button>
@@ -1187,11 +1198,15 @@ export default function AdminDashboard() {
 
     if (!user || user.role !== "ADMIN") {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#F4F6FB]">
-                <div className="text-center">
-                    <AlertTriangle size={48} className="text-yellow-500 mx-auto mb-3" />
-                    <h2 className="text-xl font-bold text-gray-700">Không có quyền truy cập</h2>
-                    <p className="text-gray-400 text-sm mt-1">Trang này chỉ dành cho Admin</p>
+            <div 
+                className="min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat bg-fixed relative"
+                style={{ backgroundImage: "url('/background3.jpg')" }}
+            >
+                <div className="absolute inset-0 bg-slate-950/35 backdrop-blur-[1px] pointer-events-none" />
+                <div className="relative z-10 text-center bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl p-8 shadow-xl shadow-slate-900/5 max-w-sm">
+                    <AlertTriangle size={48} className="text-amber-500 mx-auto mb-3" />
+                    <h2 className="text-xl font-bold text-slate-800">Không có quyền truy cập</h2>
+                    <p className="text-slate-500 text-sm mt-1">Trang này chỉ dành cho Admin</p>
                 </div>
             </div>
         );
@@ -1211,17 +1226,27 @@ export default function AdminDashboard() {
     };
 
     return (
-        <div className="flex min-h-screen bg-[#F4F6FB] font-sans">
-            <AdminSidebar
-                active={activeTab}
-                setActive={setActiveTab}
-                user={user}
-                onLogout={handleLogout}
-                pendingCount={pendingEmployerCount}
-            />
-            <main className="flex-1 p-6 lg:p-8 overflow-auto">
-                {TABS[activeTab]}
-            </main>
+        <div 
+            className="min-h-screen flex bg-cover bg-center bg-no-repeat bg-fixed relative font-sans w-full"
+            style={{ backgroundImage: "url('/background3.jpg')" }}
+        >
+            {/* Premium backdrop-blur and overlay */}
+            <div className="absolute inset-0 bg-slate-950/35 backdrop-blur-[1px] pointer-events-none" />
+
+            <div className="relative z-10 flex w-full min-h-screen">
+                <AdminSidebar
+                    active={activeTab}
+                    setActive={setActiveTab}
+                    user={user}
+                    onLogout={handleLogout}
+                    pendingCount={pendingEmployerCount}
+                />
+                <main className="flex-1 p-6 lg:p-8 overflow-auto">
+                    <div className="max-w-7xl mx-auto w-full space-y-6">
+                        {TABS[activeTab]}
+                    </div>
+                </main>
+            </div>
         </div>
     );
 }

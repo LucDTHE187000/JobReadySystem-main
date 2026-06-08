@@ -655,7 +655,7 @@ export default function CVUpload() {
                                                                 ? 'bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 text-emerald-300 border border-emerald-500/20'
                                                                 : cv.analysis.score >= 60
                                                                 ? 'bg-gradient-to-r from-blue-500/20 to-blue-500/10 text-blue-300 border border-blue-500/20'
-                                                                : 'bg-gradient-to-r from-amber-500/20 to-amber-500/10 text-amber-300 border border-amber-500/20'
+                                                                : 'bg-gradient-to-r from-amber-500/20 to-amber-500/10 text-gray-500 border border-amber-500/20'
                                                         }`}>
                                                             {cv.analysis.score >= 75 ? '🌟 Tuyệt vời' : cv.analysis.score >= 60 ? '✓ Tốt' : '⚠ Cần cải thiện'}
                                                             <span className="font-bold text-lg">{cv.analysis.score}/100</span>

@@ -25,6 +25,7 @@ import { adminRouter } from "./modules/admin/admin.router.js";
 import notificationRouter from "./modules/notification/notification.router.js";
 import campaignRouter from "./modules/campaign/campaign.router.js";
 import blogRouter from "./modules/blog/blog.router.js";
+import { contactRouter } from "./modules/contact/contact.router.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -91,6 +92,7 @@ app.use("/api/admin", adminRouter);
 app.use("/api/notifications", notificationRouter);
 app.use("/api/campaigns", campaignRouter);
 app.use("/api/blogs", blogRouter);
+app.use("/api/contact", contactRouter);
 
 
 // ===== ERROR HANDLER =====

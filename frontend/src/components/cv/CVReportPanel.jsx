@@ -147,13 +147,13 @@ export default function CVReportPanel({ analysis, fileName, onClose }) {
         <div className="space-y-6">
             <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                    <p className="text-xs text-slate-500 mb-1">Activity Hub › CV Marking Report</p>
+                    
                     <h2 className="text-2xl font-bold text-slate-800">Kết quả phân tích CV</h2>
                     <p className="text-sm text-slate-500">{fileName}</p>
                 </div>
                 <div className="text-right">
-                    <p className="text-5xl font-extrabold text-emerald-600">{score}%</p>
-                    <p className="text-sm text-slate-500">Điểm ATS tổng quát</p>
+                    <p className="text-5xl font-extrabold text-red-900">{score}%</p>
+                    <p className="text-sm text-slate-900">Điểm ATS tổng quát</p>
                 </div>
             </div>
 

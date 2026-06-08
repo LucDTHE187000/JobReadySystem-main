@@ -94,147 +94,153 @@ const JobDetail = () => {
 
 
     return (
-        <div className="flex min-h-screen bg-[#F8FAFC]">
-            <SideBar profile={user} />
+        <div 
+            className="min-h-screen flex bg-cover bg-center bg-no-repeat bg-fixed relative"
+            style={{ backgroundImage: `url('/background3.jpg')` }}
+        >
+            {/* Premium backdrop-blur and dark-gradient overlay */}
+            <div className="absolute inset-0 bg-slate-950/30 backdrop-blur-[1px] pointer-events-none" />
 
-            <div className="flex-1 p-8 overflow-y-auto">
-                {/* Header & Back Button */}
-                <div className="flex items-center justify-between mb-8">
-                    <button onClick={() => navigate(-1)} className="flex items-center text-gray-500 hover:text-blue-600 transition-colors font-medium">
-                        <ArrowLeft className="w-5 h-5 mr-2" /> Quay lại
-                    </button>
-                    <div className="flex gap-2">
-                        <span className="text-xs text-gray-400 bg-white border border-gray-200 px-3 py-1.5 rounded-lg flex items-center">
-                            <Eye className="w-3.5 h-3.5 mr-1.5" /> {data.views || 0} lượt xem
-                        </span>
+            <div className="relative z-10 flex w-full">
+                <SideBar profile={user} />
+
+                <div className="flex-1 p-8 overflow-y-auto">
+                    {/* Header & Back Button */}
+                    <div className="flex items-center justify-between mb-8 bg-white/60 backdrop-blur-md p-4 rounded-2xl border border-white/50 shadow-xl shadow-slate-900/5">
+                        <button onClick={() => navigate(-1)} className="flex items-center text-slate-700 hover:text-indigo-650 transition-colors font-semibold text-sm">
+                            <ArrowLeft className="w-5 h-5 mr-2 text-slate-650" /> Quay lại
+                        </button>
+                        <div className="flex gap-2">
+                            <span className="text-xs text-slate-650 font-semibold bg-white/80 border border-slate-200 px-3 py-1.5 rounded-xl flex items-center shadow-sm">
+                                <Eye className="w-3.5 h-3.5 mr-1.5 text-slate-500" /> {data.views || 0} lượt xem
+                            </span>
+                        </div>
                     </div>
-                </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* CỘT TRÁI: THÔNG TIN CHI TIẾT */}
-                    <div className="lg:col-span-2 space-y-8">
-                        <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-                            <div className="flex justify-between items-start mb-6">
-                                <div>
-                                    <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">{data.title}</h1>
-                                    <div className="flex items-center mt-3 gap-3">
-                                        <span className="bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-md uppercase tracking-wider">
-                                            {data.jobType?.replace('_', ' ')}
-                                        </span>
-                                        <span className={`flex items-center text-xs font-bold px-3 py-1 rounded-md uppercase tracking-wider ${data.status === 'open' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-                                            {data.status === 'open' ? 'Đang tuyển' : 'Đã đóng'}
-                                        </span>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* CỘT TRÁI: THÔNG TIN CHI TIẾT */}
+                        <div className="lg:col-span-2 space-y-8">
+                            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-xl shadow-slate-900/5 border border-white/60">
+                                <div className="flex justify-between items-start mb-6">
+                                    <div>
+                                        <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-800">{data.title}</h1>
+                                        <div className="flex items-center mt-3 gap-3">
+                                            <span className="bg-indigo-50 border border-indigo-100/60 text-indigo-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                                                {data.jobType?.replace('_', ' ')}
+                                            </span>
+                                            <span className={`flex items-center text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border ${data.status === 'open' ? 'bg-emerald-50 border-emerald-100/60 text-emerald-600 shadow-sm' : 'bg-red-50 border-red-100/60 text-red-600 shadow-sm'}`}>
+                                                {data.status === 'open' ? 'Đang tuyển' : 'Đã đóng'}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="space-y-8 mt-10">
-                                <div>
-                                    <h3 className="text-lg font-bold text-gray-900 flex items-center mb-4">
-                                        <span className="w-1.5 h-6 bg-blue-600 rounded-full mr-3"></span>
-                                        Mô tả công việc
-                                    </h3>
-                                    <p className="text-gray-600 leading-relaxed whitespace-pre-line pl-4 text-[15px]">
-                                        {data.description}
-                                    </p>
-                                </div>
+                                <div className="space-y-8 mt-10">
+                                    <div>
+                                        <h3 className="text-base font-bold text-slate-805 flex items-center mb-4 border-b border-slate-100 pb-2">
+                                            <span className="w-1.5 h-6 bg-indigo-500 rounded-full mr-3"></span>
+                                            Mô tả công việc
+                                        </h3>
+                                        <p className="text-slate-600 leading-relaxed font-medium whitespace-pre-line pl-4 text-sm">
+                                            {data.description}
+                                        </p>
+                                    </div>
 
-                                <div>
-                                    <h3 className="text-lg font-bold text-gray-900 flex items-center mb-4">
-                                        <span className="w-1.5 h-6 bg-blue-600 rounded-full mr-3"></span>
-                                        Yêu cầu ứng viên
-                                    </h3>
-                                    <p className="text-gray-600 leading-relaxed whitespace-pre-line pl-4 text-[15px]">
-                                        {data.requirements || "Không có yêu cầu cụ thể."}
-                                    </p>
+                                    <div>
+                                        <h3 className="text-base font-bold text-slate-805 flex items-center mb-4 border-b border-slate-100 pb-2">
+                                            <span className="w-1.5 h-6 bg-indigo-500 rounded-full mr-3"></span>
+                                            Yêu cầu ứng viên
+                                        </h3>
+                                        <p className="text-slate-600 leading-relaxed font-medium whitespace-pre-line pl-4 text-sm">
+                                            {data.requirements || "Không có yêu cầu cụ thể."}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
+                        {/* CỘT PHẢI: THÔNG TIN NHANH */}
+                        <div className="lg:col-span-1 space-y-6">
+                            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-xl shadow-slate-900/5 border border-white/60 sticky top-8">
+                                <h3 className="text-slate-800 font-bold mb-6 flex items-center px-2 border-b border-slate-100 pb-3">
+                                    Tóm tắt công việc
+                                </h3>
 
-                    </div>
-
-                    {/* CỘT PHẢI: THÔNG TIN NHANH */}
-                    <div className="lg:col-span-1 space-y-6">
-                        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 sticky top-8">
-                            <h3 className="text-gray-900 font-bold mb-6 flex items-center px-2">
-                                Tóm tắt công việc
-                            </h3>
-
-                            <div className="space-y-1">
-                                <div className="flex items-center p-4 hover:bg-gray-50 rounded-2xl transition-colors">
-                                    <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center mr-4">
-                                        <DollarSign className="w-5 h-5 text-green-600" />
+                                <div className="space-y-1">
+                                    <div className="flex items-center p-4 hover:bg-slate-50/60 rounded-xl transition-colors">
+                                        <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center mr-4 border border-emerald-100/60">
+                                            <DollarSign className="w-5 h-5 text-emerald-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Mức lương</p>
+                                            <p className="text-sm font-bold text-slate-800">
+                                                {data.salary?.min?.toLocaleString()} - {data.salary?.max?.toLocaleString()} {data.salary?.currency}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Mức lương</p>
-                                        <p className="text-sm font-bold text-gray-900">
-                                            {data.salary?.min?.toLocaleString()} - {data.salary?.max?.toLocaleString()} {data.salary?.currency}
-                                        </p>
+
+                                    <div className="flex items-center p-4 hover:bg-slate-50/60 rounded-xl transition-colors">
+                                        <div className="w-10 h-10 bg-indigo-50 border border-indigo-100/60 rounded-xl flex items-center justify-center mr-4">
+                                            <MapPin className="w-5 h-5 text-indigo-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Địa điểm</p>
+                                            <p className="text-sm font-bold text-slate-800 leading-tight">
+                                                {data.location?.city}, {data.location?.district}
+                                            </p>
+                                            <p className="text-xs text-slate-500 font-medium mt-0.5 line-clamp-1">{data.location?.address}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center p-4 hover:bg-slate-50/60 rounded-xl transition-colors">
+                                        <div className="w-10 h-10 bg-violet-50 border border-violet-100/60 rounded-xl flex items-center justify-center mr-4">
+                                            <Calendar className="w-5 h-5 text-violet-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Ngày đăng</p>
+                                            <p className="text-sm font-bold text-slate-800">
+                                                {new Date(data.createdAt).toLocaleDateString('vi-VN')}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center p-4 hover:bg-slate-50/60 rounded-xl transition-colors">
+                                        <div className="w-10 h-10 bg-amber-50 border border-amber-200/60 rounded-xl flex items-center justify-center mr-4">
+                                            <Clock className="w-5 h-5 text-amber-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Hình thức</p>
+                                            <p className="text-sm font-bold text-slate-800 capitalize">
+                                                {data.jobType?.replace('_', ' ')}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center p-4 hover:bg-gray-50 rounded-2xl transition-colors">
-                                    <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mr-4">
-                                        <MapPin className="w-5 h-5 text-blue-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Địa điểm</p>
-                                        <p className="text-sm font-bold text-gray-900 leading-tight">
-                                            {data.location?.city}, {data.location?.district}
-                                        </p>
-                                        <p className="text-[11px] text-gray-500 mt-0.5 line-clamp-1">{data.location?.address}</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center p-4 hover:bg-gray-50 rounded-2xl transition-colors">
-                                    <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center mr-4">
-                                        <Calendar className="w-5 h-5 text-purple-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Ngày đăng</p>
-                                        <p className="text-sm font-bold text-gray-900">
-                                            {new Date(data.createdAt).toLocaleDateString('vi-VN')}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center p-4 hover:bg-gray-50 rounded-2xl transition-colors">
-                                    <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center mr-4">
-                                        <Clock className="w-5 h-5 text-amber-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Hình thức</p>
-                                        <p className="text-sm font-bold text-gray-900 capitalize">
-                                            {data.jobType?.replace('_', ' ')}
-                                        </p>
-                                    </div>
-                                </div>
+                                {/* 🔥 BUTTON QUẢN LÝ TRẠNG THÁI */}
+                                <button
+                                    onClick={handleToggleStatus}
+                                    disabled={updatingStatus}
+                                    className={`w-full mt-6 py-3.5 rounded-xl font-semibold shadow-md transition-all flex items-center justify-center group ${data.status === 'open'
+                                        ? 'bg-red-50 border border-red-150 text-red-600 hover:bg-red-100/80 shadow-sm'
+                                        : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg shadow-emerald-100/25'
+                                        } ${updatingStatus && "opacity-70 cursor-not-allowed"}`}
+                                  >
+                                    {updatingStatus ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                            Đang cập nhật...
+                                        </>
+                                    ) : (
+                                        <>
+                                            {data.status === 'open'
+                                                ? 'Đóng tuyển dụng'
+                                                : 'Mở lại tuyển dụng'}
+                                            <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                                        </>
+                                    )}
+                                </button>
                             </div>
-
-                            {/* 🔥 BUTTON QUẢN LÝ TRẠNG THÁI */}
-                            <button
-                                onClick={handleToggleStatus}
-                                disabled={updatingStatus}
-                                className={`w-full mt-6 py-4 rounded-2xl font-bold transition-all flex items-center justify-center group ${data.status === 'open'
-                                    ? 'bg-red-600 hover:bg-red-700 text-white'
-                                    : 'bg-green-600 hover:bg-green-700 text-white'
-                                    } ${updatingStatus && "opacity-70 cursor-not-allowed"}`}
-                            >
-                                {updatingStatus ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                        Đang cập nhật...
-                                    </>
-                                ) : (
-                                    <>
-                                        {data.status === 'open'
-                                            ? 'Đóng tuyển dụng'
-                                            : 'Mở lại tuyển dụng'}
-                                        <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                                    </>
-                                )}
-                            </button>
                         </div>
                     </div>
                 </div>

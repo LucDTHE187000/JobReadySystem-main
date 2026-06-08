@@ -41,19 +41,25 @@ const Sidebar = ({
     <aside
       className={`
         fixed lg:sticky z-30 top-0 left-0
-        bg-[#0A2463] w-64 min-h-screen p-4 flex flex-col
-        transition-transform duration-300
+        bg-slate-900/45 border-r border-white/10 backdrop-blur-md w-64 min-h-screen p-4 flex flex-col
+        transition-transform duration-300 shadow-xl
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
     >
-      <div className="flex items-center justify-between mb-8 px-2 flex-shrink-0">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-[#F5C518] rounded-lg flex items-center justify-center">
-            <span className="font-heading text-[#0A2463] text-lg leading-none pt-0.5">JR</span>
+      <div className="flex items-center justify-between mb-8 px-2 flex-shrink-0 border-b border-white/10 pb-5">
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 bg-gradient-to-r from-indigo-600 to-violet-600 rounded-lg flex items-center justify-center font-bold text-white text-sm">
+              JR
+            </div>
+            <span className="font-bold text-white text-lg">
+              JOB<span className="text-indigo-400">READY</span>
+            </span>
           </div>
-          <span className="font-heading text-xl text-white tracking-wide">
-            JOB<span className="text-[#F5C518]">READY</span>
-          </span>
+          <div className="mt-3 flex items-center gap-2">
+            <Briefcase size={14} className="text-indigo-400" />
+            <span className="text-indigo-400/90 text-xs font-semibold uppercase tracking-wider">Recruiter Panel</span>
+          </div>
         </div>
 
         <button
@@ -115,16 +121,17 @@ const Sidebar = ({
       <div className="mt-auto px-2 flex-shrink-0 border-t border-white/10 pt-4">
         <div
           onClick={() => navigate("/profile")}
-          className="flex items-center gap-3 px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer group"
+          className="flex items-center gap-3 px-2 py-2 cursor-pointer hover:bg-white/5 rounded-xl transition-all group"
+          title="Xem hồ sơ cá nhân"
         >
-          <div className="w-10 h-10 bg-[#F5C518] rounded-full flex items-center justify-center text-[#0A2463] font-bold text-lg flex-shrink-0">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold flex items-center justify-center text-sm shadow-md">
             {profile?.name?.charAt(0) || "C"}
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm text-white truncate">{profile?.name || "User"}</p>
-            <p className="text-xs text-white/50">Nhà tuyển dụng</p>
+          <div className="flex-1 min-w-0 text-left">
+            <p className="font-semibold text-white text-sm truncate">{profile?.name || "Nhà tuyển dụng"}</p>
+            <p className="text-[10px] text-white/40">Xem hồ sơ</p>
           </div>
-          <ChevronRight size={18} className="text-white/40 group-hover:text-white transition-colors" />
+          <ChevronRight size={16} className="text-white/40 group-hover:text-white transition-colors" />
         </div>
       </div>
     </aside>
@@ -136,10 +143,10 @@ export default Sidebar;
 const MenuItem = ({ icon, label, active, onClick }) => (
   <button
     onClick={onClick}
-    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors mx-0 ${
+    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all border-l-2 text-sm font-medium mx-0 cursor-pointer ${
       active
-        ? "bg-[#F5C518]/20 text-[#F5C518] border-l-2 border-[#F5C518]"
-        : "text-white/70 hover:bg-white/10 hover:text-white"
+        ? "bg-indigo-600/30 text-indigo-200 border-indigo-500 shadow-inner"
+        : "text-white/60 hover:bg-white/5 hover:text-white border-transparent"
     }`}
   >
     {icon}
