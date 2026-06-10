@@ -18,6 +18,7 @@ export default function InterviewSession() {
     const questionFetchedRef = useRef(false); // Use ref to prevent double fetches
     const previousSessionIdRef = useRef(null); // Track session changes
     const sessionRef = useRef(null);
+    const initialAnswerRef = useRef('');
 
     const [session, setSession] = useState(null);
 
@@ -61,9 +62,17 @@ export default function InterviewSession() {
         setupSpeechRecognition();
         
         return () => {
-            console.log('[SETUP EFFECT CLEANUP] Cleaning up streams for sessionId:', sessionId);
+            console.log('[SETUP EFFECT CLEANUP] Cleaning up streams and recognition for sessionId:', sessionId);
             if (streamRef.current) {
                 streamRef.current.getTracks().forEach(track => track.stop());
+            }
+            if (recognitionRef.current) {
+                try {
+                    recognitionRef.current.stop();
+                } catch (e) {
+                    // Ignore if already stopped
+                }
+                recognitionRef.current = null;
             }
         };
     }, [sessionId]);
@@ -102,12 +111,13 @@ export default function InterviewSession() {
         };
 
         recognition.onresult = (event) => {
-            let transcript = '';
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                transcript += event.results[i][0].transcript;
+            let sessionTranscript = '';
+            for (let i = 0; i < event.results.length; i++) {
+                sessionTranscript += event.results[i][0].transcript;
             }
-            if (transcript.trim()) {
-                setUserAnswer(prev => prev ? prev + ' ' + transcript : transcript);
+            if (sessionTranscript.trim()) {
+                const base = initialAnswerRef.current.trim();
+                setUserAnswer(base ? base + ' ' + sessionTranscript.trim() : sessionTranscript.trim());
             }
         };
 
@@ -125,6 +135,7 @@ export default function InterviewSession() {
 
     const startListening = () => {
         if (recognitionRef.current) {
+            initialAnswerRef.current = userAnswer;
             recognitionRef.current.start();
         }
     };
