@@ -9,6 +9,8 @@ import {
     Eye, ChevronRight, UserCheck
 } from 'lucide-react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
 const JobDetail = () => {
     const { user } = useAuth();
     const { jobId } = useParams();
@@ -28,7 +30,7 @@ const JobDetail = () => {
                 const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
                 const response = await axios.get(
-                    `http://localhost:4000/api/jobs/job-applications/${jobId}`,
+                    `${API_URL}/api/jobs/job-applications/${jobId}`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -53,7 +55,7 @@ const JobDetail = () => {
             const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
             const response = await axios.patch(
-                `http://localhost:4000/api/jobs/${jobId}/toggle-status`,
+                `${API_URL}/api/jobs/${jobId}/toggle-status`,
                 {},
                 {
                     headers: {

@@ -3,6 +3,8 @@ import SideBar from "../../components/SideBar";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Star } from 'lucide-react';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
 function ApplicationsList() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -34,7 +36,7 @@ function ApplicationsList() {
         }
 
         const res = await fetch(
-          "http://localhost:4000/api/jobs/job-application",
+          `${API_URL}/api/jobs/job-application`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -63,7 +65,7 @@ function ApplicationsList() {
     if (!window.confirm("Bạn có chắc chắn muốn xóa tin tuyển dụng này? Tất cả các hồ sơ ứng tuyển liên quan sẽ bị xóa!")) return;
     try {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-      const res = await fetch(`http://localhost:4000/api/jobs/${jobId}`, {
+      const res = await fetch(`${API_URL}/api/jobs/${jobId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`

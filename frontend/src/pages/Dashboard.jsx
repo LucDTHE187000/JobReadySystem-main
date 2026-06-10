@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import SideBar from "../components/SideBar";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
 
 export default function Dashboard() {
     const { user, signOut } = useAuth();
@@ -64,8 +66,8 @@ export default function Dashboard() {
                 const headers = { Authorization: `Bearer ${token}` };
 
                 const [jobsRes, appsRes] = await Promise.all([
-                    fetch('http://localhost:4000/api/jobs/my', { headers }),
-                    fetch('http://localhost:4000/api/applications/company/applicants', { headers }),
+                    fetch(`${API_URL}/api/jobs/my`, { headers }),
+                    fetch(`${API_URL}/api/applications/company/applicants`, { headers }),
                 ]);
                 const jobsData = jobsRes.ok ? await jobsRes.json() : null;
                 const appsData = appsRes.ok ? await appsRes.json() : null;
@@ -147,7 +149,7 @@ export default function Dashboard() {
             setCampaignSuccess('');
 
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const res = await fetch('http://localhost:4000/api/campaigns', {
+            const res = await fetch(`${API_URL}/api/campaigns`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -181,7 +183,7 @@ export default function Dashboard() {
         try {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
             if (!token) return;
-            const res = await fetch('http://localhost:4000/api/notifications', {
+            const res = await fetch(`${API_URL}/api/notifications`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (res.ok) {
@@ -197,7 +199,7 @@ export default function Dashboard() {
         try {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
             if (!token) return;
-            const res = await fetch('http://localhost:4000/api/campaigns/my', {
+            const res = await fetch(`${API_URL}/api/campaigns/my`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (res.ok) {

@@ -20,6 +20,8 @@ const POPULAR_SKILLS = [
     "Excel", "Marketing", "Design", "Figma", "Communication", "Leadership"
 ];
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
 export default function CandidateSearch() {
     const { user } = useAuth();
     const [candidates, setCandidates] = useState([]);
@@ -53,7 +55,7 @@ export default function CandidateSearch() {
             if (selectedSkills.length > 0) params.skills = selectedSkills.join(",");
             if (experience) params.experience = experience;
 
-            const res = await axios.get("http://localhost:4000/api/users/candidates/search", {
+            const res = await axios.get(`${API_URL}/api/users/candidates/search`, {
                 headers: { Authorization: `Bearer ${token}` },
                 params,
             });
@@ -113,7 +115,7 @@ export default function CandidateSearch() {
         setSendingEmail(true);
         try {
             const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-            await axios.post("http://localhost:4000/api/users/candidates/contact", {
+            await axios.post(`${API_URL}/api/users/candidates/contact`, {
                 candidateEmail: selectedCandidate.email,
                 subject: emailSubject,
                 body: emailBody

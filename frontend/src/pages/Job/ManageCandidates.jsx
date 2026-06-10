@@ -17,6 +17,8 @@ import {
     Trash2,
 } from "lucide-react";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
 export default function ManageCandidates() {
     const { user } = useAuth();
 
@@ -57,7 +59,7 @@ export default function ManageCandidates() {
         setSendingEmail(true);
         try {
             const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
             await axios.post(`${API_URL}/api/users/candidates/contact`, {
                 candidateEmail: contactCandidate.jobseekerId.email,
                 subject: emailSubject,
@@ -87,7 +89,7 @@ export default function ManageCandidates() {
                 console.log("token: ", token);
 
                 const res = await axios.get(
-                    "http://localhost:4000/api/applications/company/applicants",
+                    `${API_URL}/api/applications/company/applicants`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -169,7 +171,7 @@ export default function ManageCandidates() {
             }
 
             await axios.put(
-                `http://localhost:4000/api/applications/${appId}/status`,
+                `${API_URL}/api/applications/${appId}/status`,
                 { status: newStatus },
                 {
                     headers: {
@@ -422,7 +424,7 @@ export default function ManageCandidates() {
                                                 }
 
                                                 await axios.put(
-                                                    `http://localhost:4000/api/applications/${selectedCandidate._id}/interview`,
+                                                    `${API_URL}/api/applications/${selectedCandidate._id}/interview`,
                                                     {
                                                         interviewDate: selectedCandidate.interviewDate,
                                                     },

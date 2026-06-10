@@ -9,7 +9,7 @@ import {
     Building2, CheckCircle2, Ban, Eye, Bell, CreditCard
 } from "lucide-react";
 
-const API = "http://localhost:4000/api/admin";
+const API = `${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/admin`;
 
 function getToken() {
     return localStorage.getItem("token") || sessionStorage.getItem("token");

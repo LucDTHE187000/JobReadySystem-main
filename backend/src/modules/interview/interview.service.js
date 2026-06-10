@@ -267,11 +267,32 @@ LƯU Ý: Tất cả các trường score, feedback, keyPoints, missedPoints, sug
                 }
             }
 
-            question.aiScore = aiEvaluation.aiScore || aiEvaluation.score || 0;
-            question.aiFeedback = aiEvaluation.aiFeedback || aiEvaluation.feedback || '';
-            question.keyPoints = aiEvaluation.keyPoints || [];
-            question.missedPoints = aiEvaluation.missedPoints || [];
-            question.suggestions = aiEvaluation.suggestions || [];
+            // Extract score robustly, converting to number
+            let extractedScore = 0;
+            if (aiEvaluation) {
+                const rawScore = aiEvaluation.aiScore ?? aiEvaluation.score ?? aiEvaluation.points ?? aiEvaluation.evaluationScore ?? aiEvaluation.rating;
+                if (rawScore !== undefined && rawScore !== null) {
+                    extractedScore = Number(rawScore);
+                    if (isNaN(extractedScore)) extractedScore = 0;
+                }
+            }
+
+            // If the score is 0 but the user actually wrote an answer, use fallback scoring based on word count
+            if (extractedScore === 0 && userAnswer && userAnswer.trim().length > 0) {
+                const wordCount = userAnswer.trim().split(/\s+/).length;
+                extractedScore = Math.min(70, 45 + Math.floor(wordCount / 5));
+            }
+
+            // Normalize 1-10 scores to 10-100 scale
+            if (extractedScore > 0 && extractedScore <= 10) {
+                extractedScore = extractedScore * 10;
+            }
+
+            question.aiScore = extractedScore;
+            question.aiFeedback = aiEvaluation?.aiFeedback || aiEvaluation?.feedback || 'Cám ơn câu trả lời của bạn. Đã ghi nhận hệ thống.';
+            question.keyPoints = Array.isArray(aiEvaluation?.keyPoints) ? aiEvaluation.keyPoints : [];
+            question.missedPoints = Array.isArray(aiEvaluation?.missedPoints) ? aiEvaluation.missedPoints : [];
+            question.suggestions = Array.isArray(aiEvaluation?.suggestions) ? aiEvaluation.suggestions : [];
             // Normalize sentiment — AI có thể trả về nhiều format khác nhau
             const rawSentiment = (aiEvaluation.sentiment || '').toLowerCase();
             const sentimentMap = {

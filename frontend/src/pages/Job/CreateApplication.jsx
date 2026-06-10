@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import SideBar from "../../components/SideBar";
 import { useAuth } from "../../contexts/AuthContext";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
 function CreateJob() {
   const navigate = useNavigate();
   const { jobId } = useParams();
@@ -33,7 +35,7 @@ function CreateJob() {
     if (isEdit && token) {
       const fetchJobDetails = async () => {
         try {
-          const res = await fetch(`http://localhost:4000/api/jobs/${jobId}`, {
+          const res = await fetch(`${API_URL}/api/jobs/${jobId}`, {
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -101,8 +103,8 @@ function CreateJob() {
       setLoading(true);
 
       const url = isEdit
-        ? `http://localhost:4000/api/jobs/${jobId}`
-        : "http://localhost:4000/api/jobs";
+        ? `${API_URL}/api/jobs/${jobId}`
+        : `${API_URL}/api/jobs`;
 
       const res = await fetch(url, {
         method: isEdit ? "PUT" : "POST",
