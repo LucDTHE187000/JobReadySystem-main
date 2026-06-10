@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
@@ -6,8 +7,6 @@ import {
     Sparkles, Loader2, ArrowRight
 } from 'lucide-react';
 import SeekerLayout from '../components/layout/SeekerLayout';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 const CATEGORIES = [
     { key: 'all', label: '📖 Tất cả lĩnh vực' },

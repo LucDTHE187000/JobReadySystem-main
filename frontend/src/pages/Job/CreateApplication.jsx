@@ -1,9 +1,8 @@
+import { API_URL } from '@/config';
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import SideBar from "../../components/SideBar";
 import { useAuth } from "../../contexts/AuthContext";
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 function CreateJob() {
   const navigate = useNavigate();

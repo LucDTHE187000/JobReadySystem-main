@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
@@ -10,8 +11,6 @@ import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/ui/Header';
 import Footer from '../components/ui/Footer';
 import { siteImages } from '../config/siteImages';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 const JOB_TYPES = [
     { value: 'full-time', label: 'Toàn thời gian' },

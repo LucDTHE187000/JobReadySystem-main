@@ -1,11 +1,10 @@
+import { API_URL } from '@/config';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import SeekerLayout from '../components/layout/SeekerLayout';
 import { ArrowRight, CheckCircle, Clock3, Copy } from 'lucide-react';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 const PACKAGES = [
   {

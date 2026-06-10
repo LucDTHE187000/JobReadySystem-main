@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
@@ -94,7 +95,7 @@ export default function Login() {
         setError('');
         setSuccessMessage('');
         try {
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
             await axios.post(`${API_URL}/api/auth/resend-otp`, { email: email.trim() });
             setSuccessMessage('Mã OTP mới đã được gửi lại vào email của bạn.');
             setResendCooldown(60);
@@ -115,7 +116,7 @@ export default function Login() {
         setForgotLoading(true);
         setForgotError('');
         try {
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
             await axios.post(`${API_URL}/api/auth/forgot-password`, { email: forgotEmail.trim() });
             setForgotStep(2);
             setForgotCooldown(60);
@@ -136,7 +137,7 @@ export default function Login() {
         setForgotLoading(true);
         setForgotError('');
         try {
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
             await axios.post(`${API_URL}/api/auth/verify-reset-otp`, {
                 email: forgotEmail.trim(),
                 otp: forgotOtp.trim()
@@ -167,7 +168,7 @@ export default function Login() {
         setForgotLoading(true);
         setForgotError('');
         try {
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
             await axios.post(`${API_URL}/api/auth/reset-password`, {
                 email: forgotEmail.trim(),
                 password: forgotNewPassword

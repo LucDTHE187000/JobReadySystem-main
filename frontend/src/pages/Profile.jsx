@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -5,8 +6,6 @@ import { isJobSeekerRole, isEmployerRole } from '../utils/roles';
 import { User, Lock, Briefcase, Camera, Building, Mail, Phone, MapPin, Save, ArrowLeft } from 'lucide-react';
 import axios from 'axios';
 import SeekerLayout from '../components/layout/SeekerLayout';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export default function Profile() {
     const { user, refreshUser } = useAuth();

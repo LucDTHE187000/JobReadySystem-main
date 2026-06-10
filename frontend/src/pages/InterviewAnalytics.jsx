@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -11,8 +12,6 @@ import {
     Loader2,
 } from 'lucide-react';
 import SeekerLayout from '../components/layout/SeekerLayout';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export default function InterviewAnalytics() {
     const navigate = useNavigate();

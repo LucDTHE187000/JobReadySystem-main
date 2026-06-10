@@ -1,11 +1,10 @@
+import { API_URL } from '@/config';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Shield, Copy, Building2 } from 'lucide-react';
 import axios from 'axios';
 import SeekerLayout from '../../components/layout/SeekerLayout';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 const BANK_INFO = {
     bank: 'BIDV',

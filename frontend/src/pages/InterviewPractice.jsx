@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -6,8 +7,6 @@ import { Users, Target, Zap, AlertCircle, FileText, CheckCircle2 } from 'lucide-
 import SeekerLayout from '../components/layout/SeekerLayout';
 import Header from '../components/ui/Header';
 import Footer from '../components/ui/Footer';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 const JOB_CATEGORIES = ['IT', 'Marketing', 'Sales', 'HR', 'Finance', 'Design', 'Business', 'Other'];
 const INTERVIEW_TYPES = [

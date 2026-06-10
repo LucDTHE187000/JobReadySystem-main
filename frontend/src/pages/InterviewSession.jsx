@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -5,8 +6,6 @@ import axios from 'axios';
 import { Send, Loader2, Mic, MicOff, Video, PhoneOff, Bot, User, AlertCircle, Mic2} from 'lucide-react';
 import SeekerLayout from '../components/layout/SeekerLayout';
 import { siteImages } from '../config/siteImages';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export default function InterviewSession() {
     const { sessionId } = useParams();

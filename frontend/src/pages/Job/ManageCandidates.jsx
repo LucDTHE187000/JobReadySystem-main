@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 import SideBar from "../../components/SideBar";
 import { useAuth } from '../../contexts/AuthContext';
 import React, { useEffect, useState, useMemo } from "react";
@@ -16,8 +17,6 @@ import {
     Send,
     Trash2,
 } from "lucide-react";
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export default function ManageCandidates() {
     const { user } = useAuth();

@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -12,8 +13,6 @@ import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
 import { useAuth } from '../../contexts/AuthContext';
 import { siteImages } from '../../config/siteImages';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 /* ---------- helpers ---------- */
 function timeAgo(dateStr) {

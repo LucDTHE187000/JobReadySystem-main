@@ -72,8 +72,9 @@ router.post("/create-link", authMiddleware, async (req, res) => {
     }
 
     const orderCode = generateOrderCode();
-    const returnUrl = `${BASE_URL}/api/payment/payment-result?orderCode=${orderCode}`;
-    const cancelUrl = `${BASE_URL}/api/payment/payment-result?orderCode=${orderCode}&status=cancelled`;
+    const reqBaseUrl = process.env.BASE_URL || `${req.protocol}://${req.get("host")}`;
+    const returnUrl = `${reqBaseUrl}/api/payment/payment-result?orderCode=${orderCode}`;
+    const cancelUrl = `${reqBaseUrl}/api/payment/payment-result?orderCode=${orderCode}&status=cancelled`;
 
     const paymentResponse = await payos.paymentRequests.create({
       orderCode,

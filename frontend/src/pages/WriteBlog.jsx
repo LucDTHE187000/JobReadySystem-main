@@ -1,10 +1,9 @@
+import { API_URL } from '@/config';
 import { useState, useEffect } from 'react';
 import SeekerLayout from '../components/layout/SeekerLayout';
 import { useAuth } from '../contexts/AuthContext';
 import { Star, Send, Award, Calendar, CheckCircle2, ListFilter, Quote } from 'lucide-react';
 import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export default function WriteBlog() {
     const { user } = useAuth();

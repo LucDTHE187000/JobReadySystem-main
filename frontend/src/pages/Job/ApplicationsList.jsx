@@ -1,9 +1,9 @@
+import { API_URL } from '@/config';
 import { useEffect, useState, useMemo } from "react";
 import SideBar from "../../components/SideBar";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Star } from 'lucide-react';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 function ApplicationsList() {
   const { user } = useAuth();

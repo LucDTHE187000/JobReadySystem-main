@@ -1,9 +1,10 @@
+import { API_URL } from '@/config';
 import { useState } from 'react';
 import axios from 'axios';
 import SeekerLayout from '../components/layout/SeekerLayout';
 
 export default function Feedback() {
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
   const [type, setType] = useState('Bug');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');

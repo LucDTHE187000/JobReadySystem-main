@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import SideBar from '../components/SideBar';
@@ -12,9 +13,6 @@ export default function FeedbackReview() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState('feedback');
   const notificationRef = useRef(null);
-
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
-
   useEffect(() => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     const fetchFeedbacks = async () => {

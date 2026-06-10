@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
@@ -8,8 +9,6 @@ import {
 } from 'lucide-react';
 import SeekerLayout from '../components/layout/SeekerLayout';
 import CVReportPanel from '../components/cv/CVReportPanel';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export default function CVUpload() {
     const { user, refreshUser } = useAuth();

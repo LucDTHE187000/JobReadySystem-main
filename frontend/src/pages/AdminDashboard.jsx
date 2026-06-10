@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -9,7 +10,7 @@ import {
     Building2, CheckCircle2, Ban, Eye, Bell, CreditCard
 } from "lucide-react";
 
-const API = `${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/admin`;
+const API = `${API_URL}/api/admin`;
 
 function getToken() {
     return localStorage.getItem("token") || sessionStorage.getItem("token");

@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
@@ -20,9 +21,6 @@ import {
     Image as ImageIcon
 } from 'lucide-react';
 import SideBar from "../components/SideBar";
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
-
 
 export default function Dashboard() {
     const { user, signOut } = useAuth();

@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 
 import { Menu, X, Bell, Search, Settings as SettingsIcon, LogOut, User, ChevronDown, FileText, ClipboardList, BrainCircuit } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
@@ -49,7 +50,7 @@ export default function Header({ variant = 'dark' }) {
             const token = localStorage.getItem("token") || sessionStorage.getItem("token");
             if (!token) return;
             try {
-                const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/notifications`, {
+                const res = await axios.get(`${API_URL}/api/notifications`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const count = res.data?.filter(n => !n.isRead).length || 0;

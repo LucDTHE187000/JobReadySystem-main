@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 import SideBar from "../../components/SideBar";
 import { useAuth } from '../../contexts/AuthContext';
 import React, { useEffect, useState } from 'react';
@@ -8,8 +9,6 @@ import {
     ArrowLeft, MapPin, DollarSign, Clock, CheckCircle,
     Eye, ChevronRight, UserCheck
 } from 'lucide-react';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 const JobDetail = () => {
     const { user } = useAuth();

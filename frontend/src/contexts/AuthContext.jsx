@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
@@ -13,8 +14,6 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { i18n } = useTranslation();
-
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
   useEffect(() => {
     checkAuth();

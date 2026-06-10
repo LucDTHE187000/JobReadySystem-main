@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -5,9 +6,6 @@ import axios from 'axios';
 import { Send, Loader2, ChevronRight, Volume2, BookOpen } from 'lucide-react';
 import Header from '../components/ui/Header';
 import Footer from '../components/ui/Footer';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
-
 export default function Interview() {
     const { user } = useAuth();
     const navigate = useNavigate();

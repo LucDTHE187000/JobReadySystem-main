@@ -1,11 +1,10 @@
+import { API_URL } from '@/config';
 import Header from '../components/ui/Header';
 import Footer from '../components/ui/Footer';
 import { Mail, Phone, MapPin, Send, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import { ScrollReveal } from '../components/ui/ScrollAnimations';
 import { siteImages } from '../config/siteImages';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export default function Contact() {
     const [name, setName] = useState('');

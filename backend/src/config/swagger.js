@@ -14,6 +14,10 @@ const options = {
                 {
                     url: `http://localhost:${process.env.PORT || 4000}`,
                     description: "Development server"
+                },
+                {
+                    url: "https://api.jobready.io.vn",
+                    description: "Production server"
                 }
             ]
         },

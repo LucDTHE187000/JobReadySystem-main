@@ -1,8 +1,7 @@
+import { API_URL } from '@/config';
 import { useState, useEffect } from 'react';
 import { CheckCheck, Calendar, Send, MessageSquare, Eye, Megaphone, ChevronDown, Bell, Circle } from 'lucide-react';
 import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export default function NotificationDropdown({ onClose }) {
     const [notifications, setNotifications] = useState([]);

@@ -1,3 +1,4 @@
+import { API_URL } from '@/config';
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -9,8 +10,6 @@ import {
 } from 'lucide-react';
 import SeekerLayout from '../components/layout/SeekerLayout';
 import { useAuth } from '../contexts/AuthContext';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 const STATUS_CONFIG = {
     pending:   { label: 'Đang xem xét', color: 'bg-blue-100/90 border border-blue-200 text-blue-900 font-extrabold',   dot: 'bg-blue-600' },

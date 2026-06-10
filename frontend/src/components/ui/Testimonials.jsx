@@ -1,9 +1,8 @@
+import { API_URL } from '@/config';
 import { useState, useEffect } from 'react';
 import { Star, Quote, MessageSquare, Award } from 'lucide-react';
 import axios from 'axios';
 import { ScrollReveal } from './ScrollAnimations';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 const DEFAULT_TESTIMONIALS = [
     {
