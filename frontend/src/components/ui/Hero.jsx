@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Play } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { ScrollReveal, AnimatedCounter } from './ScrollAnimations';
+import Magnetic from './Magnetic';
+import { useState } from 'react';
 
 const HERO_IMAGE = '/abc.jpg';
 
@@ -15,6 +17,20 @@ const stats = [
 export default function Hero() {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const [parallaxOffset, setParallaxOffset] = useState({ x: 0, y: 0 });
+
+    const handleMouseMove = (e) => {
+        const { clientX, clientY } = e;
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        const offsetX = (clientX - centerX) / centerX;
+        const offsetY = (clientY - centerY) / centerY;
+        setParallaxOffset({ x: offsetX, y: offsetY });
+    };
+
+    const handleMouseLeave = () => {
+        setParallaxOffset({ x: 0, y: 0 });
+    };
 
     const handleCTA = () => {
         if (user) {
@@ -28,11 +44,41 @@ export default function Hero() {
     };
 
     return (
-        <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-transparent">
+        <section 
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            className="relative min-h-[92vh] flex items-center overflow-hidden bg-transparent"
+        >
             {/* Ambient Background Glows */}
-            <div className="absolute top-[15%] left-[5%] w-72 h-72 rounded-full bg-[#F5C518]/15 blur-[120px] animate-float-slow pointer-events-none" />
-            <div className="absolute bottom-[10%] right-[10%] w-96 h-96 rounded-full bg-[#1A3A7C]/40 blur-[130px] animate-float-reverse pointer-events-none" />
-            <div className="absolute top-[40%] right-[20%] w-64 h-64 rounded-full bg-[#F5C518]/5 blur-[100px] animate-float-slow pointer-events-none" />
+            <div 
+                style={{ 
+                    transform: `translate3d(${parallaxOffset.x * 25}px, ${parallaxOffset.y * 25}px, 0)`,
+                    transition: 'transform 0.3s ease-out'
+                }}
+                className="absolute top-[15%] left-[5%] pointer-events-none"
+            >
+                <div className="w-72 h-72 rounded-full bg-[#F5C518]/15 blur-[120px] animate-float-slow" />
+            </div>
+
+            <div 
+                style={{ 
+                    transform: `translate3d(${parallaxOffset.x * -40}px, ${parallaxOffset.y * -40}px, 0)`,
+                    transition: 'transform 0.3s ease-out'
+                }}
+                className="absolute bottom-[10%] right-[10%] pointer-events-none"
+            >
+                <div className="w-96 h-96 rounded-full bg-[#1A3A7C]/40 blur-[130px] animate-float-reverse" />
+            </div>
+
+            <div 
+                style={{ 
+                    transform: `translate3d(${parallaxOffset.x * 15}px, ${parallaxOffset.y * 15}px, 0)`,
+                    transition: 'transform 0.3s ease-out'
+                }}
+                className="absolute top-[40%] right-[20%] pointer-events-none"
+            >
+                <div className="w-64 h-64 rounded-full bg-[#F5C518]/5 blur-[100px] animate-float-slow" />
+            </div>
 
             {/* Subtle diagonal pattern overlay */}
             <div
@@ -85,20 +131,24 @@ export default function Hero() {
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-4">
-                            <button
-                                onClick={handleCTA}
-                                className="flex items-center justify-center gap-2.5 px-8 py-3.5 bg-gradient-to-r from-[#F5C518] to-[#D4A800] text-[#0A2463] font-black rounded-xl shadow-lg shadow-[#F5C518]/10 hover:shadow-[#F5C518]/25 hover:scale-104 active:scale-95 transition-all duration-300 text-sm cursor-pointer"
-                            >
-                                Bắt đầu miễn phí
-                                <ArrowRight className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={() => navigate('/interview')}
-                                className="flex items-center justify-center gap-2.5 px-8 py-3.5 border border-white/20 text-white font-bold rounded-xl bg-white/5 backdrop-blur-sm hover:bg-white/15 hover:border-white/40 hover:scale-104 active:scale-95 transition-all duration-300 text-sm cursor-pointer"
-                            >
-                                <Play className="w-4 h-4 fill-white/10 text-white" />
-                                Xem demo
-                            </button>
+                            <Magnetic>
+                                <button
+                                    onClick={handleCTA}
+                                    className="flex items-center justify-center gap-2.5 px-8 py-3.5 bg-gradient-to-r from-[#F5C518] to-[#D4A800] text-[#0A2463] font-black rounded-xl shadow-lg shadow-[#F5C518]/10 hover:shadow-[#F5C518]/25 hover:scale-104 active:scale-95 transition-all duration-300 text-sm cursor-pointer"
+                                >
+                                    Bắt đầu miễn phí
+                                    <ArrowRight className="w-4 h-4" />
+                                </button>
+                            </Magnetic>
+                            <Magnetic>
+                                <button
+                                    onClick={() => navigate('/interview')}
+                                    className="flex items-center justify-center gap-2.5 px-8 py-3.5 border border-white/20 text-white font-bold rounded-xl bg-white/5 backdrop-blur-sm hover:bg-white/15 hover:border-white/40 hover:scale-104 active:scale-95 transition-all duration-300 text-sm cursor-pointer"
+                                >
+                                    <Play className="w-4 h-4 fill-white/10 text-white" />
+                                    Xem demo
+                                </button>
+                            </Magnetic>
                         </div>
                     </ScrollReveal>
 

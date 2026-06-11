@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import NotificationDropdown from './NotificationDropdown';
 import axios from 'axios';
+import Magnetic from './Magnetic';
 
 const ROLE_LABEL = {
     ADMIN: 'Quản trị viên',
@@ -225,14 +226,17 @@ export default function Header({ variant = 'dark' }) {
                                 </div>
                             </>
                         ) : (
-                            <div className="hidden sm:flex items-center gap-2">
-
-                                <Link to="/login" className="px-4 py-2 text-sm border border-white/30 text-white rounded-md hover:bg-white/10 font-medium transition-colors">
-                                    {t('auth.login')}
-                                </Link>
-                                <Link to="/register" className="px-5 py-2 text-sm bg-[#F5C518] text-[#0A2463] font-semibold rounded-md hover:bg-[#D4A800] transition-colors">
-                                    {t('auth.register')}
-                                </Link>
+                            <div className="hidden sm:flex items-center gap-3">
+                                <Magnetic>
+                                    <Link to="/login" className="px-4 py-2 text-sm border border-white/30 text-white rounded-md hover:bg-white/10 font-medium transition-colors">
+                                        {t('auth.login')}
+                                    </Link>
+                                </Magnetic>
+                                <Magnetic>
+                                    <Link to="/register" className="px-5 py-2 text-sm bg-[#F5C518] text-[#0A2463] font-semibold rounded-md hover:bg-[#D4A800] transition-colors">
+                                        {t('auth.register')}
+                                    </Link>
+                                </Magnetic>
                             </div>
                         )}
 

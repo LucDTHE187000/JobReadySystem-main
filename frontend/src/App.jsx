@@ -35,6 +35,7 @@ import Learning from './pages/Learning';
 import CandidateSearch from './pages/Job/CandidateSearch';
 import AdminDashboard from './pages/AdminDashboard';
 import WriteBlog from './pages/WriteBlog';
+import CursorFollower from './components/ui/CursorFollower';
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <ScrollToTop />
+          <CursorFollower />
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
