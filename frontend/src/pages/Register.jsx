@@ -89,8 +89,8 @@ export default function Register() {
         <div className="min-h-screen flex flex-col md:flex-row">
             <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-[#0A2463] to-[#1A3A7C] flex-col p-12 relative overflow-hidden">
                 <Link to="/" className="flex items-center gap-2.5 mb-8 relative z-10">
-                    <div className="w-10 h-10 rounded-lg bg-[#F5C518] flex items-center justify-center">
-                        <span className="font-heading text-[#0A2463] text-xl leading-none pt-0.5">JR</span>
+                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        <img src="/logo-jobready.png" alt="JobReady logo" className="w-full h-full object-cover" />
                     </div>
                     <span className="font-heading text-2xl text-white tracking-wide">JOB<span className="text-[#F5C518]">READY</span></span>
                 </Link>
@@ -113,7 +113,12 @@ export default function Register() {
             <div className="flex-1 bg-white flex items-center justify-center p-8 md:p-12">
                 <div className="w-full max-w-md">
                     <div className="md:hidden mb-8">
-                        <Link to="/" className="font-heading text-3xl text-[#0A2463]">JOB<span className="text-[#F5C518]">READY</span></Link>
+                        <Link to="/" className="flex items-center gap-2.5 font-heading text-3xl text-[#0A2463]">
+                            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center flex-shrink-0 overflow-hidden border border-[#DDE3F0]">
+                                <img src="/logo-jobready.png" alt="JobReady logo" className="w-full h-full object-cover" />
+                            </div>
+                            <span>JOB<span className="text-[#F5C518]">READY</span></span>
+                        </Link>
                     </div>
 
                     <h1 className="font-heading text-3xl text-[#0A2463] mb-2">TẠO TÀI KHOẢN MỚI</h1>

@@ -35,8 +35,10 @@ export default function SeekerLayout({ children, title, breadcrumb }) {
 
             <aside className="relative z-10 hidden lg:flex w-64 min-h-screen bg-[#030A21]/75 backdrop-blur-md flex-col flex-shrink-0 border-r border-white/10">
                 <div className="p-5 border-b border-white/10">
-                    <Link to="/" className="flex items-center gap-2">
-                        <div className="w-9 h-9 bg-[#F5C518] rounded-lg flex items-center justify-center font-bold text-[#0A2463] text-sm">JR</div>
+                    <Link to="/" className="flex items-center gap-2.5">
+                        <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            <img src="/logo-jobready.png" alt="JobReady logo" className="w-full h-full object-cover" />
+                        </div>
                         <span className="font-bold text-white text-lg tracking-tight">JOB<span className="text-[#F5C518]">READY</span></span>
                     </Link>
                 </div>
@@ -101,7 +103,12 @@ export default function SeekerLayout({ children, title, breadcrumb }) {
 
             <div className="relative z-10 flex-1 flex flex-col min-w-0">
                 <header className="lg:hidden sticky top-0 z-40 bg-[#030A21]/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-white/10">
-                    <Link to="/" className="font-bold text-white">JOB<span className="text-[#F5C518]">READY</span></Link>
+                    <Link to="/" className="flex items-center gap-2 font-bold text-white">
+                        <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            <img src="/logo-jobready.png" alt="JobReady logo" className="w-full h-full object-cover" />
+                        </div>
+                        <span>JOB<span className="text-[#F5C518]">READY</span></span>
+                    </Link>
                     <span className="text-[#F5C518] font-bold text-sm">{credits} credit</span>
                 </header>
 

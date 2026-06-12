@@ -49,8 +49,8 @@ const Sidebar = ({
       <div className="flex items-center justify-between mb-8 px-2 flex-shrink-0 border-b border-white/10 pb-5">
         <div className="flex flex-col">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 bg-gradient-to-r from-indigo-600 to-violet-600 rounded-lg flex items-center justify-center font-bold text-white text-sm">
-              JR
+            <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0 overflow-hidden">
+              <img src="/logo-jobready.png" alt="JobReady logo" className="w-full h-full object-cover" />
             </div>
             <span className="font-bold text-white text-lg">
               JOB<span className="text-indigo-400">READY</span>

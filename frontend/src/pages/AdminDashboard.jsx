@@ -36,8 +36,10 @@ function AdminSidebar({ active, setActive, user, onLogout, pendingCount }) {
     return (
         <aside className="w-64 min-h-screen bg-slate-900/45 border-r border-white/10 backdrop-blur-md flex flex-col flex-shrink-0 shadow-xl relative z-10">
             <div className="p-5 border-b border-white/10">
-                <div className="flex items-center gap-2">
-                    <div className="w-9 h-9 bg-gradient-to-r from-indigo-600 to-violet-600 rounded-lg flex items-center justify-center font-bold text-white text-sm">JR</div>
+                <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        <img src="/logo-jobready.png" alt="JobReady logo" className="w-full h-full object-cover" />
+                    </div>
                     <span className="font-bold text-white text-lg">JOB<span className="text-indigo-400">READY</span></span>
                 </div>
                 <div className="mt-3 flex items-center gap-2">

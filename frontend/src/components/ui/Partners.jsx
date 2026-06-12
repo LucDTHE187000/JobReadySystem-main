@@ -17,7 +17,7 @@ export default function Partners() {
                     <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl text-white mb-4 font-black tracking-tight">
                         NGƯỜI <span className="text-gradient-gold">SÁNG LẬP</span>
                     </h2>
-                    <p className="text-white/60 text-sm sm:text-base max-w-xl mx-auto font-light">Những con người đam mê công nghệ và giáo dục nghề nghiệp</p>
+                    <p className="text-white/60 text-sm sm:text-base max-w-xl mx-auto font-light">Những con người đam mê công nghệ và khát vọng khởi nghiệp</p>
                 </ScrollReveal>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8">
