@@ -84,6 +84,29 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const signInWithGoogle = async (googleToken, role = undefined) => {
+    try {
+      const response = await axios.post(`${API_URL}/api/auth/google`, {
+        token: googleToken,
+        role
+      });
+
+      const { token, user } = response.data;
+
+      localStorage.setItem('token', token);
+
+      setUser(user);
+      return { error: null, user };
+    } catch (err) {
+      console.error("Google login failed:", err);
+      return {
+        error: {
+          message: err.response?.data?.message || 'Đăng nhập bằng Google thất bại'
+        }
+      };
+    }
+  };
+
   const signUp = async (email, password, fullName, userType) => {
     try {
       // Map frontend role to backend role
@@ -134,6 +157,7 @@ export function AuthProvider({ children }) {
     loading,
     error,
     signIn,
+    signInWithGoogle,
     signUp,
     signOut,
     refreshUser,

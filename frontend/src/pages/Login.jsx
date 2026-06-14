@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, ArrowRight, BrainCircuit, FileText, TrendingUp, AlertTriangle } from 'lucide-react';
 import axios from 'axios';
+import GoogleLoginButton from '../components/ui/GoogleLoginButton';
 
 const LOGIN_IMAGE = '/images/Login_side.png';
 
@@ -383,6 +384,10 @@ export default function Login() {
                         </button>
 
                         <p className="text-center text-sm text-[#5A6482]">— hoặc đăng nhập với —</p>
+
+                        <div className="flex justify-center my-2">
+                            <GoogleLoginButton />
+                        </div>
 
                         <p className="text-center text-sm text-[#5A6482]">
                             Chưa có tài khoản?{' '}

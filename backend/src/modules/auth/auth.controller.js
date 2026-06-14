@@ -2,6 +2,11 @@ import { AuthService } from "./auth.service.js";
 import { z } from "zod";
 
 // Validation schemas
+export const googleLoginSchema = z.object({
+    token: z.string().min(1, "Google token is required"),
+    role: z.enum(["ADMIN", "EMPLOYER", "JOB_SEEKER"]).optional()
+});
+
 export const registerSchema = z.object({
     email: z.string().email("Email không hợp lệ").min(1, "Email không được để trống"),
     password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự").max(100, "Mật khẩu không được vượt quá 100 ký tự"),
@@ -321,6 +326,29 @@ export class AuthController {
             console.error("Reset password error:", error);
             return res.status(500).json({
                 message: error.message || "Internal server error"
+            });
+        }
+    }
+
+    static async googleLogin(req, res) {
+        try {
+            const parse = googleLoginSchema.safeParse(req.body);
+            if (!parse.success) {
+                return res.status(400).json({
+                    message: "Dữ liệu không hợp lệ",
+                    errors: parse.error.flatten()
+                });
+            }
+
+            const result = await AuthService.googleLogin(parse.data);
+            return res.status(200).json(result);
+        } catch (error) {
+            console.error("Google login error:", error);
+            if (error.message === "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.") {
+                return res.status(403).json({ message: error.message });
+            }
+            return res.status(401).json({
+                message: error.message || "Đăng nhập Google thất bại"
             });
         }
     }

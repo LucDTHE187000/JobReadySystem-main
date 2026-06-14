@@ -3,6 +3,7 @@ import { OtpModel } from "../otp/otp.model.js";
 import { generateTokenFromUser } from "../../utils/jwt.util.js";
 import { generateOTP, generateOTPExpiry } from "../../utils/otp.util.js";
 import { sendOTPEmail, sendResetPasswordEmail } from "../../utils/email.util.js";
+import { OAuth2Client } from "google-auth-library";
 
 export class AuthService {
     // Đăng ký tài khoản mới
@@ -347,6 +348,114 @@ export class AuthService {
         return {
             success: true,
             message: "Password reset successfully. You can now login with your new password."
+        };
+    }
+
+    // Đăng nhập bằng Google
+    static async googleLogin({ token, role }) {
+        if (!token) {
+            throw new Error("Google ID Token is required");
+        }
+
+        const clientId = process.env.GOOGLE_CLIENT_ID;
+        if (!clientId) {
+            throw new Error("GOOGLE_CLIENT_ID is not configured in backend env");
+        }
+
+        const client = new OAuth2Client(clientId);
+        let ticket;
+        try {
+            ticket = await client.verifyIdToken({
+                idToken: token,
+                audience: clientId,
+            });
+        } catch (error) {
+            console.error("Error verifying Google token:", error);
+            throw new Error("Xác thực token Google thất bại");
+        }
+
+        const payload = ticket.getPayload();
+        if (!payload) {
+            throw new Error("Không lấy được thông tin từ Google token");
+        }
+
+        const { sub: googleId, email, name, picture: avatarUrl } = payload;
+        const normalizedEmail = email.toLowerCase().trim();
+
+        // 1. Tìm user theo googleId hoặc email
+        let user = await UserModel.findOne({
+            $or: [{ googleId }, { email: normalizedEmail }]
+        });
+
+        if (user) {
+            // Nếu tìm thấy user bằng email nhưng chưa liên kết googleId
+            if (!user.googleId) {
+                user.googleId = googleId;
+                user.authProvider = "google";
+                if (!user.isVerified) {
+                    user.isVerified = true; // Google email đã xác thực
+                }
+                if (!user.avatarUrl && avatarUrl) {
+                    user.avatarUrl = avatarUrl;
+                }
+                await user.save();
+            }
+        } else {
+            // 2. Tạo user mới
+            // Map role được truyền từ client (JOB_SEEKER hoặc EMPLOYER)
+            const userRole = (role === "EMPLOYER" || role === "ADMIN") ? role : "JOB_SEEKER";
+            
+            user = await UserModel.create({
+                email: normalizedEmail,
+                name: name || "Google User",
+                googleId,
+                authProvider: "google",
+                isVerified: true,
+                role: userRole,
+                avatarUrl: avatarUrl || "",
+                credits: userRole === "JOB_SEEKER" ? 14000 : 0 // Matching local signup credits logic
+            });
+
+            // Tạo thông báo chào mừng
+            try {
+                const { NotificationService } = await import("../notification/notification.service.js");
+                await NotificationService.createNotification(
+                    user._id,
+                    "Chào mừng đến với JobReady System",
+                    "Chúc mừng bạn đã tạo tài khoản thành công qua Google! Hãy cập nhật hồ sơ cá nhân để có trải nghiệm tốt nhất.",
+                    "system"
+                );
+            } catch (notiErr) {
+                console.error("Welcome notification creation failed:", notiErr);
+            }
+        }
+
+        if (user.isActive === false) {
+            throw new Error("Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.");
+        }
+
+        const jwtToken = generateTokenFromUser(user);
+        return {
+            token: jwtToken,
+            user: {
+                id: user._id,
+                _id: user._id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                language: user.language,
+                credits: user.credits ?? 14000,
+                phone: user.phone || '',
+                address: user.address || '',
+                avatar: user.avatar || '',
+                avatarUrl: user.avatarUrl || '',
+                skills: user.skills || [],
+                experience: user.experience || '',
+                education: user.education || '',
+                companyName: user.companyName || '',
+                companyDescription: user.companyDescription || '',
+                companyWebsite: user.companyWebsite || '',
+            },
         };
     }
 }

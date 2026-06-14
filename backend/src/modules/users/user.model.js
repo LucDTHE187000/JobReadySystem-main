@@ -4,7 +4,9 @@ import { hashPassword, comparePassword } from "../../utils/bcrypt.util.js";
 const userSchema = new mongoose.Schema(
   {
     email: { type: String, unique: true, required: true },
-    password: { type: String, required: true },
+    password: { type: String },
+    googleId: { type: String, unique: true, sparse: true },
+    authProvider: { type: String, enum: ["local", "google"], default: "local" },
     name: { type: String, required: true },
 
     // Thông tin xác thực

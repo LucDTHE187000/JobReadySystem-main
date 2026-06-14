@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Briefcase, User, Eye, EyeOff, ArrowRight, AlertTriangle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import GoogleLoginButton from '../components/ui/GoogleLoginButton';
 
 const REGISTER_IMAGE = '/images/Register_side.png';
 
@@ -251,6 +251,12 @@ export default function Register() {
                                 <>Đăng ký ngay <ArrowRight className="w-5 h-5" /></>
                             )}
                         </button>
+
+                        <p className="text-center text-sm text-[#5A6482] my-2">— hoặc đăng ký nhanh với —</p>
+
+                        <div className="flex justify-center my-2">
+                            <GoogleLoginButton role={userType === 'candidate' ? 'JOB_SEEKER' : 'EMPLOYER'} />
+                        </div>
 
                         <p className="text-center text-sm text-[#5A6482]">
                             Đã có tài khoản?{' '}

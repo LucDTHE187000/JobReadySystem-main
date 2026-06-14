@@ -16,6 +16,9 @@ authRouter.post("/resend-otp", AuthController.resendOTP);
 // Đăng nhập
 authRouter.post("/login", AuthController.login);
 
+// Đăng nhập bằng Google
+authRouter.post("/google", AuthController.googleLogin);
+
 // Quên mật khẩu
 authRouter.post("/forgot-password", AuthController.forgotPassword);
 
