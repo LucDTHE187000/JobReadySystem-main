@@ -118,7 +118,7 @@ export default function Learning() {
                     <div className="relative overflow-hidden bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-3xl p-8 sm:p-10 text-slate-800 mb-8 shadow-md">
                         <div className="absolute top-0 right-0 translate-x-12 -translate-y-12 w-64 h-64 bg-[#F5C518]/10 rounded-full blur-2xl"></div>
                         <div className="relative z-10 max-w-2xl">
-                            <span className="bg-[#F5C518]/25 border border-[#F5C518]/30 text-[#F5C518] px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 w-fit mb-4">
+                            <span className="bg-amber-50 border border-amber-200 text-amber-800 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 w-fit mb-4 shadow-sm">
                                 <Sparkles className="w-3.5 h-3.5" /> Học tập không giới hạn
                             </span>
                             <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-3">
@@ -150,8 +150,8 @@ export default function Learning() {
                     {/* Courses grid */}
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-3">
-                            <Loader2 className="w-10 h-10 animate-spin text-[#F5C518]" />
-                            <p className="text-sm text-white/60 font-medium">Đang tải danh sách bài học...</p>
+                            <Loader2 className="w-10 h-10 animate-spin text-[#0A2463]" />
+                            <p className="text-sm text-slate-500 font-medium">Đang tải danh sách bài học...</p>
                         </div>
                     ) : filteredCourses.length === 0 ? (
                         <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-12 text-center shadow-md text-slate-700">
@@ -177,10 +177,16 @@ export default function Learning() {
                                             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-xl group-hover:scale-110 transition-transform duration-500"></div>
                                             <div className="flex justify-between items-center z-10">
                                                 <span className="text-[10px] bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-lg font-bold border border-white/10 uppercase tracking-wider text-white">
-                                                    {course.field}
+                                                    {course.field === 'IT' ? 'Công nghệ & Code' :
+                                                     course.field === 'Sales' ? 'Kinh doanh & Sales' :
+                                                     course.field === 'Marketing' ? 'Marketing & Ads' :
+                                                     course.field === 'Finance' ? 'Tài chính & Đầu tư' :
+                                                     course.field === 'HR' ? 'Quản trị Nhân sự' : course.field}
                                                 </span>
                                                 <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase z-10 bg-white/25 backdrop-blur-md border border-white/10 text-white">
-                                                    {course.level}
+                                                    {course.level === 'Beginner' ? 'Cơ bản' : 
+                                                     course.level === 'Intermediate' ? 'Trung cấp' : 
+                                                     course.level === 'Advanced' ? 'Nâng cao' : course.level}
                                                 </span>
                                             </div>
                                             <div className="z-10">
@@ -215,16 +221,16 @@ export default function Learning() {
                                             <div className="border-t border-slate-200 pt-4 flex items-center justify-between">
                                                 <div className="flex items-center gap-3 text-xs text-slate-500 font-medium">
                                                     <span className="flex items-center gap-1">
-                                                        <Clock className="w-3.5 h-3.5 text-white/40" />
+                                                        <Clock className="w-3.5 h-3.5 text-slate-400" />
                                                         {course.duration}
                                                     </span>
                                                     <span className="flex items-center gap-1">
-                                                        <BookOpen className="w-3.5 h-3.5 text-white/40" />
+                                                        <BookOpen className="w-3.5 h-3.5 text-slate-400" />
                                                         {course.lessonsCount} bài
                                                     </span>
                                                 </div>
                                                 {isFinished ? (
-                                                    <span className="text-xs text-emerald-600 font-bold flex items-center gap-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 px-2 py-1 rounded-lg">
+                                                    <span className="text-xs text-emerald-700 font-bold flex items-center gap-1 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-lg shadow-sm">
                                                         <CheckCircle className="w-3.5 h-3.5" /> Hoàn thành
                                                     </span>
                                                 ) : completedCount > 0 ? (
@@ -239,7 +245,7 @@ export default function Learning() {
                                         <div className="px-5 pb-5 bg-transparent">
                                             <button
                                                 onClick={() => handleSelectCourse(course._id)}
-                                                className="w-full py-2.5 bg-white/10 border border-white/10 text-gray-500 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group-hover:bg-[#F5C518] group-hover:text-[#0A2463] hover:bg-[#F5C518] hover:text-[#0A2463] hover:shadow-md"
+                                                className="w-full py-2.5 bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group-hover:bg-[#F5C518] group-hover:text-[#0A2463] group-hover:border-[#F5C518] hover:bg-[#F5C518] hover:text-[#0A2463] hover:shadow-md"
                                             >
                                                 <PlayCircle className="w-4 h-4" /> Bắt đầu học
                                             </button>
@@ -271,8 +277,8 @@ export default function Learning() {
 
                 {courseDetailLoading ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-3">
-                        <Loader2 className="w-10 h-10 animate-spin text-[#F5C518]" />
-                        <p className="text-sm text-white/60 font-medium">Đang tải nội dung khóa học...</p>
+                        <Loader2 className="w-10 h-10 animate-spin text-[#0A2463]" />
+                        <p className="text-sm text-slate-500 font-medium">Đang tải nội dung khóa học...</p>
                     </div>
                 ) : (
                     <div className="grid lg:grid-cols-3 gap-8 items-start">
@@ -368,7 +374,7 @@ export default function Learning() {
                                 <div className="text-xs text-slate-500 flex justify-between">
                                     <span>Đã xong: {completedList.length}/{selectedCourse.lessonsCount} bài</span>
                                     {isCourseCompleted && (
-                                        <span className="text-emerald-600 font-bold flex items-center gap-1 bg-emerald-500/20 px-2 py-0.5 rounded-lg border border-emerald-500/30 text-emerald-300 animate-bounce">
+                                        <span className="text-emerald-700 font-bold flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200 animate-bounce shadow-sm">
                                             <Award className="w-3.5 h-3.5" /> Xuất sắc!
                                         </span>
                                     )}
@@ -405,12 +411,12 @@ export default function Learning() {
 
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex justify-between items-center gap-2">
-                                                        <span className="text-[10px] text-white/40 font-bold uppercase tracking-wider">Bài {les.order}</span>
-                                                        <span className="text-[10px] text-white/40 flex items-center gap-0.5">
+                                                        <span className={`text-[10px] font-bold uppercase tracking-wider ${isSelected ? 'text-[#0A2463]/70' : 'text-slate-400'}`}>Bài {les.order}</span>
+                                                        <span className={`text-[10px] flex items-center gap-0.5 ${isSelected ? 'text-[#0A2463]/70' : 'text-slate-400'}`}>
                                                             <Clock className="w-2.5 h-2.5" /> {les.duration}
                                                         </span>
                                                     </div>
-                                                    <p className={`text-xs font-bold mt-1 line-clamp-2 leading-snug ${isSelected ? 'text-[#F5C518]' : 'text-white/80'}`}>
+                                                    <p className={`text-xs font-bold mt-1 line-clamp-2 leading-snug ${isSelected ? 'text-[#0A2463]' : 'text-slate-700'}`}>
                                                         {les.title}
                                                     </p>
                                                 </div>

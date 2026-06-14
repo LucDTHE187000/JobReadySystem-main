@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Users, Target, Zap, AlertCircle, FileText, CheckCircle2 } from 'lucide-react';
+import { Users, Target, Zap, AlertCircle, FileText, CheckCircle2, Bot, BarChart3 } from 'lucide-react';
 import SeekerLayout from '../components/layout/SeekerLayout';
 import Header from '../components/ui/Header';
 import Footer from '../components/ui/Footer';
@@ -29,7 +29,7 @@ const inputClass =
 export default function InterviewPractice() {
     const { user, refreshUser } = useAuth();
     const credits = user?.credits ?? 0;
-    const sessionCost = 4000;
+    const sessionCost = 1500;
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         jobTitle: '',
@@ -341,19 +341,22 @@ export default function InterviewPractice() {
                             )}
                         </div>
                         <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 border-l-4 border-l-[#F5C518] shadow-md">
-                            <h3 className="font-bold text-[#0A2463] mb-4">Tính năng</h3>
-                            <div className="space-y-3">
+                            <h3 className="font-bold text-[#0A2463] mb-4 font-heading">Tính năng</h3>
+                            <div className="space-y-3.5">
                                 {[
-                                    { icon: '🤖', text: 'AI sinh câu hỏi theo ngành' },
-                                    { icon: '⚡', text: 'Feedback realtime' },
-                                    { icon: '📊', text: 'Scoring & Analytics' },
-                                    { icon: '🎯', text: 'Follow-up questions' },
-                                ].map((feature, i) => (
-                                    <div key={i} className="flex items-center gap-3">
-                                        <span className="text-lg">{feature.icon}</span>
-                                        <p className="text-sm text-slate-500">{feature.text}</p>
-                                    </div>
-                                ))}
+                                    { icon: Bot, text: 'AI sinh câu hỏi theo ngành', color: 'text-amber-500' },
+                                    { icon: Zap, text: 'Feedback realtime', color: 'text-yellow-500' },
+                                    { icon: BarChart3, text: 'Scoring & Analytics', color: 'text-blue-500' },
+                                    { icon: Target, text: 'Follow-up questions', color: 'text-red-500' },
+                                ].map((feature, i) => {
+                                    const IconComponent = feature.icon;
+                                    return (
+                                        <div key={i} className="flex items-center gap-3">
+                                            <IconComponent className={`w-4 h-4 ${feature.color} flex-shrink-0`} />
+                                            <p className="text-sm text-slate-500 font-semibold">{feature.text}</p>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
 

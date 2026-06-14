@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Briefcase, User, Eye, EyeOff, ArrowRight, AlertTriangle } from 'lucide-react';
+import { Briefcase, User, Eye, EyeOff, ArrowRight, AlertTriangle, Target, Bot, BarChart3 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import GoogleLoginButton from '../components/ui/GoogleLoginButton';
 
 const REGISTER_IMAGE = '/images/Register_side.png';
 
 const featurePills = [
-    '🎯 CV Gate — Chỉ CV đạt chuẩn',
-    '🤖 AI phỏng vấn thích ứng',
-    '📊 Analytics tiến trình',
+    { label: 'CV Gate — Chỉ CV đạt chuẩn', icon: Target, color: 'text-red-400' },
+    { label: 'AI phỏng vấn thích ứng', icon: Bot, color: 'text-amber-400' },
+    { label: 'Analytics tiến trình', icon: BarChart3, color: 'text-blue-405' },
 ];
 
 export default function Register() {
@@ -81,7 +81,7 @@ export default function Register() {
         } else {
             setSuccessMessage('Đăng ký thành công! Đang chuyển hướng đến trang nhập mã xác thực OTP...');
             setLoading(false);
-            setTimeout(() => navigate(`/login?email=${encodeURIComponent(email)}&unverified=true`), 2000);
+            setTimeout(() => navigate(`/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&unverified=true`), 2000);
         }
     };
 
@@ -101,11 +101,15 @@ export default function Register() {
                     <h2 className="font-heading text-3xl text-white mb-6">MỞ KHÓA CƠ HỘI NGHỀ NGHIỆP</h2>
 
                     <div className="space-y-3">
-                        {featurePills.map((pill) => (
-                            <div key={pill} className="bg-white/10 rounded-xl px-4 py-2.5 text-white text-sm flex items-center gap-3">
-                                {pill}
-                            </div>
-                        ))}
+                        {featurePills.map((pill) => {
+                            const IconComponent = pill.icon;
+                            return (
+                                <div key={pill.label} className="bg-white/10 rounded-xl px-4 py-2.5 text-white text-sm flex items-center gap-3">
+                                    <IconComponent className={`w-4 h-4 ${pill.color} flex-shrink-0`} />
+                                    <span>{pill.label}</span>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>

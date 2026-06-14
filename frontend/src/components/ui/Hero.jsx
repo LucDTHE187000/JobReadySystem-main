@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Play } from 'lucide-react';
+import { ArrowRight, Play, Zap } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { ScrollReveal, AnimatedCounter } from './ScrollAnimations';
 import Magnetic from './Magnetic';
@@ -34,10 +34,7 @@ export default function Hero() {
 
     const handleCTA = () => {
         if (user) {
-            const role = user.role;
-            if (role === 'employer') navigate('/employer/dashboard');
-            else if (role === 'admin') navigate('/admin/dashboard');
-            else navigate('/dashboard');
+            navigate('/interview');
         } else {
             navigate('/register');
         }
@@ -168,7 +165,7 @@ export default function Hero() {
 
                             {/* Bottom-left badge (glassmorphic) */}
                             <div className="absolute -bottom-4 -left-4 bg-white/95 backdrop-blur-md rounded-xl shadow-xl px-5 py-3.5 flex items-center gap-2.5 hover:scale-105 transition-transform duration-300 border border-white/20">
-                                <span className="text-xl">⚡</span>
+                                <Zap className="w-5 h-5 text-amber-400 flex-shrink-0" />
                                 <span className="font-extrabold text-[#0A2463] text-xs uppercase tracking-wider">Feedback tức thì</span>
                             </div>
 

@@ -212,7 +212,7 @@ export class AuthService {
                 name: user.name,
                 role: user.role,
                 language: user.language,
-                credits: user.credits ?? 14000,
+                credits: user.credits ?? 6500,
                 phone: user.phone || '',
                 address: user.address || '',
                 avatar: user.avatar || '',
@@ -413,7 +413,7 @@ export class AuthService {
                 isVerified: true,
                 role: userRole,
                 avatarUrl: avatarUrl || "",
-                credits: userRole === "JOB_SEEKER" ? 14000 : 0 // Matching local signup credits logic
+                credits: userRole === "JOB_SEEKER" ? 6500 : 0 // Matching local signup credits logic
             });
 
             // Tạo thông báo chào mừng
@@ -444,7 +444,7 @@ export class AuthService {
                 name: user.name,
                 role: user.role,
                 language: user.language,
-                credits: user.credits ?? 14000,
+                credits: user.credits ?? 6500,
                 phone: user.phone || '',
                 address: user.address || '',
                 avatar: user.avatar || '',

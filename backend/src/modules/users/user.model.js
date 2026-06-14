@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema(
     isApproved: { type: Boolean, default: false }, // Dùng cho Employer: Admin duyệt mới được đăng tin
     language: { type: String, enum: ["EN", "VI"], default: "VI" },
 
-    credits: { type: Number, default: 14000, min: 0 },
+    credits: { type: Number, default: 6500, min: 0 },
 
     // Thông tin cho Job Seeker
     resume: { type: String }, // Deprecated: dùng cvs array thay thế

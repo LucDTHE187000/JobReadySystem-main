@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import {
     Search, MapPin, Heart, Clock, ChevronDown,
-    ChevronLeft, ChevronRight, Briefcase, SlidersHorizontal, X
+    ChevronLeft, ChevronRight, Briefcase, SlidersHorizontal, X, DollarSign
 } from 'lucide-react';
 import SeekerLayout from '../components/layout/SeekerLayout';
 import { useAuth } from '../contexts/AuthContext';
@@ -146,12 +146,13 @@ function JobCard({ job, onToggleSave, saved }) {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2.5">
-                        <span className={`flex items-center gap-1.5 text-sm font-semibold px-2.5 py-1 rounded-full ${
+                        <span className={`flex items-center gap-1 text-sm font-semibold px-2.5 py-1 rounded-full ${
                             user 
                                 ? 'text-amber-700 bg-amber-50 border border-amber-100' 
                                 : 'text-[#F5C518] bg-white/10'
                         }`}>
-                            💰 {formatSalary(job.salary)}
+                            <DollarSign className="w-3.5 h-3.5 flex-shrink-0" />
+                            {formatSalary(job.salary)}
                         </span>
                         <span className={`flex items-center gap-1 text-sm ${user ? 'text-slate-500' : 'text-white/60'}`}>
                             <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-slate-400" />
@@ -606,7 +607,10 @@ export default function JobSearch() {
 
                             {/* Salary */}
                             <div>
-                                <h4 className={`text-sm font-semibold mb-3 ${user ? 'text-slate-700' : 'text-white'}`}>💰 Mức lương mong muốn</h4>
+                                <h4 className={`text-sm font-semibold mb-3 flex items-center gap-1.5 ${user ? 'text-slate-700' : 'text-white'}`}>
+                                    <DollarSign className="w-4 h-4 flex-shrink-0 text-slate-500" />
+                                    Mức lương mong muốn
+                                </h4>
                                 <div className="space-y-2.5">
                                     {SALARY_RANGES.map(range => (
                                         <label key={range.value} className="flex items-center gap-2.5 cursor-pointer group">
@@ -733,7 +737,8 @@ export default function JobSearch() {
                                             ? 'bg-slate-100 text-slate-700 border-slate-200'
                                             : 'bg-white/10 text-white border border-white/10'
                                     }`}>
-                                        📍 {location}
+                                        <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-slate-500" />
+                                        {location}
                                         <button onClick={() => setLocation('')} className="hover:text-red-500"><X className="w-3 h-3" /></button>
                                     </span>
                                 )}

@@ -1,7 +1,7 @@
 import { API_URL } from '@/config';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import SeekerLayout from '../components/layout/SeekerLayout';
 import { ArrowRight, CheckCircle, Clock3, Copy } from 'lucide-react';
@@ -10,26 +10,26 @@ const PACKAGES = [
   {
     id: 'starter',
     title: 'Starter',
-    credits: 5000,
-    price: 19000,
+    credits: 3000,
+    price: 29000,
     label: 'Tiết kiệm',
-    description: 'Nạp 5.000 credit cho các tính năng cơ bản',
+    description: 'Nạp 3.000 credit cho các tính năng cơ bản',
   },
   {
     id: 'pro',
     title: 'Pro',
-    credits: 20000,
-    price: 69000,
+    credits: 9000,
+    price: 79000,
     label: 'Tiêu chuẩn',
-    description: 'Nạp 20.000 credit, phù hợp cho ứng viên thường xuyên',
+    description: 'Nạp 9.000 credit, phù hợp cho ứng viên thường xuyên',
   },
   {
     id: 'max',
     title: 'Max',
-    credits: 50000,
+    credits: 21000,
     price: 149000,
     label: 'Cao cấp',
-    description: 'Nạp 50.000 credit cho nhu cầu sử dụng nâng cao',
+    description: 'Nạp 21.000 credit cho nhu cầu sử dụng nâng cao',
   },
 ];
 
@@ -77,7 +77,14 @@ function QRCodeImage({ value, size = 280 }) {
 export default function CreditShopPage() {
   const { refreshUser } = useAuth();
   const navigate = useNavigate();
-  const [selectedPackage, setSelectedPackage] = useState(PACKAGES[1]);
+  const location = useLocation();
+
+  // Read package from query parameter if present
+  const queryParams = new URLSearchParams(location.search);
+  const packageParam = queryParams.get('package');
+  const initialPackage = PACKAGES.find((p) => p.id === packageParam) || PACKAGES[1];
+
+  const [selectedPackage, setSelectedPackage] = useState(initialPackage);
   const [loading, setLoading] = useState(false);
   const [payment, setPayment] = useState(null);
   const [verifyState, setVerifyState] = useState('idle');
@@ -85,6 +92,41 @@ export default function CreditShopPage() {
   const [copiedField, setCopiedField] = useState('');
 
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const pkg = params.get('package');
+    if (pkg) {
+      const found = PACKAGES.find((p) => p.id === pkg);
+      if (found) {
+        setSelectedPackage(found);
+        if (token) {
+          const autoCreatePayment = async () => {
+            setLoading(true);
+            setVerifyState('idle');
+            setVerifyMessage('');
+            try {
+              const response = await axios.post(
+                `${API_URL}/api/payment/create-link`,
+                { packageId: found.id },
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+              setPayment(response.data);
+            } catch (error) {
+              console.error(error);
+              setVerifyState('error');
+              setVerifyMessage(error.response?.data?.message || 'Không thể tạo liên kết PayOS.');
+            } finally {
+              setLoading(false);
+            }
+          };
+          autoCreatePayment();
+        } else {
+          navigate('/login');
+        }
+      }
+    }
+  }, [location.search, token, navigate]);
 
   const handleChoosePackage = (pack) => {
     setSelectedPackage(pack);
@@ -168,14 +210,15 @@ export default function CreditShopPage() {
   return (
     <SeekerLayout title="Nạp credit" breadcrumb="Credit › PayOS QR">
       <div className="max-w-5xl mx-auto space-y-10">
-        <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+        {!payment && !loading && (
+          <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
           <div className="rounded-[32px] bg-white/80 border border-slate-200/60 backdrop-blur-md p-8 shadow-md text-slate-800">
             <div className="flex items-center justify-between gap-4 mb-8">
               <div>
                 <p className="text-sm text-slate-500 uppercase tracking-[0.18em]">Chọn gói credit</p>
-                <h2 className="mt-3 text-3xl font-bold text-white">PayOS QR </h2>
+                <h2 className="mt-3 text-3xl font-bold text-[#0A2463]">PayOS QR </h2>
               </div>
-              <span className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500/20 border border-emerald-500/20 px-4 py-2 text-sm font-semibold text-emerald-300">
+              <span className="inline-flex items-center gap-2 rounded-2xl bg-emerald-50 border border-emerald-200 px-4 py-2 text-sm font-bold text-emerald-700 shadow-sm flex-shrink-0">
                 <CheckCircle className="h-4 w-4" /> Hỗ trợ PayOS
               </span>
             </div>
@@ -190,11 +233,11 @@ export default function CreditShopPage() {
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <p className="text-sm font-semibold text-slate-600">{pack.label}</p>
-                      <h3 className="mt-2 text-2xl font-bold text-white">{pack.credits.toLocaleString()} credit</h3>
+                      <p className="text-sm font-semibold text-slate-650">{pack.label}</p>
+                      <h3 className="mt-2 text-2xl font-bold text-[#0A2463]">{pack.credits.toLocaleString()} credit</h3>
                     </div>
                     <div className="text-right">
-                      <p className="text-2xl font-extrabold text-white">{formatCurrency(pack.price)}</p>
+                      <p className="text-2xl font-extrabold text-[#0A2463]">{formatCurrency(pack.price)}</p>
                       <p className="text-sm text-slate-500">/ gói</p>
                     </div>
                   </div>
@@ -235,12 +278,23 @@ export default function CreditShopPage() {
             </div>
 
             <div className="space-y-4 text-sm text-slate-600">
-              <p><span className="font-semibold text-white">Gói đang chọn:</span> {selectedPackage.title}</p>
-              <p><span className="font-semibold text-white">Credit nhận:</span> {selectedPackage.credits.toLocaleString()}</p>
-              <p><span className="font-semibold text-white">Giá:</span> {formatCurrency(selectedPackage.price)}</p>
+              <p><span className="font-bold text-slate-700">Gói đang chọn:</span> {selectedPackage.title}</p>
+              <p><span className="font-bold text-slate-700">Credit nhận:</span> {selectedPackage.credits.toLocaleString()}</p>
+              <p><span className="font-bold text-slate-700">Giá:</span> {formatCurrency(selectedPackage.price)}</p>
             </div>
           </div>
         </section>
+        )}
+
+        {loading && !payment && (
+          <div className="flex flex-col items-center justify-center py-20 text-slate-600 bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-[32px] shadow-md">
+            <svg className="h-10 w-10 animate-spin text-[#F5C518] mb-4" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+            </svg>
+            <p className="text-lg font-bold">Đang tạo mã QR thanh toán...</p>
+          </div>
+        )}
 
         {payment && (
           <section className="rounded-[32px] bg-white/80 border border-slate-200/60 backdrop-blur-md p-8 shadow-md text-slate-800">
@@ -288,19 +342,19 @@ export default function CreditShopPage() {
 
                 <div className="mt-6 grid gap-4 sm:grid-cols-2">
                   <div className="bg-white border border-slate-200 rounded-3xl p-5 text-left shadow-sm">
-                    <p className="text-xs uppercase text-slate-500">Mã đơn hàng</p>
-                    <p className="mt-2 text-lg font-semibold text-white">{payment.orderCode}</p>
+                    <p className="text-xs uppercase text-slate-500 font-semibold">Mã đơn hàng</p>
+                    <p className="mt-2 text-lg font-bold text-slate-800">{payment.orderCode}</p>
                   </div>
                   <div className="bg-white border border-slate-200 rounded-3xl p-5 text-left shadow-sm">
-                    <p className="text-xs uppercase text-slate-500">Số tiền</p>
-                    <p className="mt-2 text-lg font-bold text-emerald-300">{formatCurrency(payment.amount)}</p>
+                    <p className="text-xs uppercase text-slate-500 font-semibold">Số tiền</p>
+                    <p className="mt-2 text-lg font-bold text-emerald-700">{formatCurrency(payment.amount)}</p>
                   </div>
                 </div>
               </div>
 
               {/* ─── CỘT PHẢI: Thông tin chuyển khoản thủ công ─── */}
               <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
-                <p className="font-semibold text-white mb-5 text-sm">Hoặc chuyển khoản thủ công</p>
+                <p className="font-bold text-slate-800 mb-5 text-sm">Hoặc chuyển khoản thủ công</p>
                 <div className="space-y-4">
                   {[
                     { label: 'Ngân hàng', value: 'BIDV' },
@@ -311,13 +365,13 @@ export default function CreditShopPage() {
                   ].map(({ label, value }) => (
                     <div key={label} className="flex items-center justify-between rounded-3xl bg-white border border-slate-200 p-4 shadow-sm">
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs uppercase text-slate-500">{label}</p>
-                        <p className="mt-1 font-semibold text-white break-words text-sm">{value}</p>
+                        <p className="text-xs uppercase text-slate-500 font-semibold">{label}</p>
+                        <p className="mt-1 font-bold text-slate-800 break-words text-sm">{value}</p>
                       </div>
                       <button
                         type="button"
                         onClick={() => copyToClipboard(value, label)}
-                        className="ml-3 inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-slate-900 text-white hover:bg-slate-700"
+                        className="ml-3 inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-[#0A2463] text-white hover:bg-[#071A4A]"
                         title={`Sao chép ${label}`}
                       >
                         <Copy className="h-3.5 w-3.5" />
@@ -358,14 +412,19 @@ export default function CreditShopPage() {
               <button
                 type="button"
                 onClick={() => copyToClipboard(payment.checkoutUrl || '', 'Liên kết PayOS')}
-                className="inline-flex items-center justify-center gap-2 rounded-3xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-white hover:bg-white/10 hover:border-white/20"
+                className="inline-flex items-center justify-center gap-2 rounded-3xl border border-slate-300 bg-slate-100 px-6 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-200 hover:border-slate-400"
               >
                 Sao chép link PayOS
                 <Copy className="h-4 w-4" />
               </button>
               <button
                 type="button"
-                onClick={() => { setPayment(null); setVerifyState('idle'); setVerifyMessage(''); }}
+                onClick={() => {
+                  setPayment(null);
+                  setVerifyState('idle');
+                  setVerifyMessage('');
+                  navigate('/credits', { replace: true });
+                }}
                 className="inline-flex items-center justify-center gap-2 rounded-3xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-500 hover:border-slate-400"
               >
                 Tạo QR mới
@@ -380,15 +439,15 @@ export default function CreditShopPage() {
               </div>
               {verifyMessage && (
                 <p className={`text-sm font-medium ${
-                  verifyState === 'success' ? 'text-emerald-300' :
-                  verifyState === 'failed' || verifyState === 'error' ? 'text-red-400' :
-                  'text-slate-600'
+                  verifyState === 'success' ? 'text-emerald-700 font-bold' :
+                  verifyState === 'failed' || verifyState === 'error' ? 'text-red-700 font-bold' :
+                  'text-slate-700'
                 }`}>
                   {verifyMessage}
                 </p>
               )}
               {copiedField && (
-                <div className="mt-3 rounded-2xl bg-emerald-500/20 border border-emerald-500/25 px-4 py-2 text-sm text-emerald-300">
+                <div className="mt-3 rounded-2xl bg-emerald-50 border border-emerald-200 px-4 py-2 text-sm text-emerald-700 shadow-sm font-bold">
                   ✓ Đã sao chép {copiedField}
                 </div>
               )}

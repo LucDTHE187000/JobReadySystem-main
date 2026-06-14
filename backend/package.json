@@ -10,7 +10,9 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "seed": "node scripts/seed_users.js",
+    "seed-50": "node scripts/migration_and_seed_50.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

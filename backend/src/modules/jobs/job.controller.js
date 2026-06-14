@@ -54,14 +54,14 @@ const applyJob = async (req, res) => {
       });
     }
 
-    // 🔥 Trừ credit cho việc apply job
-    try {
-      await deductCredits(jobseekerId, CREDIT_COSTS.JOB_APPLY, UserModel);
-    } catch (creditErr) {
-      return res.status(creditErr.status || 402).json({
-        error: creditErr.message || 'Không đủ credit để apply job',
-      });
-    }
+    // 🔥 Trừ credit cho việc apply job (Bỏ: free theo yêu cầu)
+    // try {
+    //   await deductCredits(jobseekerId, CREDIT_COSTS.JOB_APPLY, UserModel);
+    // } catch (creditErr) {
+    //   return res.status(creditErr.status || 402).json({
+    //     error: creditErr.message || 'Không đủ credit để apply job',
+    //   });
+    // }
 
     const application = await JobApplication.create({
       jobId,

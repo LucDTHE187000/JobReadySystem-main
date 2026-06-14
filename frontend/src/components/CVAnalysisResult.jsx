@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, CheckCircle, AlertCircle, ChevronDown, ChevronUp, Zap, Target, TrendingUp } from 'lucide-react';
+import { X, CheckCircle, AlertCircle, ChevronDown, ChevronUp, Zap, Target, TrendingUp, FileText, Globe } from 'lucide-react';
 
 /**
  * Author: Dương Trọng Lực - mssv: HE187000
@@ -34,10 +34,10 @@ export default function CVAnalysisResult({ analysis, onClose }) {
     };
 
     const metricsData = [
-        { label: 'Cấu trúc', value: breakdown.structure || 0, color: 'from-emerald-400 to-emerald-600', icon: '📋' },
-        { label: 'Nội dung', value: breakdown.content || 0, color: 'from-cyan-400 to-cyan-600', icon: '📝' },
-        { label: 'Ngôn ngữ', value: breakdown.language || 0, color: 'from-purple-400 to-purple-600', icon: '🌐' },
-        { label: 'Phù hợp', value: breakdown.relevance || 0, color: 'from-orange-400 to-orange-600', icon: '🎯' },
+        { label: 'Cấu trúc', value: breakdown.structure || 0, color: 'from-emerald-400 to-emerald-600', icon: FileText },
+        { label: 'Nội dung', value: breakdown.content || 0, color: 'from-cyan-400 to-cyan-600', icon: Zap },
+        { label: 'Ngôn ngữ', value: breakdown.language || 0, color: 'from-purple-400 to-purple-600', icon: Globe },
+        { label: 'Phù hợp', value: breakdown.relevance || 0, color: 'from-orange-400 to-orange-600', icon: Target },
     ];
 
     return (
@@ -138,7 +138,7 @@ export default function CVAnalysisResult({ analysis, onClose }) {
                             {metricsData.map((metric, idx) => (
                                 <div key={idx} className={`bg-gradient-to-br ${metric.color} rounded-2xl p-6 text-white`}>
                                     <div className="flex items-center justify-between mb-4">
-                                        <span className="text-3xl">{metric.icon}</span>
+                                        <metric.icon className="w-7 h-7 text-white flex-shrink-0" />
                                         <span className="text-2xl font-bold">{metric.value}/100</span>
                                     </div>
                                     <p className="font-semibold mb-3">{metric.label}</p>
@@ -225,21 +225,24 @@ export default function CVAnalysisResult({ analysis, onClose }) {
                                     Biểu đồ radar hiển thị từng khía cạnh của CV của bạn được đánh giá bởi AI:
                                 </p>
                                 <div className="space-y-3">
-                                    {metricsData.map((metric, idx) => (
-                                        <div key={idx} className="flex items-center gap-3">
-                                            <span className="text-2xl">{metric.icon}</span>
-                                            <div className="flex-1">
-                                                <p className="text-sm font-semibold text-gray-900">{metric.label}</p>
-                                                <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-                                                    <div
-                                                        className="bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full h-2"
-                                                        style={{ width: `${metric.value}%` }}
-                                                    />
+                                    {metricsData.map((metric, idx) => {
+                                        const IconComponent = metric.icon;
+                                        return (
+                                            <div key={idx} className="flex items-center gap-3">
+                                                <IconComponent className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                                                <div className="flex-1">
+                                                    <p className="text-sm font-semibold text-gray-900">{metric.label}</p>
+                                                    <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                                        <div
+                                                            className="bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full h-2"
+                                                            style={{ width: `${metric.value}%` }}
+                                                        />
+                                                    </div>
                                                 </div>
+                                                <span className="text-sm font-bold text-emerald-600 min-w-10">{metric.value}/100</span>
                                             </div>
-                                            <span className="text-sm font-bold text-emerald-600 min-w-10">{metric.value}/100</span>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>

@@ -23,7 +23,7 @@ export default function SeekerLayout({ children, title, breadcrumb }) {
     const { user, signOut } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
-    const credits = user?.credits ?? 14000;
+    const credits = user?.credits ?? 6500;
 
     return (
         <div 

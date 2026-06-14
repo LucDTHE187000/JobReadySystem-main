@@ -19,23 +19,23 @@ const CREDIT_PACKAGES = [
   {
     id: "starter",
     packageName: "Starter",
-    creditAmount: 5000,
-    amount: 19000,
-    description: "Gói Starter 5.000 credit",
+    creditAmount: 3000,
+    amount: 29000,
+    description: "Gói Starter 3.000 credit",
   },
   {
     id: "pro",
     packageName: "Pro",
-    creditAmount: 20000,
-    amount: 69000,
-    description: "Gói Pro 20.000 credit",
+    creditAmount: 9000,
+    amount: 79000,
+    description: "Gói Pro 9.000 credit",
   },
   {
     id: "max",
     packageName: "Max",
-    creditAmount: 50000,
+    creditAmount: 21000,
     amount: 149000,
-    description: "Gói Max 50.000 credit",
+    description: "Gói Max 21.000 credit",
   },
 ];
 

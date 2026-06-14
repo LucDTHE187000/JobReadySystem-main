@@ -3,7 +3,7 @@ import { CourseModel } from "./course.model.js";
 const coursesData = [
     // === IT & SOFTWARE ===
     {
-        title: "Frontend Developer Interview Masterclass",
+        title: "Khóa học Chinh phục Phỏng vấn Frontend Developer",
         field: "IT",
         description: "Làm chủ các câu hỏi phỏng vấn hóc búa nhất về React, Javascript ES6+, CSS Grid/Flexbox và tối ưu hóa hiệu năng website. Khóa học được thiết kế đặc biệt giúp bạn tự tin chinh phục các vị trí Senior Frontend.",
         level: "Intermediate",
@@ -59,7 +59,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Backend & System Design Essentials",
+        title: "Thiết kế Hệ thống & Phát triển Backend toàn diện",
         field: "IT",
         description: "Học cách thiết kế hệ thống lớn có khả năng chịu tải cao, thiết kế RESTful API chuẩn hóa, cơ chế caching với Redis và quản trị CSDL SQL/NoSQL.",
         level: "Advanced",
@@ -115,7 +115,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Git & Team Collaboration Essentials",
+        title: "Làm chủ Git và Quy trình làm việc nhóm chuyên nghiệp",
         field: "IT",
         description: "Khóa học giúp bạn nắm chắc Git flow chuyên nghiệp, giải quyết conflicts phức tạp và nâng cao chất lượng code thông qua quá trình Code Review hiệu quả.",
         level: "Beginner",
@@ -171,7 +171,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Algorithm & Data Structure Prep",
+        title: "Cấu trúc Dữ liệu & Giải thuật ứng dụng",
         field: "IT",
         description: "Chuẩn bị tốt nhất cho các kỳ thi thuật toán của Google, VinGroup hay FPT. Học từ các cấu trúc dữ liệu cơ bản như Mảng, Danh sách liên kết đến Đồ thị và Quy hoạch động.",
         level: "Intermediate",
@@ -227,7 +227,7 @@ const coursesData = [
         ]
     },
     {
-        title: "UI/UX Basics for Frontend Devs",
+        title: "UI/UX căn bản dành cho Lập trình viên Frontend",
         field: "IT",
         description: "Cầu nối giữa Lập trình và Thiết kế. Hiểu các nguyên lý UI/UX quan trọng, cách sử dụng Figma cơ bản và tạo ra các giao diện thân thiện với người dùng nhất.",
         level: "Beginner",
@@ -285,7 +285,7 @@ const coursesData = [
 
     // === SALES ===
     {
-        title: "Advanced B2B Negotiation Techniques",
+        title: "Nghệ thuật Đàm phán và Thương lượng B2B nâng cao",
         field: "Sales",
         description: "Phương pháp đàm phán hợp đồng thương mại lớn với đối tác doanh nghiệp. Cách xử lý phản đối, thiết lập kịch bản win-win và chốt deal hiệu quả.",
         level: "Advanced",
@@ -341,7 +341,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Cold Calling & Lead Generation",
+        title: "Tìm kiếm Khách hàng & Kịch bản gọi điện Telesales",
         field: "Sales",
         description: "Khóa học thực chiến giúp bạn vượt qua nỗi sợ gọi điện, xây dựng kịch bản Telesales chinh phục khách hàng ngay từ 10 giây đầu tiên.",
         level: "Beginner",
@@ -397,7 +397,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Key Account Management Masterclass",
+        title: "Quản lý Khách hàng Trọng điểm (Key Account Management)",
         field: "Sales",
         description: "Phương pháp quản lý và tối đa hóa giá trị từ các khách hàng lớn cốt lõi của doanh nghiệp. Tăng trưởng doanh thu thông qua Upselling và Cross-selling.",
         level: "Advanced",
@@ -453,7 +453,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Closing Sales in Retail & Showrooms",
+        title: "Kỹ năng Chốt Sales và Tư vấn Bán lẻ tại Showroom",
         field: "Sales",
         description: "Kỹ năng tư vấn bán lẻ trực tiếp tại cửa hàng hoặc showroom. Thấu hiểu tâm lý khách hàng vãng lai và nghệ thuật chốt sales nhanh.",
         level: "Beginner",
@@ -509,7 +509,7 @@ const coursesData = [
         ]
     },
     {
-        title: "E-commerce Strategy & Sales Funnels",
+        title: "Chiến lược Bán hàng Thương mại Điện tử & Phễu chuyển đổi",
         field: "Sales",
         description: "Phương pháp xây dựng phễu bán hàng online, tối ưu tỷ lệ chuyển đổi (CR) trên website thương mại điện tử và các sàn Shopee, Lazada, TikTok Shop.",
         level: "Intermediate",
@@ -567,7 +567,7 @@ const coursesData = [
 
     // === MARKETING ===
     {
-        title: "SEO Masterclass: Lên Top Google Bền Vững",
+        title: "Chinh phục SEO: Lên Top Tìm kiếm Google bền vững",
         field: "Marketing",
         description: "Lộ trình đào tạo SEO bài bản từ nghiên cứu từ khóa, tối ưu SEO Onpage, viết bài chuẩn SEO, đến xây dựng Entity và tối ưu Technical SEO.",
         level: "Intermediate",
@@ -623,7 +623,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Performance Marketing & Digital Ads",
+        title: "Performance Marketing & Tối ưu hóa Quảng cáo đa kênh",
         field: "Marketing",
         description: "Học cách thiết lập, chạy thử nghiệm A/B và tối ưu hóa ngân sách quảng cáo trên Facebook Ads, Google Search/GDN và TikTok Ads.",
         level: "Intermediate",
@@ -679,7 +679,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Content Marketing Strategy",
+        title: "Chiến lược Tiếp thị Nội dung (Content Marketing) đa kênh",
         field: "Marketing",
         description: "Phương pháp lên chiến lược nội dung đa kênh, viết bài copywriting thôi miên khách hàng và xây dựng lịch biên tập chuyên nghiệp.",
         level: "Beginner",
@@ -735,7 +735,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Social Media Branding & Community Building",
+        title: "Xây dựng Thương hiệu MXH & Phát triển Cộng đồng",
         field: "Marketing",
         description: "Bí quyết định vị thương hiệu cá nhân hoặc doanh nghiệp trên MXH. Cách xây dựng và vận hành group cộng đồng hàng chục nghìn thành viên.",
         level: "Beginner",
@@ -745,7 +745,7 @@ const coursesData = [
             avatar: "/uploads/avatars/instructor-dung.jpg"
         },
         thumbnail: "from-[#4EA8DE] to-[#5390D9]",
-        duration: "3.5 hours",
+        duration: "3 giờ 30 phút",
         lessonsCount: 5,
         lessons: [
             {
@@ -791,7 +791,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Email Marketing Automation",
+        title: "Tự động hóa Email Tiếp thị (Email Marketing Automation)",
         field: "Marketing",
         description: "Xây dựng tệp email chất lượng, viết tiêu đề email có tỷ lệ mở (Open Rate) cao và thiết kế kịch bản nuôi dưỡng khách hàng tự động.",
         level: "Intermediate",
@@ -849,7 +849,7 @@ const coursesData = [
 
     // === FINANCE ===
     {
-        title: "Corporate Finance Analysis",
+        title: "Phân tích Tài chính Doanh nghiệp (Corporate Finance)",
         field: "Finance",
         description: "Phân tích sức khỏe tài chính doanh nghiệp thông qua bảng cân đối kế toán, báo cáo kết quả kinh doanh và báo cáo lưu chuyển tiền tệ.",
         level: "Intermediate",
@@ -905,7 +905,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Financial Modeling in Excel",
+        title: "Xây dựng Mô hình Tài chính bằng Excel",
         field: "Finance",
         description: "Học cách thiết lập mô hình tài chính chuyên nghiệp từ dự phóng doanh thu, chi phí đến phân tích độ nhạy của dự án đầu tư.",
         level: "Advanced",
@@ -915,7 +915,7 @@ const coursesData = [
             avatar: "/uploads/avatars/instructor-ha.jpg"
         },
         thumbnail: "from-[#1D3557] to-[#457B9D]",
-        duration: "4.5 hours",
+        duration: "4 giờ 30 phút",
         lessonsCount: 5,
         lessons: [
             {
@@ -961,7 +961,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Tax & Auditing Foundations",
+        title: "Nguyên lý Thuế & Kiểm toán căn bản",
         field: "Finance",
         description: "Các kiến thức thuế thu nhập doanh nghiệp, thuế GTGT cơ bản và quy trình kiểm toán nội bộ tối thiểu mọi kế toán viên cần nắm vững.",
         level: "Beginner",
@@ -971,7 +971,7 @@ const coursesData = [
             avatar: "/uploads/avatars/instructor-tien.jpg"
         },
         thumbnail: "from-[#2B2D42] to-[#8D99AE]",
-        duration: "3.5 hours",
+        duration: "3 giờ 30 phút",
         lessonsCount: 5,
         lessons: [
             {
@@ -1017,7 +1017,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Investment Portfolio Management",
+        title: "Quản lý Danh mục Đầu tư Tài chính",
         field: "Finance",
         description: "Phương pháp phân bổ tài sản, lựa chọn cổ phiếu theo trường phái phân tích cơ bản (FA) và quản trị rủi ro danh mục đầu tư chứng khoán.",
         level: "Intermediate",
@@ -1027,7 +1027,7 @@ const coursesData = [
             avatar: "/uploads/avatars/instructor-minhduc.jpg"
         },
         thumbnail: "from-[#003049] to-[#D62828]",
-        duration: "3.5 hours",
+        duration: "3 giờ 30 phút",
         lessonsCount: 5,
         lessons: [
             {
@@ -1073,7 +1073,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Personal Finance & Wealth Management",
+        title: "Quản lý Tài chính Cá nhân & Tích lũy Tài sản",
         field: "Finance",
         description: "Lập kế hoạch tài chính cá nhân, quản lý chi tiêu hiệu quả theo quy tắc 6 chiếc hũ và phương pháp xây dựng quỹ dự phòng khẩn cấp.",
         level: "Beginner",
@@ -1083,7 +1083,7 @@ const coursesData = [
             avatar: "/uploads/avatars/instructor-yen.jpg"
         },
         thumbnail: "from-[#E07A5F] to-[#3D405B]",
-        duration: "2.5 hours",
+        duration: "2 giờ 30 phút",
         lessonsCount: 5,
         lessons: [
             {
@@ -1131,7 +1131,7 @@ const coursesData = [
 
     // === HR ===
     {
-        title: "Modern Recruitment & Headhunting",
+        title: "Phương pháp Tuyển dụng & Săn đầu người Hiện đại",
         field: "HR",
         description: "Phương pháp tìm kiếm ứng viên tài năng (Sourcing), xây dựng thương hiệu tuyển dụng (Employer Branding) và phỏng vấn đánh giá ứng viên chuyên nghiệp.",
         level: "Intermediate",
@@ -1141,7 +1141,7 @@ const coursesData = [
             avatar: "/uploads/avatars/instructor-trang.jpg"
         },
         thumbnail: "from-[#5E503F] to-[#0A0908]",
-        duration: "3.5 hours",
+        duration: "3 giờ 30 phút",
         lessonsCount: 5,
         lessons: [
             {
@@ -1187,7 +1187,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Employee Engagement & Company Culture",
+        title: "Gắn kết Nhân sự & Xây dựng Văn hóa Doanh nghiệp",
         field: "HR",
         description: "Phương pháp khảo sát mức độ hài lòng, thiết kế các chương trình gắn kết nội bộ và định hình văn hóa doanh nghiệp độc đáo.",
         level: "Intermediate",
@@ -1197,7 +1197,7 @@ const coursesData = [
             avatar: "/uploads/avatars/instructor-minhanh.jpg"
         },
         thumbnail: "from-[#F25C54] to-[#F48A64]",
-        duration: "3.5 hours",
+        duration: "3 giờ 30 phút",
         lessonsCount: 5,
         lessons: [
             {
@@ -1243,7 +1243,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Payroll & Labor Law Basics",
+        title: "Quy định Tiền lương & Luật Lao động căn bản",
         field: "HR",
         description: "Các quy định luật lao động mới nhất về hợp đồng, thời giờ làm việc, bảo hiểm xã hội và phương pháp tính lương, thuế TNCN cho nhân viên.",
         level: "Beginner",
@@ -1253,7 +1253,7 @@ const coursesData = [
             avatar: "/uploads/avatars/instructor-lananh.jpg"
         },
         thumbnail: "from-[#457B9D] to-[#1D3557]",
-        duration: "3.5 hours",
+        duration: "3 giờ 30 phút",
         lessonsCount: 5,
         lessons: [
             {
@@ -1299,7 +1299,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Performance Appraisal Systems (KPIs & OKRs)",
+        title: "Hệ thống Đánh giá Hiệu suất Nhân sự (KPIs & OKRs)",
         field: "HR",
         description: "Phương pháp thiết kế chỉ số hiệu suất KPI, triển khai quản trị mục tiêu OKR đồng bộ từ cấp ban giám đốc đến từng nhân viên.",
         level: "Intermediate",
@@ -1309,7 +1309,7 @@ const coursesData = [
             avatar: "/uploads/avatars/instructor-nam.jpg"
         },
         thumbnail: "from-[#023E8A] to-[#0096C7]",
-        duration: "3.5 hours",
+        duration: "3 giờ 30 phút",
         lessonsCount: 5,
         lessons: [
             {
@@ -1355,7 +1355,7 @@ const coursesData = [
         ]
     },
     {
-        title: "Conflict Resolution in the Workspace",
+        title: "Kỹ năng Giao tiếp & Giải quyết Xung đột nơi Công sở",
         field: "HR",
         description: "Kỹ năng hòa giải tranh chấp, xử lý xung đột quyền lợi giữa các cá nhân/phòng ban và xây dựng bầu không khí làm việc hòa hợp.",
         level: "Intermediate",
@@ -1365,7 +1365,7 @@ const coursesData = [
             avatar: "/uploads/avatars/instructor-maianh.jpg"
         },
         thumbnail: "from-[#1D3557] to-[#E63946]",
-        duration: "3.5 hours",
+        duration: "3 giờ 30 phút",
         lessonsCount: 5,
         lessons: [
             {
@@ -1414,13 +1414,8 @@ const coursesData = [
 
 export async function seedCourses() {
     try {
-        const count = await CourseModel.countDocuments();
-        if (count > 0) {
-            console.log("ℹ️ Courses collection already contains data. Skipping seed.");
-            return;
-        }
-
-        console.log("🌱 Seeding courses and lessons into database...");
+        console.log("🌱 Cleaning and seeding courses and lessons into database...");
+        await CourseModel.deleteMany({});
         await CourseModel.insertMany(coursesData);
         console.log("✅ Seeded 25 courses with 125 lessons successfully!");
     } catch (error) {

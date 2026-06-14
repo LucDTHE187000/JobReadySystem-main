@@ -7,7 +7,7 @@ import {
     Briefcase, Users, Calendar, Eye, Facebook,
     Loader2, AlertCircle, Globe, ExternalLink,
     CheckCircle2, Send, X, FileText, Mail,
-    Phone, Upload, ArrowRight
+    Phone, Upload, ArrowRight, DollarSign
 } from 'lucide-react';
 import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
@@ -176,8 +176,9 @@ function ApplyModal({ job, user, onClose, onSuccess }) {
                                         <MapPin className="w-3 h-3" />
                                         {job.location?.city || 'Không xác định'}
                                     </span>
-                                    <span className="text-xs font-medium text-[#F5C518]">
-                                        💰 {formatSalary(job.salary)}
+                                    <span className="text-xs font-medium text-[#F5C518] inline-flex items-center gap-1">
+                                        <DollarSign className="w-3.5 h-3.5 flex-shrink-0" />
+                                        {formatSalary(job.salary)}
                                     </span>
                                 </div>
                             </div>
@@ -523,7 +524,8 @@ export default function PublicJobDetail() {
                                         : 'Không xác định'}
                                 </span>
                                 <span className="flex items-center gap-1.5 text-sm font-semibold text-[#F5C518]">
-                                    💰 {formatSalary(job.salary)}
+                                    <DollarSign className="w-4 h-4 flex-shrink-0" />
+                                    {formatSalary(job.salary)}
                                 </span>
                                 <span className="flex items-center gap-1.5 text-sm text-white/50">
                                     <Clock className="w-4 h-4 text-white/40 flex-shrink-0" />
@@ -637,7 +639,7 @@ export default function PublicJobDetail() {
 
                                 <div className="flex items-center gap-3">
                                     <div className="w-9 h-9 bg-[#F5C518]/15 rounded-xl flex items-center justify-center flex-shrink-0 border border-[#F5C518]/20">
-                                        <span className="text-sm">💰</span>
+                                        <DollarSign className="w-4 h-4 text-[#F5C518] flex-shrink-0" />
                                     </div>
                                     <div>
                                         <p className="text-[11px] text-white/40 uppercase tracking-wide font-semibold">Mức lương</p>

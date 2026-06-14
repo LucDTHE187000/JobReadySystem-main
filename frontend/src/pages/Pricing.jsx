@@ -9,74 +9,66 @@ import { useAuth } from '../contexts/AuthContext';
 
 const plans = [
     {
-        id: 'free',
-        name: 'Miễn phí',
+        id: 'starter',
+        name: 'Tiết kiệm',
         icon: Zap,
-        price: '0 ',
+        price: '29,000',
         period: '',
-        credits: '14,000 credits/user',
-        desc: 'Dành cho người mới bắt đầu muốn trải nghiệm ',
+        credits: '3,000 credits',
         features: [
-            '3 phiên phỏng vấn AI chuyên sâu',
-            'Phân tích 4CV ',
-            'Tìm kiếm việc làm',
-            'Lịch sử phỏng vấn',
+            'Nạp 3.000 credit cho các tính năng cơ bản',
+            'Tìm kiếm việc làm free',
+            'Phân tích CV (500 credit/lượt)',
+            'Phỏng vấn AI (1.500 credit/lượt)',
         ],
-        missing: ['Feedback chi tiết AI', 'Tin tuyển dụng premium', 'Analytics nâng cao'],
-        cta: 'Bắt đầu miễn phí',
+        missing: [],
+        cta: 'Tạo mã QR thanh toán',
         highlight: false,
     },
     {
         id: 'pro',
         name: 'Tiêu Chuẩn',
         icon: Crown,
-        price: '69,000',
+        price: '79,000',
         period: '',
-        credits: '20,000 credits/user',
-        desc: 'Cho ứng viên nghiêm túc tìm việc',
+        credits: '9,000 credits',
         features: [
-            'Không giới hạn phỏng vấn AI',
-            'Phân tích CV nâng cao + điểm số',
-            'Feedback chi tiết từng câu trả lời',
-            'Analytics & xu hướng tiến bộ',
-            'Ưu tiên hiển thị hồ sơ',
-            'Hỗ trợ email 24/7',
+            'Nạp 9.000 credit cho các tính năng cơ bản',
+            'Tìm kiếm việc làm free',
+            'Phân tích CV (500 credit/lượt)',
+            'Phỏng vấn AI (1.500 credit/lượt)',
         ],
         missing: [],
-        cta: 'Nâng cấp Pro',
+        cta: 'Tạo mã QR thanh toán',
         highlight: true,
     },
     {
-        id: 'enterprise',
-        name: 'Doanh nghiệp',
+        id: 'max',
+        name: 'Cao cấp',
         icon: Building2,
-        price: 'Liên hệ',
+        price: '149,000',
         period: '',
-        credits: 'Không giới hạn',
-        desc: 'Cho nhà tuyển dụng và HR team',
+        credits: '21,000 credits',
         features: [
-            'Đăng tin tuyển dụng premium',
-            'Quản lý ứng viên không giới hạn',
-            'Tìm kiếm ứng viên theo kỹ năng',
-            'Báo cáo tuyển dụng chi tiết',
-            'Tích hợp API',
-            'Account manager riêng',
+            'Nạp 21.000 credit cho các tính năng cơ bản',
+            'Tìm kiếm việc làm free',
+            'Phân tích CV (500 credit/lượt)',
+            'Phỏng vấn AI (1.500 credit/lượt)',
         ],
         missing: [],
-        cta: 'Liên hệ sales',
+        cta: 'Tạo mã QR thanh toán',
         highlight: false,
     },
 ];
 
 const creditUsage = [
-    { action: '1 phiên phỏng vấn AI (10 câu) 🎤🤖', credits: 4000 },
+    { action: '1 phiên phỏng vấn AI (10 câu) 🎤🤖', credits: 1500 },
     { action: 'Phân tích CV nâng cao 📋✓', credits: 500 },
     { action: 'Đăng tin tuyển dụng 📈', credits: 0 },
-    { action: 'Tìm kiếm việc làm 🔍', credits: 2000 },
+    { action: 'Tìm kiếm việc làm 🔍', credits: 0 },
 ];
 
 export default function Pricing() {
-    const [billing, setBilling] = useState('monthly');
     const { user } = useAuth();
 
     return (
@@ -112,23 +104,6 @@ export default function Pricing() {
                         <p className="text-white/70 text-lg max-w-2xl mx-auto mb-10 font-light">
                             Hệ thống credit linh hoạt — trả cho những gì bạn thực sự sử dụng. Không ràng buộc, hủy bất cứ lúc nào.
                         </p>
-
-                        {/* Billing toggle */}
-                        <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-1.5 backdrop-blur-md">
-                            <button
-                                onClick={() => setBilling('monthly')}
-                                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${billing === 'monthly' ? 'bg-[#F5C518] text-[#0A2463] shadow-md' : 'text-white/70 hover:text-white hover:bg-white/5'}`}
-                            >
-                                Hàng tháng
-                            </button>
-                            <button
-                                onClick={() => setBilling('yearly')}
-                                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 cursor-pointer ${billing === 'yearly' ? 'bg-[#F5C518] text-[#0A2463] shadow-md' : 'text-white/70 hover:text-white hover:bg-white/5'}`}
-                            >
-                                Hàng năm
-                                <span className="text-[10px] bg-navy/20 px-2 py-0.5 rounded-full uppercase tracking-wider font-extrabold">-20%</span>
-                            </button>
-                        </div>
                     </ScrollReveal>
                 </div>
             </section>
@@ -142,9 +117,7 @@ export default function Pricing() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 items-stretch">
                         {plans.map((plan, i) => {
                             const Icon = plan.icon;
-                            const displayPrice = billing === 'yearly' && plan.price !== '0 ' && plan.price !== 'Liên hệ'
-                                ? Math.round(Number.parseInt(plan.price.replaceAll(',', ''), 10) * 0.8).toLocaleString('en-US')
-                                : plan.price;
+                            const displayPrice = plan.price;
                             let ctaLink = '/about';
                             if (plan.id === 'pro') {
                                 ctaLink = '/credits';
@@ -172,8 +145,7 @@ export default function Pricing() {
                                                 <Icon className={`w-6 h-6 ${plan.highlight ? 'text-[#0A2463]' : 'text-[#F5C518]'}`} />
                                             </div>
 
-                                            <h3 className={`font-heading text-3xl font-black mb-1.5 ${plan.highlight ? 'text-white' : 'text-white'}`}>{plan.name}</h3>
-                                            <p className={`text-sm mb-6 font-light ${plan.highlight ? 'text-white/70' : 'text-white/60'}`}>{plan.desc}</p>
+                                            <h3 className={`font-heading text-3xl font-black mb-6 ${plan.highlight ? 'text-white' : 'text-white'}`}>{plan.name}</h3>
 
                                             <div className="mb-3 flex items-baseline">
                                                 {plan.price === 'Liên hệ' ? (
@@ -206,14 +178,14 @@ export default function Pricing() {
                                         </div>
 
                                         <Link
-                                            to={ctaLink}
+                                            to={`/credits?package=${plan.id}`}
                                             className={`block w-full text-center py-4 rounded-xl font-black text-sm transition-all duration-300 ${
                                                 plan.highlight 
                                                     ? 'bg-gradient-to-r from-[#F5C518] to-[#D4A800] text-[#0A2463] shadow-md hover:scale-105 active:scale-95 shadow-[#F5C518]/10 hover:shadow-[#F5C518]/25' 
                                                     : 'bg-white/10 border border-white/10 text-white hover:bg-white/20 hover:scale-105 active:scale-95'
                                             }`}
                                         >
-                                            {plan.id === 'free' && user ? 'Gói hiện tại' : plan.cta}
+                                            Tạo mã QR thanh toán
                                         </Link>
                                     </div>
                                 </ScrollReveal>

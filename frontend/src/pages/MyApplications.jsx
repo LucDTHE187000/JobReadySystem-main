@@ -6,7 +6,7 @@ import {
     Briefcase, MapPin, Clock, ChevronRight, Loader2,
     FileText, Heart, User, Settings, LogOut, LayoutDashboard,
     CheckCircle2, Circle, Calendar, Building2, Filter, Search,
-    ClipboardList, ChevronLeft, ChevronDown
+    ClipboardList, ChevronLeft, ChevronDown, DollarSign
 } from 'lucide-react';
 import SeekerLayout from '../components/layout/SeekerLayout';
 import { useAuth } from '../contexts/AuthContext';
@@ -278,23 +278,25 @@ export default function MyApplications() {
                 <div className="flex border-b border-slate-300 mb-6 bg-white/45 backdrop-blur-sm rounded-xl p-1 shadow-sm">
                     <button
                         onClick={() => setActiveParentTab('applications')}
-                        className={`pb-3 pt-2 px-5 text-sm font-extrabold border-b-2 transition-all ${
+                        className={`pb-3 pt-2 px-5 text-sm font-extrabold border-b-2 transition-all flex items-center gap-2 ${
                             activeParentTab === 'applications'
                                 ? 'border-[#0A2463] text-[#0A2463] font-black'
                                 : 'border-transparent text-slate-700 hover:text-slate-950 hover:bg-slate-200/40 rounded-t-lg'
                         }`}
                     >
-                        💼 Đơn ứng tuyển
+                        <Briefcase className="w-4 h-4 flex-shrink-0" />
+                        <span>Đơn ứng tuyển</span>
                     </button>
                     <button
                         onClick={() => setActiveParentTab('saved')}
-                        className={`pb-3 pt-2 px-5 text-sm font-extrabold border-b-2 transition-all ${
+                        className={`pb-3 pt-2 px-5 text-sm font-extrabold border-b-2 transition-all flex items-center gap-2 ${
                             activeParentTab === 'saved'
                                 ? 'border-[#0A2463] text-[#0A2463] font-black'
                                 : 'border-transparent text-slate-700 hover:text-slate-950 hover:bg-slate-200/40 rounded-t-lg'
                         }`}
                     >
-                        ⭐ Việc làm đã lưu
+                        <Heart className="w-4 h-4 flex-shrink-0" />
+                        <span>Việc làm đã lưu</span>
                     </button>
                 </div>
 
@@ -439,7 +441,10 @@ export default function MyApplications() {
                                                     </p>
                                                     <div className="flex flex-wrap gap-2 mt-2">
                                                         <span className="text-xs px-2 py-1 bg-blue-100 text-blue-900 border border-blue-200 rounded-lg font-extrabold">{job.jobType}</span>
-                                                        <span className="text-xs px-2 py-1 bg-amber-100 text-amber-900 border border-amber-200 rounded-lg font-black">💰 {formatSalary(job.salary)}</span>
+                                                        <span className="text-xs px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-200 rounded-lg font-black inline-flex items-center gap-1">
+                                                            <DollarSign className="w-3.5 h-3.5 text-amber-800" />
+                                                            {formatSalary(job.salary)}
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>

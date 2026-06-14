@@ -1,7 +1,8 @@
 import { MapPin, DollarSign, Bookmark, ArrowRight, CheckCircle2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { siteImages } from '../../config/siteImages';
 import { ScrollReveal } from './ScrollAnimations';
+import { useAuth } from '../../contexts/AuthContext';
 
 const features = [
     {
@@ -9,18 +10,21 @@ const features = [
         desc: 'Upload CV và nhận điểm số, gợi ý cải thiện chi tiết trong vài giây từ AI chuyên nghiệp.',
         image: siteImages.feature2,
         tag: 'Smart CV',
+        path: '/cv-upload',
     },
     {
         title: 'Phỏng vấn AI thông minh',
         desc: 'Mô phỏng phỏng vấn thực tế với câu hỏi được cá nhân hóa theo vị trí và ngành nghề cụ thể.',
         image: siteImages.feature1,
         tag: 'AI Powered',
+        path: '/interview',
     },
     {
         title: 'Kết nối nhà tuyển dụng',
         desc: 'Hàng ngàn cơ hội việc làm hấp dẫn từ các doanh nghiệp uy tín hàng đầu trên khắp Việt Nam.',
         image: siteImages.feature3,
         tag: 'Job Board',
+        path: '/jobs',
     },
 ];
 
@@ -31,6 +35,35 @@ const jobs = [
 ];
 
 export default function JobListings() {
+    const navigate = useNavigate();
+    const { user } = useAuth();
+
+    const handleFeatureClick = (featurePath) => {
+        if (!user) {
+            // Visitors: go to /login except for /jobs which is public
+            if (featurePath === '/jobs') {
+                navigate('/jobs');
+            } else {
+                navigate('/login');
+            }
+        } else {
+            // Logged-in users: go to function
+            if (user.role === 'employer') {
+                if (featurePath === '/cv-upload') {
+                    navigate('/candidate-search');
+                } else if (featurePath === '/interview') {
+                    navigate('/dashboard');
+                } else {
+                    navigate(featurePath);
+                }
+            } else if (user.role === 'admin') {
+                navigate('/admin/dashboard');
+            } else {
+                navigate(featurePath);
+            }
+        }
+    };
+
     return (
         <>
             {/* Features section */}
@@ -49,9 +82,12 @@ export default function JobListings() {
                     </ScrollReveal>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
-                        {features.map(({ title, desc, image, tag }, i) => (
+                        {features.map(({ title, desc, image, tag, path }, i) => (
                             <ScrollReveal key={title} delay={150 * (i + 1)} type="all" direction="up">
-                                <div className="group rounded-2xl overflow-hidden border border-white/10 bg-white/5 hover:bg-white/15 backdrop-blur-md shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col h-full glow-border-gold">
+                                <div 
+                                    onClick={() => handleFeatureClick(path)}
+                                    className="group rounded-2xl overflow-hidden border border-white/10 bg-white/5 hover:bg-white/15 backdrop-blur-md shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col h-full glow-border-gold cursor-pointer"
+                                >
                                     <div className="relative h-56 overflow-hidden bg-white/5">
                                         <img src={image} alt={title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 group-hover:brightness-105" />
                                         <div className="absolute inset-0 bg-gradient-to-t from-[#030A21]/70 via-transparent to-transparent" />

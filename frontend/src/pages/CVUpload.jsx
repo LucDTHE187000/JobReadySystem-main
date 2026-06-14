@@ -5,7 +5,8 @@ import axios from 'axios';
 import {
     Upload, FileText, Trash2,
     CheckCircle, AlertCircle, Loader2,
-    Sparkles, Bot
+    Sparkles, Bot, BarChart3, Target, Zap, TrendingUp,
+    GraduationCap, Wrench, Folder, Palette, Briefcase, FileEdit
 } from 'lucide-react';
 import SeekerLayout from '../components/layout/SeekerLayout';
 import CVReportPanel from '../components/cv/CVReportPanel';
@@ -585,7 +586,10 @@ export default function CVUpload() {
                                         ) : analyzing ? (
                                             <>
                                                 <Loader2 className="w-8 h-8 animate-spin text-orange-500 mx-auto mb-3" />
-                                                <p className="text-slate-800 font-semibold text-lg">🤖 AI đang phân tích chi tiết CV...</p>
+                                                <p className="text-slate-800 font-semibold text-lg flex items-center justify-center gap-2">
+                                                    <Bot className="w-5 h-5 text-cyan-500 animate-bounce" />
+                                                    AI đang phân tích chi tiết CV...
+                                                </p>
                                                 <p className="text-sm text-slate-600 mt-3">Đang kiểm tra: Kinh nghiệm • Kỹ năng • Thành tích • Ngôn ngữ</p>
                                                 <div className="w-48 h-1 bg-slate-200 rounded-full mx-auto mt-3 overflow-hidden">
                                                     <div className="h-full bg-gradient-to-r from-orange-500 to-cyan-500 animate-pulse"></div>
@@ -619,12 +623,27 @@ export default function CVUpload() {
                                     <CheckCircle className="w-5 h-5 text-emerald-400" />
                                     Tính Năng
                                 </h3>
-                                <ul className="space-y-3 text-sm text-slate-600">
-                                    <li className="flex items-center gap-2"><span className="text-emerald-400 font-bold">✨</span> Upload nhiều CV cùng lúc</li>
-                                    <li className="flex items-center gap-2"><span className="text-emerald-400 font-bold">📊</span> Đánh giá chi tiết theo tiêu chí</li>
-                                    <li className="flex items-center gap-2"><span className="text-emerald-400 font-bold">🎯</span> Gợi ý cụ thể cải thiện</li>
-                                    <li className="flex items-center gap-2"><span className="text-emerald-400 font-bold">⚡</span> Phân tích AI 3-5 giây</li>
-                                    <li className="flex items-center gap-2"><span className="text-emerald-400 font-bold">📈</span> So sánh điểm các CV</li>
+                                <ul className="space-y-3.5 text-sm text-slate-600">
+                                    <li className="flex items-center gap-2.5">
+                                        <Sparkles className="w-4 h-4 text-orange-400 flex-shrink-0" />
+                                        <span>Upload nhiều CV cùng lúc</span>
+                                    </li>
+                                    <li className="flex items-center gap-2.5">
+                                        <BarChart3 className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                                        <span>Đánh giá chi tiết theo tiêu chí</span>
+                                    </li>
+                                    <li className="flex items-center gap-2.5">
+                                        <Target className="w-4 h-4 text-red-400 flex-shrink-0" />
+                                        <span>Gợi ý cụ thể cải thiện</span>
+                                    </li>
+                                    <li className="flex items-center gap-2.5">
+                                        <Zap className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                                        <span>Phân tích AI 3-5 giây</span>
+                                    </li>
+                                    <li className="flex items-center gap-2.5">
+                                        <TrendingUp className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                                        <span>So sánh điểm các CV</span>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -792,7 +811,7 @@ export default function CVUpload() {
                             {/* Summary */}
                             <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
                                 <h3 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 flex items-center gap-2">
-                                    <span className="p-1 rounded-lg bg-white/10 text-white">📝</span>
+                                    <FileEdit className="w-5 h-5 text-indigo-500 flex-shrink-0" />
                                     Giới thiệu bản thân
                                 </h3>
                                 <textarea
@@ -807,8 +826,8 @@ export default function CVUpload() {
                             {/* Experience */}
                             <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
                                 <div className="flex justify-between items-center mb-4 border-b pb-2">
-                                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                        <span className="p-1 rounded-lg bg-white/10 text-white">💼</span>
+                                    <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                        <Briefcase className="w-5 h-5 text-emerald-500 flex-shrink-0" />
                                         Kinh nghiệm làm việc
                                     </h3>
                                     <button
@@ -881,8 +900,8 @@ export default function CVUpload() {
                             {/* Education */}
                             <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
                                 <div className="flex justify-between items-center mb-4 border-b pb-2">
-                                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                        <span className="p-1 rounded-lg bg-white/10 text-white">🎓</span>
+                                    <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                        <GraduationCap className="w-5 h-5 text-blue-500 flex-shrink-0" />
                                         Học vấn
                                     </h3>
                                     <button
@@ -955,7 +974,7 @@ export default function CVUpload() {
                             {/* Skills */}
                             <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
                                 <h3 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 flex items-center gap-2">
-                                    <span className="p-1 rounded-lg bg-white/10 text-white">🛠️</span>
+                                    <Wrench className="w-5 h-5 text-amber-500 flex-shrink-0" />
                                     Kỹ năng chuyên môn
                                 </h3>
                                 <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase font-semibold text-slate-600">Danh sách kỹ năng (ngăn cách bằng dấu phẩy)</label>
@@ -971,8 +990,8 @@ export default function CVUpload() {
                             {/* Projects */}
                             <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
                                 <div className="flex justify-between items-center mb-4 border-b pb-2">
-                                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                        <span className="p-1 rounded-lg bg-white/10 text-white">📂</span>
+                                    <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                        <Folder className="w-5 h-5 text-cyan-500 flex-shrink-0" />
                                         Dự án cá nhân (Tùy chọn)
                                     </h3>
                                     <button
@@ -1024,7 +1043,10 @@ export default function CVUpload() {
                         {/* Sidebar templates & download */}
                         <div className="space-y-6">
                             <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
-                                <h3 className="font-bold text-lg mb-4 text-[#F5C518]">🎨 Chọn Giao Diện</h3>
+                                <h3 className="font-bold text-lg mb-4 text-[#0A2463] flex items-center gap-2">
+                                    <Palette className="w-5 h-5 text-[#F5C518] flex-shrink-0" />
+                                    Chọn Giao Diện
+                                </h3>
                                 <div className="space-y-3">
                                     {[
                                         { id: 'standard', name: 'Standard (Thanh Lịch)', desc: 'Bố cục truyền thống màu Navy sang trọng.' },

@@ -3,7 +3,7 @@ import { useEffect, useState, useMemo } from "react";
 import SideBar from "../../components/SideBar";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { Star } from 'lucide-react';
+import { Star, Briefcase, DollarSign, MapPin } from 'lucide-react';
 
 function ApplicationsList() {
   const { user } = useAuth();
@@ -235,16 +235,23 @@ function ApplicationsList() {
                       {job.description}
                     </p>
 
-                    <div className="text-xs text-slate-500 font-medium flex gap-4 flex-wrap">
-                      <span>💼 {job.jobType || "N/A"}</span>
+                    <div className="text-xs text-slate-550 font-semibold flex gap-4 flex-wrap items-center">
+                      <span className="flex items-center gap-1">
+                        <Briefcase className="w-3.5 h-3.5 text-slate-500" />
+                        {job.jobType || "N/A"}
+                      </span>
 
-                      <span>
-                        💰 {job.salary?.min?.toLocaleString() || 0} -{" "}
+                      <span className="flex items-center gap-1">
+                        <DollarSign className="w-3.5 h-3.5 text-slate-500" />
+                        {job.salary?.min?.toLocaleString() || 0} -{" "}
                         {job.salary?.max?.toLocaleString() || 0}{" "}
                         {job.salary?.currency || ""}
                       </span>
 
-                      <span>📍 {job.location?.city || "N/A"}</span>
+                      <span className="flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-slate-500" />
+                        {job.location?.city || "N/A"}
+                      </span>
                     </div>
 
                     <div className="text-[10px] text-slate-400 font-medium">

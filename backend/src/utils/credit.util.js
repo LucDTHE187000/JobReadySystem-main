@@ -1,11 +1,11 @@
 /** Chi phí credit theo hành động */
 export const CREDIT_COSTS = {
     CV_ANALYZE: 500,
-    INTERVIEW_SESSION: 4000,
-    JOB_APPLY: 2000,
+    INTERVIEW_SESSION: 1500,
+    JOB_APPLY: 0,
 };
 
-export const DEFAULT_CREDITS = 14000;
+export const DEFAULT_CREDITS = 6500;
 
 export async function deductCredits(userId, amount, UserModel) {
     const user = await UserModel.findById(userId);

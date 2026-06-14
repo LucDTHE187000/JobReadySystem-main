@@ -52,13 +52,17 @@ export default function Login() {
         }
     }, [user, navigate]);
 
-    // Parse email and unverified parameters on mount
+    // Parse email, password and unverified parameters on mount
     useEffect(() => {
         const queryParams = new URLSearchParams(window.location.search);
         const urlEmail = queryParams.get('email');
+        const urlPassword = queryParams.get('password');
         const isUnverified = queryParams.get('unverified') === 'true';
         if (urlEmail) {
             setEmail(urlEmail);
+        }
+        if (urlPassword) {
+            setPassword(urlPassword);
         }
         if (isUnverified) {
             setShowOtpField(true);
