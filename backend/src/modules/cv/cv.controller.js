@@ -23,7 +23,7 @@ export class CVController {
             }
 
             const userId = req.user.userId;
-            const originalFilename = req.file.originalname;
+            const originalFilename = Buffer.from(req.file.originalname, 'latin1').toString('utf8');
             const fileSize = req.file.size;
             const timestamp = Date.now();
             const newFilename = `cv_${userId}_${timestamp}.pdf`;

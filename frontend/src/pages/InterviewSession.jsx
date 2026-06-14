@@ -444,7 +444,7 @@ export default function InterviewSession() {
                         ))}
                         {submitting && (
                             <div className="flex items-center gap-2 text-white/60 text-sm">
-                                <Loader2 className="w-4 h-4 animate-spin" /> AI đang chấm điểm...
+                                <Loader2 className="w-4 h-4 animate-spin" /> Đã Ghi Nhớ Câu Trả Lời Của Bạn , AI Đang Gen Câu Hỏi Phù Hợp Tiếp Theo !
                             </div>
                         )}
                         <div ref={chatEndRef} />

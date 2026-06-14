@@ -5,8 +5,10 @@ import {
   ChevronRight,
   MessageSquare,
   Search,
+  LogOut,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const Sidebar = ({
   sidebarOpen,
@@ -18,6 +20,8 @@ const Sidebar = ({
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
+  const { user, signOut } = useAuth();
+  const displayProfile = profile || user;
 
   const getActiveMenu = () => {
     if (activeMenu) return activeMenu;
@@ -118,21 +122,29 @@ const Sidebar = ({
         />
       </nav>
 
-      <div className="mt-auto px-2 flex-shrink-0 border-t border-white/10 pt-4">
+      <div className="mt-auto px-2 flex-shrink-0 border-t border-white/10 pt-4 space-y-2">
         <div
           onClick={() => navigate("/profile")}
           className="flex items-center gap-3 px-2 py-2 cursor-pointer hover:bg-white/5 rounded-xl transition-all group"
           title="Xem hồ sơ cá nhân"
         >
           <div className="w-9 h-9 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold flex items-center justify-center text-sm shadow-md">
-            {profile?.name?.charAt(0) || "C"}
+            {displayProfile?.name?.charAt(0) || "C"}
           </div>
           <div className="flex-1 min-w-0 text-left">
-            <p className="font-semibold text-white text-sm truncate">{profile?.name || "Nhà tuyển dụng"}</p>
+            <p className="font-semibold text-white text-sm truncate">{displayProfile?.name || "Nhà tuyển dụng"}</p>
             <p className="text-[10px] text-white/40">Xem hồ sơ</p>
           </div>
           <ChevronRight size={16} className="text-white/40 group-hover:text-white transition-colors" />
         </div>
+
+        <button
+          onClick={() => signOut()}
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all border border-transparent text-red-400 hover:bg-red-500/10 hover:text-red-300 text-sm font-medium mx-0 cursor-pointer text-left"
+        >
+          <LogOut size={20} />
+          <span>Đăng xuất</span>
+        </button>
       </div>
     </aside>
   );

@@ -167,9 +167,6 @@ export default function InterviewPractice() {
                                             Điểm CV của bạn hiện tại dưới mức khuyến nghị (60 điểm) {cvScore ? `(${cvScore}/100)` : ''}.
                                             Chúng tôi khuyên bạn nên cải thiện CV trước khi ứng tuyển. Tuy nhiên, bạn vẫn có thể tiếp tục luyện tập phỏng vấn.
                                         </p>
-                                        <p className="text-xs sm:text-sm text-amber-700 mt-1.5 font-mono italic bg-amber-50/50 p-2 rounded-lg border border-amber-200">
-                                            "Your CV score is below the recommended threshold (60 points). We recommend improving your CV before applying for jobs. However, you may still continue to practice interviews."
-                                        </p>
                                         <div className="mt-3 flex gap-3">
                                             <button
                                                 onClick={() => navigate('/cv-upload')}
@@ -191,9 +188,6 @@ export default function InterviewPractice() {
                                         <h4 className="font-bold text-emerald-800 text-sm sm:text-base">✓ CV đạt yêu cầu chất lượng</h4>
                                         <p className="text-xs sm:text-sm text-emerald-700 mt-1 leading-relaxed">
                                             CV của bạn đạt chất lượng khuyến nghị ({cvScore}/100). Bạn đã sẵn sàng để phỏng vấn.
-                                        </p>
-                                        <p className="text-xs sm:text-sm text-emerald-700 mt-1.5 font-mono italic bg-emerald-50/50 p-2 rounded-lg border border-emerald-200">
-                                            "Your CV meets the recommended quality threshold. You are ready to participate in AI Interview."
                                         </p>
                                     </div>
                                 </div>

@@ -50,8 +50,8 @@ export default function Dashboard() {
     }, [user]);
 
     const [stats, setStats] = useState([
-        { label: 'Tin tuyển dụng', value: '—', icon: FileText, change: '' },
-        { label: 'Ứng viên', value: '—', icon: Eye, change: '' },
+        { label: 'Việc làm của bạn', value: '—', icon: FileText, change: '' },
+        { label: 'Tổng ứng viên', value: '—', icon: Eye, change: '' },
         { label: 'Chờ phỏng vấn', value: '—', icon: Calendar, change: '' },
         { label: 'Tỷ lệ chấp nhận', value: '—', icon: TrendingUp, change: '' },
     ]);
@@ -78,7 +78,7 @@ export default function Dashboard() {
                 const acceptRate = totalApplicants > 0 ? ((acceptedCount / totalApplicants) * 100).toFixed(1) + '%' : '0%';
 
                 setStats([
-                    { label: 'Tin tuyển dụng', value: totalJobs.toString(), icon: FileText, change: '' },
+                    { label: 'Việc làm của bạn', value: totalJobs.toString(), icon: FileText, change: '' },
                     { label: 'Tổng ứng viên', value: totalApplicants.toString(), icon: Users, change: '' },
                     { label: 'Chờ phỏng vấn', value: interviewCount.toString(), icon: Calendar, change: '' },
                     { label: 'Tỷ lệ chấp nhận', value: acceptRate, icon: TrendingUp, change: '' },
@@ -342,7 +342,10 @@ export default function Dashboard() {
                                     </div>
                                 )}
                             </div>
-                            <button className="relative p-2 text-slate-650 hover:bg-slate-100 hover:text-slate-800 rounded-xl hidden sm:block transition-all">
+                            <button 
+                                onClick={() => navigate('/employer/feedback')}
+                                className="relative p-2 text-slate-650 hover:bg-slate-100 hover:text-slate-800 rounded-xl hidden sm:block transition-all"
+                            >
                                 <MessageSquare size={22} />
                             </button>
                             <button

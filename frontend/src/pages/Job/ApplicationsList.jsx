@@ -123,7 +123,22 @@ function ApplicationsList() {
     setSortBy("newest");
   };
 
-  if (loading) return <div className="p-6 text-slate-800 font-bold bg-white/80 backdrop-blur-md rounded-2xl border border-white/60 shadow-xl m-8">Loading...</div>;
+  const getJobTypeLabel = (type) => {
+    switch (type) {
+      case "full_time":
+      case "full-time":
+        return "Toàn thời gian";
+      case "part_time":
+      case "part-time":
+        return "Bán thời gian";
+      case "internship":
+        return "Thực tập";
+      default:
+        return type || "N/A";
+    }
+  };
+
+  if (loading) return <div className="p-6 text-slate-800 font-bold bg-white/80 backdrop-blur-md rounded-2xl border border-white/60 shadow-xl m-8">Đang tải...</div>;
 
   return (
     <div 
@@ -140,7 +155,7 @@ function ApplicationsList() {
           {/* HEADER */}
           <div className="flex items-center justify-between bg-white/60 backdrop-blur-md p-6 rounded-2xl border border-white/50 shadow-xl shadow-slate-900/5">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-800">My Job Posts</h1>
+              <h1 className="text-2xl font-bold tracking-tight text-slate-800">Việc làm của bạn</h1>
               <p className="text-sm text-slate-500 font-medium mt-1">Quản lý danh sách tin tuyển dụng của công ty bạn</p>
             </div>
 
@@ -148,7 +163,7 @@ function ApplicationsList() {
               className="px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-100/30 transition-all duration-300"
               onClick={() => navigate("/create")}
             >
-              + Create Job
+              + Đăng tin tuyển dụng
             </button>
           </div>
 
@@ -156,7 +171,7 @@ function ApplicationsList() {
           <div className="bg-white/80 backdrop-blur-md p-4 border border-white/60 rounded-2xl shadow-xl shadow-slate-900/5 flex flex-wrap gap-4 items-center">
             <input
               type="text"
-              placeholder="Search title..."
+              placeholder="Tìm kiếm tiêu đề..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="bg-white/70 border border-slate-200 focus:border-indigo-500 focus:bg-white px-3 py-2 rounded-xl text-sm w-56 text-slate-800 placeholder-slate-400 font-medium transition-all shadow-inner focus:ring-0 outline-none"
@@ -167,9 +182,9 @@ function ApplicationsList() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="bg-white/70 border border-slate-200 focus:border-indigo-500 focus:bg-white px-3 py-2 rounded-xl text-sm text-slate-700 font-semibold transition-all shadow-inner focus:ring-0 outline-none"
             >
-              <option value="all">All Status</option>
-              <option value="open">Open</option>
-              <option value="closed">Closed</option>
+              <option value="all">Tất cả trạng thái</option>
+              <option value="open">Đang mở</option>
+              <option value="closed">Đã đóng</option>
             </select>
 
             <select
@@ -177,10 +192,10 @@ function ApplicationsList() {
               onChange={(e) => setTypeFilter(e.target.value)}
               className="bg-white/70 border border-slate-200 focus:border-indigo-500 focus:bg-white px-3 py-2 rounded-xl text-sm text-slate-700 font-semibold transition-all shadow-inner focus:ring-0 outline-none"
             >
-              <option value="all">All Types</option>
-              <option value="full_time">Full Time</option>
-              <option value="part_time">Part Time</option>
-              <option value="internship">Internship</option>
+              <option value="all">Tất cả hình thức</option>
+              <option value="full_time">Toàn thời gian</option>
+              <option value="part_time">Bán thời gian</option>
+              <option value="internship">Thực tập</option>
             </select>
 
             <select
@@ -188,22 +203,22 @@ function ApplicationsList() {
               onChange={(e) => setSortBy(e.target.value)}
               className="bg-white/70 border border-slate-200 focus:border-indigo-500 focus:bg-white px-3 py-2 rounded-xl text-sm text-slate-700 font-semibold transition-all shadow-inner focus:ring-0 outline-none"
             >
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
+              <option value="newest">Mới nhất</option>
+              <option value="oldest">Cũ nhất</option>
             </select>
 
             <button
               onClick={clearFilters}
               className="px-4 py-2 text-sm bg-white/80 border border-slate-200 text-slate-650 font-semibold rounded-xl hover:bg-slate-50 shadow-sm transition-all"
             >
-              Clear
+              Xóa bộ lọc
             </button>
           </div>
 
           {/* JOB LIST */}
           {filteredJobs.length === 0 ? (
             <div className="bg-white/80 backdrop-blur-md border border-white/60 rounded-2xl p-8 text-center text-slate-705 shadow-xl shadow-slate-900/5">
-              <p className="font-semibold text-slate-800 text-lg">No jobs found.</p>
+              <p className="font-semibold text-slate-800 text-lg">Không tìm thấy công việc nào.</p>
               <p className="text-sm text-slate-500 font-medium mt-1">Hãy đăng tin tuyển dụng mới để tiếp cận hàng ngàn ứng viên!</p>
             </div>
           ) : (
@@ -222,7 +237,7 @@ function ApplicationsList() {
                           : "bg-slate-150 border-slate-200 text-slate-500"
                           }`}
                       >
-                        {job.status === "open" ? "Open" : "Closed"}
+                        {job.status === "open" ? "Đang mở" : "Đã đóng"}
                       </span>
                       {job.isPremium && (
                         <span className="inline-flex items-center gap-1 bg-amber-50 border border-amber-200/60 text-amber-700 text-xs px-2.5 py-0.5 rounded-full font-semibold shadow-sm">
@@ -238,7 +253,7 @@ function ApplicationsList() {
                     <div className="text-xs text-slate-550 font-semibold flex gap-4 flex-wrap items-center">
                       <span className="flex items-center gap-1">
                         <Briefcase className="w-3.5 h-3.5 text-slate-500" />
-                        {job.jobType || "N/A"}
+                        {getJobTypeLabel(job.jobType)}
                       </span>
 
                       <span className="flex items-center gap-1">
@@ -255,7 +270,7 @@ function ApplicationsList() {
                     </div>
 
                     <div className="text-[10px] text-slate-400 font-medium">
-                      Created at:{" "}
+                      Ngày tạo:{" "}
                       {job.createdAt
                         ? new Date(job.createdAt).toLocaleDateString("vi-VN")
                         : "N/A"}
@@ -264,7 +279,7 @@ function ApplicationsList() {
 
                   <div className="text-left md:text-right space-y-3 flex-shrink-0 w-full md:w-auto">
                     <div className="text-xs font-semibold text-slate-500">
-                      Applications:{" "}
+                      Hồ sơ ứng tuyển:{" "}
                       <span className="font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2.5 py-0.5 rounded-xl ml-1 shadow-sm">
                         {job.applicationsCount ?? 0}
                       </span>
@@ -277,7 +292,7 @@ function ApplicationsList() {
                           navigate(`/job-applications/${job._id}`)
                         }
                       >
-                        View Applications
+                        Xem danh sách ứng tuyển
                       </button>
                       <button
                         className="px-3.5 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 text-xs font-semibold shadow-sm transition-all"
