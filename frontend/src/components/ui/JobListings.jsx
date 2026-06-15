@@ -123,34 +123,37 @@ export default function JobListings() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                         {jobs.map((job, i) => (
                             <ScrollReveal key={job.id} delay={150 * (i + 1)} type="all" direction="up">
-                                <div className="bg-white/5 hover:bg-white/15 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col justify-between h-full group glow-border-gold">
+                                <div className="bg-white/5 hover:bg-white/15 backdrop-blur-md rounded-2xl border border-white/10 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col justify-between h-full group glow-border-gold overflow-hidden">
                                     <div>
-                                        <div className="flex justify-between items-start mb-5">
-                                            <div className="w-13 h-13 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center overflow-hidden flex-shrink-0 transition-transform duration-500 group-hover:scale-108 group-hover:rotate-3">
-                                                {job.logo ? (
-                                                    <img src={job.logo} alt={`${job.company} logo`} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <span className="font-heading text-[#F5C518] font-extrabold text-xl">{job.company.charAt(0)}</span>
-                                                )}
-                                            </div>
-                                            <button className="p-2 hover:bg-white/10 rounded-xl transition-colors text-white/40 hover:text-[#F5C518] cursor-pointer">
+                                        <div className="relative h-44 overflow-hidden bg-white/5">
+                                            {job.logo ? (
+                                                <img src={job.logo} alt={`${job.company} logo`} className="w-full h-full object-cover transition-transform duration-750 group-hover:scale-105 group-hover:brightness-105" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center bg-[#0A2463]/30">
+                                                    <span className="font-heading text-[#F5C518] font-extrabold text-4xl">{job.company.charAt(0)}</span>
+                                                </div>
+                                            )}
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                                            <button className="absolute top-4 right-4 p-2 bg-black/45 hover:bg-black/65 rounded-xl transition-colors text-white/80 hover:text-[#F5C518] cursor-pointer z-10">
                                                 <Bookmark className="w-5 h-5 fill-current" />
                                             </button>
                                         </div>
-                                        <h3 className="text-base sm:text-lg font-bold text-white mb-1 line-clamp-1 group-hover:text-[#F5C518] transition-colors duration-300">{job.title}</h3>
-                                        <p className="text-xs sm:text-sm text-white/70 mb-5 font-semibold">{job.company}</p>
-                                        <div className="flex flex-col gap-3 mb-6 pt-4 border-t border-white/5">
-                                            <div className="flex items-center gap-2.5 text-xs text-white/80 font-bold">
-                                                <MapPin className="w-4 h-4 text-[#F5C518] flex-shrink-0" />
-                                                {job.location}
-                                            </div>
-                                            <div className="flex items-center gap-2.5 text-xs text-white/80 font-bold">
-                                                <DollarSign className="w-4 h-4 text-[#F5C518] flex-shrink-0" />
-                                                {job.salary}
+                                        <div className="p-6 pb-0">
+                                            <h3 className="text-base sm:text-lg font-bold text-white mb-1 line-clamp-1 group-hover:text-[#F5C518] transition-colors duration-300">{job.title}</h3>
+                                            <p className="text-xs sm:text-sm text-white/70 mb-5 font-semibold">{job.company}</p>
+                                            <div className="flex flex-col gap-3 mb-6 pt-4 border-t border-white/5">
+                                                <div className="flex items-center gap-2.5 text-xs text-white/80 font-bold">
+                                                    <MapPin className="w-4 h-4 text-[#F5C518] flex-shrink-0" />
+                                                    {job.location}
+                                                </div>
+                                                <div className="flex items-center gap-2.5 text-xs text-white/80 font-bold">
+                                                    <DollarSign className="w-4 h-4 text-[#F5C518] flex-shrink-0" />
+                                                    {job.salary}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center justify-between pt-4 border-t border-white/5 mt-auto">
+                                    <div className="flex items-center justify-between p-6 pt-4 border-t border-white/5 mt-auto">
                                         <span className="px-3 py-1 bg-white/10 text-white/90 border border-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest">{job.type}</span>
                                         <Link to="/jobs" className="text-xs font-black text-white hover:text-[#F5C518] transition-colors flex items-center gap-0.5">Ứng tuyển ngay →</Link>
                                     </div>

@@ -873,6 +873,11 @@ export default function CVUpload() {
                                         <option key={d._id} value={d._id}>{d.name}</option>
                                     ))}
                                 </select>
+                                {savedDesigns.length === 0 && (
+                                    <p className="text-[11px] text-slate-500 mt-1 italic">
+                                        * Chưa có thiết kế nào được lưu. Nhập thông tin bên dưới rồi bấm "Lưu thiết kế" ở bên phải.
+                                    </p>
+                                )}
                             </div>
                             <div className="flex-1 space-y-1">
                                 <label className="block text-xs font-semibold text-slate-500 uppercase">Tên thiết kế</label>
