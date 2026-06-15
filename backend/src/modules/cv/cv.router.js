@@ -16,6 +16,11 @@ cvRouter.post('/analyze', authMiddleware, CVController.analyzeCV);
 // Phân tích CV hiện tại của user (POST /api/cv/analyze-current)
 cvRouter.post('/analyze-current', authMiddleware, CVController.analyzeCurrentCV);
 
+// Quản lý mẫu thiết kế CV tự tạo
+cvRouter.get('/designs', authMiddleware, CVController.getCVDesigns);
+cvRouter.post('/designs', authMiddleware, CVController.saveCVDesign);
+cvRouter.delete('/designs/:id', authMiddleware, CVController.deleteCVDesign);
+
 // Upload CV (JOB_SEEKER only)
 cvRouter.post('/upload', authMiddleware, (req, res, next) => {
     if (req.user.userContext?.role !== 'JOB_SEEKER') {

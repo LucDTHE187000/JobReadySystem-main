@@ -172,6 +172,11 @@ export class AuthService {
         const user = await UserModel.findOne({ email });
         if (!user) throw new Error("Invalid credentials");
 
+        // Kiểm tra xem tài khoản có mật khẩu hay không (trường hợp đăng ký bằng Google)
+        if (!user.password && user.googleId) {
+            throw new Error("GoogleAccountLocalLoginAttempt");
+        }
+
         const isPasswordValid = await user.comparePassword(password);
         if (!isPasswordValid) throw new Error("Invalid credentials");
 

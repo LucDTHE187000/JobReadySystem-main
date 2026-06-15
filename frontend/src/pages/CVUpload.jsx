@@ -26,6 +26,11 @@ export default function CVUpload() {
     const [analysisResult, setAnalysisResult] = useState(null);
     const [showAnalysis, setShowAnalysis] = useState(false);
 
+    // CV templates & designs state
+    const [savedDesigns, setSavedDesigns] = useState([]);
+    const [selectedDesignId, setSelectedDesignId] = useState('');
+    const [newDesignName, setNewDesignName] = useState('');
+
     // CV Builder states
     const [activeTab, setActiveTab] = useState('upload'); // 'upload' | 'builder'
     const [cvForm, setCvForm] = useState({
@@ -111,7 +116,7 @@ export default function CVUpload() {
         });
     };
 
-    const handleDownloadPDF = () => {
+    const handleDownloadPDF = (isPrint = true) => {
         const printWindow = window.open('', '_blank');
         
         let templateCSS = '';
@@ -312,7 +317,7 @@ export default function CVUpload() {
         printWindow.document.write(`
             <html>
                 <head>
-                    <title>CV_${cvForm.name ? cvForm.name.replace(/\\s+/g, '_') : 'JobReady'}</title>
+                    <title>CV_${cvForm.name ? cvForm.name.replace(/\s+/g, '_') : 'JobReady'}</title>
                     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
                     <style>
                         ${templateCSS}
@@ -325,11 +330,13 @@ export default function CVUpload() {
                 </head>
                 <body>
                     ${cvHTML}
+                    ${isPrint ? `
                     <script>
                         window.onload = function() {
                             window.print();
                         }
                     </script>
+                    ` : ''}
                 </body>
             </html>
         `);
@@ -338,7 +345,103 @@ export default function CVUpload() {
 
     useEffect(() => {
         fetchCVs();
+        fetchDesigns();
     }, []);
+
+    const fetchDesigns = async () => {
+        try {
+            const res = await axios.get(`${API_URL}/api/cv/designs`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setSavedDesigns(res.data.designs || []);
+        } catch (error) {
+            console.error("Fetch designs error:", error);
+        }
+    };
+
+    const handleSelectDesign = (id) => {
+        setSelectedDesignId(id);
+        if (!id) {
+            setCvForm({
+                name: user?.name || '',
+                title: '',
+                email: user?.email || '',
+                phone: user?.phone || '',
+                address: user?.address || '',
+                summary: '',
+                experience: [{ company: '', role: '', duration: '', desc: '' }],
+                education: [{ school: '', major: '', duration: '', desc: '' }],
+                skills: '',
+                projects: [{ name: '', desc: '' }],
+                template: 'standard'
+            });
+            setNewDesignName('');
+            return;
+        }
+        const design = savedDesigns.find(d => d._id === id);
+        if (design) {
+            setCvForm(design.data);
+            setNewDesignName(design.name);
+        }
+    };
+
+    const handleSaveDesign = async () => {
+        const designName = newDesignName.trim();
+        if (!designName) {
+            alert("Vui lòng nhập tên thiết kế CV!");
+            return;
+        }
+
+        try {
+            const res = await axios.post(`${API_URL}/api/cv/designs`, {
+                id: selectedDesignId || undefined,
+                name: designName,
+                data: cvForm
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (res.data.success) {
+                setSavedDesigns(res.data.designs || []);
+                const saved = (res.data.designs || []).find(d => d.name === designName);
+                if (saved) {
+                    setSelectedDesignId(saved._id);
+                    setNewDesignName(saved.name);
+                }
+                alert("Lưu thiết kế CV thành công!");
+            }
+        } catch (error) {
+            console.error("Save design error:", error);
+            alert("Không thể lưu thiết kế CV.");
+        }
+    };
+
+    const handleDeleteDesign = async () => {
+        if (!selectedDesignId) {
+            alert("Vui lòng chọn một thiết kế để xóa!");
+            return;
+        }
+
+        if (!window.confirm("Bạn có chắc chắn muốn xóa thiết kế này?")) {
+            return;
+        }
+
+        try {
+            const res = await axios.delete(`${API_URL}/api/cv/designs/${selectedDesignId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (res.data.success) {
+                setSavedDesigns(res.data.designs || []);
+                setSelectedDesignId('');
+                setNewDesignName('');
+                alert("Đã xóa thiết kế CV thành công!");
+            }
+        } catch (error) {
+            console.error("Delete design error:", error);
+            alert("Không thể xóa thiết kế CV.");
+        }
+    };
 
     const fetchCVs = async () => {
         try {
@@ -704,7 +807,7 @@ export default function CVUpload() {
                                                 <button
                                                     onClick={() => handleAnalyze(cv._id)}
                                                     disabled={analyzingCvId === cv._id}
-                                                    className="flex-1 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 disabled:opacity-50 font-semibold rounded-lg transition-all flex items-center justify-center gap-2"
+                                                    className="flex-1 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 disabled:opacity-50 font-semibold rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                                                 >
                                                     {analyzingCvId === cv._id ? (
                                                         <>
@@ -718,9 +821,19 @@ export default function CVUpload() {
                                                         </>
                                                     )}
                                                 </button>
+                                                {cv.filePath && (
+                                                    <a
+                                                        href={`${API_URL}${cv.filePath}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg border border-slate-350 transition-all flex items-center gap-2 cursor-pointer text-sm"
+                                                    >
+                                                        Xem CV
+                                                    </a>
+                                                )}
                                                 <button
                                                     onClick={() => handleDeleteCV(cv._id)}
-                                                    className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold rounded-lg border border-red-500/20 transition-all flex items-center gap-2"
+                                                    className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold rounded-lg border border-red-500/20 transition-all flex items-center gap-2 cursor-pointer"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                     Xóa
@@ -745,7 +858,53 @@ export default function CVUpload() {
 
                 {/* Tab: CV Builder */}
                 {activeTab === 'builder' && (
-                    <div className="grid lg:grid-cols-3 gap-8">
+                    <div className="space-y-6">
+                        {/* Saved Templates Selector */}
+                        <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex-1 space-y-1">
+                                <label className="block text-xs font-semibold text-slate-500 uppercase">Chọn mẫu thiết kế đã lưu</label>
+                                <select
+                                    value={selectedDesignId}
+                                    onChange={(e) => handleSelectDesign(e.target.value)}
+                                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 outline-none focus:ring-2 focus:ring-[#0A2463] font-medium"
+                                >
+                                    <option value="">-- Tạo thiết kế mới --</option>
+                                    {savedDesigns.map((d) => (
+                                        <option key={d._id} value={d._id}>{d.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex-1 space-y-1">
+                                <label className="block text-xs font-semibold text-slate-500 uppercase">Tên thiết kế</label>
+                                <input
+                                    type="text"
+                                    placeholder="Ví dụ: CV Tiếng Anh, CV 2026..."
+                                    value={newDesignName}
+                                    onChange={(e) => setNewDesignName(e.target.value)}
+                                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 outline-none focus:ring-2 focus:ring-[#0A2463]"
+                                />
+                            </div>
+                            <div className="flex items-end gap-2 pt-5">
+                                <button
+                                    type="button"
+                                    onClick={handleSaveDesign}
+                                    className="px-4 py-2 bg-[#F5C518] hover:bg-[#d9ae10] text-[#0A2463] font-bold text-sm rounded-lg shadow-md transition-all cursor-pointer"
+                                >
+                                    Lưu thiết kế
+                                </button>
+                                {selectedDesignId && (
+                                    <button
+                                        type="button"
+                                        onClick={handleDeleteDesign}
+                                        className="px-4 py-2 bg-red-50 text-red-650 hover:bg-red-100 font-bold text-sm rounded-lg border border-red-200 transition-all cursor-pointer"
+                                    >
+                                        Xóa mẫu
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="grid lg:grid-cols-3 gap-8">
                         {/* Form input - 2 columns */}
                         <div className="lg:col-span-2 space-y-6">
                             {/* Personal Info */}
@@ -1070,10 +1229,17 @@ export default function CVUpload() {
 
                                 <button
                                     type="button"
-                                    onClick={handleDownloadPDF}
+                                    onClick={() => handleDownloadPDF(true)}
                                     className="w-full mt-6 py-3 bg-[#F5C518] hover:bg-[#d9ae10] text-[#0A2463] font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-lg cursor-pointer"
                                 >
                                     📥 Tải xuống CV (PDF)
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleDownloadPDF(false)}
+                                    className="w-full mt-3 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                                >
+                                    🔍 Xem trước CV
                                 </button>
                             </div>
 
@@ -1086,6 +1252,7 @@ export default function CVUpload() {
                                 </p>
                             </div>
                         </div>
+                    </div>
                     </div>
                 )}
             </div>

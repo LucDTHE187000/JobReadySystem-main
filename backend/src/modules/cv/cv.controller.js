@@ -218,6 +218,7 @@ export class CVController {
                     validCVs.push({
                         _id: cv._id,
                         fileName: cv.fileName,
+                        filePath: cv.filePath,
                         fileSize: cv.fileSize,
                         uploadedAt: cv.uploadedAt,
                         analysis: cv.analysis,
@@ -368,6 +369,115 @@ export class CVController {
         } catch (error) {
             console.error('Analyze current CV error:', error);
             return res.status(500).json({ error: error.message || 'Lỗi khi phân tích CV' });
+        }
+    }
+
+    /**
+     * Lấy danh sách thiết kế mẫu CV của user hiện tại
+     * GET /api/cv/designs
+     */
+    static async getCVDesigns(req, res) {
+        try {
+            const userId = req.user.userId;
+            const user = await UserModel.findById(userId).select('cvDesigns').lean();
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+            return res.status(200).json({
+                success: true,
+                designs: user.cvDesigns || []
+            });
+        } catch (error) {
+            console.error('Get CV designs error:', error);
+            return res.status(500).json({ message: 'Lỗi khi lấy danh sách thiết kế CV' });
+        }
+    }
+
+    /**
+     * Lưu thiết kế mẫu CV (Lưu mới hoặc lưu đè)
+     * POST /api/cv/designs
+     */
+    static async saveCVDesign(req, res) {
+        try {
+            const userId = req.user.userId;
+            const { id, name, data } = req.body;
+
+            if (!name || !data) {
+                return res.status(400).json({ message: 'Thiếu thông tin tên thiết kế hoặc dữ liệu thiết kế' });
+            }
+
+            const user = await UserModel.findById(userId);
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            if (!user.cvDesigns) {
+                user.cvDesigns = [];
+            }
+
+            let design;
+            if (id) {
+                // Tìm theo id
+                design = user.cvDesigns.id(id);
+            } else {
+                // Hoặc tìm theo name
+                design = user.cvDesigns.find(d => d.name === name);
+            }
+
+            if (design) {
+                design.name = name;
+                design.data = data;
+                design.updatedAt = new Date();
+            } else {
+                user.cvDesigns.push({
+                    name,
+                    data,
+                    updatedAt: new Date()
+                });
+            }
+
+            await user.save();
+
+            return res.status(200).json({
+                success: true,
+                message: 'Lưu thiết kế CV thành công',
+                designs: user.cvDesigns
+            });
+        } catch (error) {
+            console.error('Save CV design error:', error);
+            return res.status(500).json({ message: 'Lỗi khi lưu thiết kế CV' });
+        }
+    }
+
+    /**
+     * Xóa thiết kế mẫu CV
+     * DELETE /api/cv/designs/:id
+     */
+    static async deleteCVDesign(req, res) {
+        try {
+            const userId = req.user.userId;
+            const { id } = req.params;
+
+            const user = await UserModel.findById(userId);
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            if (!user.cvDesigns) {
+                return res.status(404).json({ message: 'Không tìm thấy thiết kế để xóa' });
+            }
+
+            user.cvDesigns = user.cvDesigns.filter(d => d._id.toString() !== id);
+            await user.save();
+
+            return res.status(200).json({
+                success: true,
+                message: 'Đã xóa thiết kế CV thành công',
+                designs: user.cvDesigns
+            });
+        } catch (error) {
+            console.error('Delete CV design error:', error);
+            return res.status(500).json({ message: 'Lỗi khi xóa thiết kế CV' });
         }
     }
 }

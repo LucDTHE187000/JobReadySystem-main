@@ -59,7 +59,7 @@ class GeminiInterviewService {
     async generateQuestion(data) {
         const {
             position, level, interviewType, targetDifficulty, targetDomain,
-            previousQuestions = [], cvSkills = [], cvTopics = [],
+            previousQuestions = [], previousAnswers = [], cvSkills = [], cvTopics = [],
             cvStrengths = [], cvWeaknesses = [], cvString = '',
             interviewStage = 1, averageScore = 0,
             weakTopics = [], strongTopics = [],
@@ -69,7 +69,18 @@ class GeminiInterviewService {
             ? previousQuestions.map((q, i) => `${i + 1}. ${q}`).join('\n')
             : 'Chưa có câu hỏi nào';
 
-        const prompt = `Bạn là một nhà tuyển dụng cấp cao, chuyên phỏng vấn ứng viên ${position} tại công ty công nghệ hàng đầu Việt Nam.
+        // Xây dựng lịch sử hội thoại chi tiết (để AI bắt nhịp hội thoại tự nhiên)
+        let conversationHistory = '';
+        if (previousQuestions.length > 0) {
+            conversationHistory = previousQuestions.map((q, i) => {
+                const ans = previousAnswers[i] || '(Chưa có câu trả lời)';
+                return `Người phỏng vấn: ${q}\nỨng viên: ${ans}`;
+            }).join('\n\n');
+        } else {
+            conversationHistory = 'Chưa có hội thoại trước đó.';
+        }
+
+        const prompt = `Bạn là một nhà tuyển dụng cấp cao, chuyên phỏng vấn ứng viên ${position} tại công ty công nghệ hàng đầu Việt Nam. Bạn đang có cuộc trò chuyện trực tiếp (chat) với ứng viên.
 
 THÔNG TIN PHỎNG VẤN:
 - Vị trí: ${position}
@@ -89,22 +100,26 @@ HỒ SƠ ỨNG VIÊN:
 - Chủ đề ứng viên đang yếu: ${weakTopics.join(', ') || 'Không có'}
 - Chủ đề ứng viên đang mạnh: ${strongTopics.join(', ') || 'Không có'}
 
+LỊCH SỬ CUỘC TRÒ CHUYỆN (CÂU HỎI & CÂU TRẢ LỜI TRƯỚC ĐÓ):
+${conversationHistory}
+
 CÁC CÂU HỎI ĐÃ HỎI — TUYỆT ĐỐI KHÔNG LẶP LẠI Ý NÀO:
 ${prevList}
 
 YÊU CẦU CÂU HỎI:
-- Viết hoàn toàn bằng tiếng Việt, tự nhiên như người phỏng vấn thực nói
-- Phải KHÁC HOÀN TOÀN với tất cả câu hỏi đã hỏi ở trên
-- Phù hợp đúng độ khó: ${targetDifficulty}
+- Viết hoàn toàn bằng tiếng Việt.
+- Bắt buộc phải phản hồi/giao tiếp tiếp nối tự nhiên dựa trên câu trả lời gần nhất của ứng viên trong lịch sử hội thoại (ví dụ: "Cảm ơn chia sẻ của bạn về...", "Từ câu trả lời của bạn, tôi thấy...", "Bạn có nhắc đến... vậy thì..."). Tạo cảm giác đàm thoại mượt mà, thân thiện như chat với ChatGPT thay vì các câu hỏi tĩnh độc lập, khô khan.
+- Tuy nhiên, hãy khéo léo dẫn dắt câu hỏi tiếp theo hướng về chủ đề mục tiêu lần này là '${targetDomain}' và phù hợp với độ khó '${targetDifficulty}'.
+- Phải KHÁC HOÀN TOÀN với tất cả câu hỏi đã hỏi ở trên.
 ${targetDifficulty === 'Hard' ? '- Với Hard: hỏi về system design, trade-off, tình huống khó, leadership, hoặc kinh nghiệm xử lý failure thực tế' : ''}
 ${targetDifficulty === 'Medium' ? '- Với Medium: hỏi tình huống cụ thể, cách giải quyết vấn đề, hoặc kinh nghiệm thực tế' : ''}
-- Nếu ứng viên yếu chủ đề nào, hỏi sâu hơn về chủ đề đó
-- Câu hỏi nên khai thác được CV của ứng viên
-- Kèm 1 follow-up question để hỏi tiếp nếu câu trả lời chung chung
+- Nếu ứng viên yếu chủ đề nào, hỏi sâu hơn về chủ đề đó.
+- Câu hỏi nên khai thác được CV của ứng viên.
+- Kèm 1 follow-up question để hỏi tiếp nếu câu trả lời chung chung.
 
 Trả về JSON:
 {
-  "questionText": "câu hỏi chính bằng tiếng Việt",
+  "questionText": "câu hỏi chính bằng tiếng Việt (bao gồm cả phần dẫn dắt/nhận xét kết nối tự nhiên từ câu trả lời trước)",
   "questionType": "Technical hoặc Behavioral",
   "topic": "${targetDomain}",
   "followUpQuestion": "câu hỏi follow-up nếu ứng viên trả lời quá ngắn hoặc chung chung"

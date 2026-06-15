@@ -147,6 +147,11 @@ export class AuthController {
             if (error.message === "Invalid credentials") {
                 return res.status(401).json({ message: "Invalid email or password" });
             }
+            if (error.message === "GoogleAccountLocalLoginAttempt") {
+                return res.status(400).json({ 
+                    message: "Tài khoản của bạn được đăng ký thông qua Google. Vui lòng sử dụng nút đăng nhập bằng Google." 
+                });
+            }
             if (error.message === "Email not verified. Please verify your email first.") {
                 return res.status(403).json({ message: "Email not verified. Please verify your email first." });
             }

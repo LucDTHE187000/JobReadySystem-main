@@ -48,6 +48,14 @@ const userSchema = new mongoose.Schema(
     experience: { type: String },
     education: { type: String },
     savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
+    cvDesigns: [
+      {
+        _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+        name: { type: String, required: true },
+        data: { type: mongoose.Schema.Types.Mixed, required: true },
+        updatedAt: { type: Date, default: Date.now }
+      }
+    ],
 
     // Thông tin cho Employer
     companyName: { type: String },

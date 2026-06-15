@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { isJobSeekerRole, isEmployerRole } from '../utils/roles';
-import { User, Lock, Briefcase, Camera, Building, Mail, Phone, MapPin, Save, ArrowLeft } from 'lucide-react';
+import { User, Lock, Briefcase, Camera, Building, Mail, Phone, MapPin, Save, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import axios from 'axios';
 import SeekerLayout from '../components/layout/SeekerLayout';
 
@@ -34,13 +34,17 @@ export default function Profile() {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
 
+    const [showOldPassword, setShowOldPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     useEffect(() => {
         if (user) {
             setFormData({
                 name: user.name || '',
                 phone: user.phone || '',
                 address: user.address || '',
-                avatar: user.avatar || '',
+                avatar: user.avatar || user.avatarUrl || '',
                 skills: user.skills ? user.skills.join(', ') : '',
                 experience: user.experience || '',
                 education: user.education || '',
@@ -319,7 +323,16 @@ export default function Profile() {
                                         </div>
                                         <div>
                                             <h3 className="text-lg font-semibold text-slate-800">Ảnh đại diện</h3>
-                                            <p className="text-sm text-slate-500 mt-1">Chấp nhận JPG, PNG dung lượng tối đa 2MB</p>
+                                            <p className="text-sm text-slate-500 mt-1 mb-2">Chấp nhận JPG, PNG dung lượng tối đa 2MB</p>
+                                            {formData.avatar && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setFormData({ ...formData, avatar: '' })}
+                                                    className="px-3 py-1 bg-red-50 text-red-650 hover:bg-red-100 hover:text-red-755 font-semibold text-xs rounded-lg border border-red-200 shadow-sm transition-all cursor-pointer"
+                                                >
+                                                    Xóa ảnh đại diện
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
 
@@ -350,8 +363,9 @@ export default function Profile() {
                                             </label>
                                             <input
                                                 type="tel" name="phone"
+                                                placeholder="Ví dụ: +84 123 456 789"
                                                 value={formData.phone} onChange={handleInputChange}
-                                                className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
+                                                className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-450 transition-all outline-none shadow-inner font-medium text-sm"
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -376,6 +390,10 @@ export default function Profile() {
 
                             {activeTab === 'professional' && (
                                 <form onSubmit={handleSaveProfile} className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                    <div className="bg-indigo-50 border border-indigo-150 rounded-xl p-4 text-xs text-indigo-800 leading-relaxed shadow-sm">
+                                        <span className="font-semibold block mb-1">💡 Tại sao cần cập nhật thông tin nghề nghiệp?</span>
+                                        Các thông tin Kỹ năng, Kinh nghiệm và Học vấn này sẽ được sử dụng làm cơ sở để AI hỗ trợ bạn chấm điểm CV, đề xuất khóa học phù hợp và tối ưu hóa câu hỏi phỏng vấn thử nghiệm. Hãy điền đầy đủ và chi tiết nhất có thể!
+                                    </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700">Kỹ năng (Cách nhau bằng dấu phẩy)</label>
                                         <input
@@ -389,7 +407,7 @@ export default function Profile() {
                                         <textarea
                                             name="experience" rows={4} placeholder="Mô tả kinh nghiệm của bạn..."
                                             value={formData.experience} onChange={handleInputChange}
-                                            className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
+                                            className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm resize-none"
                                         ></textarea>
                                     </div>
                                     <div className="space-y-2">
@@ -397,7 +415,7 @@ export default function Profile() {
                                         <textarea
                                             name="education" rows={3} placeholder="Trường đại học, chứng chỉ..."
                                             value={formData.education} onChange={handleInputChange}
-                                            className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
+                                            className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm resize-none"
                                         ></textarea>
                                     </div>
 
@@ -477,7 +495,7 @@ export default function Profile() {
                                         <textarea
                                             name="companyDescription" rows={5} placeholder="Giới thiệu về văn hóa, lĩnh vực hoạt động..."
                                             value={formData.companyDescription} onChange={handleInputChange}
-                                            className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
+                                            className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm resize-none"
                                         ></textarea>
                                     </div>
 
@@ -494,31 +512,58 @@ export default function Profile() {
                                     <div className="max-w-md space-y-5">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700">Mật khẩu hiện tại</label>
-                                            <input
-                                                type="password" name="oldPassword"
-                                                value={passwordData.oldPassword} onChange={handlePasswordChange}
-                                                className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
-                                                required
-                                            />
+                                            <div className="relative">
+                                                <input
+                                                    type={showOldPassword ? "text" : "password"} name="oldPassword"
+                                                    value={passwordData.oldPassword} onChange={handlePasswordChange}
+                                                    className="w-full px-4 py-2.5 pr-10 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
+                                                    required
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowOldPassword(!showOldPassword)}
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-450 hover:text-slate-600 transition-colors cursor-pointer"
+                                                >
+                                                    {showOldPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                                </button>
+                                            </div>
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700">Mật khẩu mới</label>
-                                            <input
-                                                type="password" name="newPassword" minLength={6}
-                                                value={passwordData.newPassword} onChange={handlePasswordChange}
-                                                className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
-                                                required
-                                            />
+                                            <div className="relative">
+                                                <input
+                                                    type={showNewPassword ? "text" : "password"} name="newPassword" minLength={6}
+                                                    value={passwordData.newPassword} onChange={handlePasswordChange}
+                                                    className="w-full px-4 py-2.5 pr-10 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
+                                                    required
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowNewPassword(!showNewPassword)}
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-450 hover:text-slate-600 transition-colors cursor-pointer"
+                                                >
+                                                    {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                                </button>
+                                            </div>
                                             <p className="text-xs text-slate-400 font-medium">Yêu cầu tối thiểu 6 ký tự.</p>
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700">Xác nhận mật khẩu mới</label>
-                                            <input
-                                                type="password" name="confirmPassword" minLength={6}
-                                                value={passwordData.confirmPassword} onChange={handlePasswordChange}
-                                                className="w-full px-4 py-2.5 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
-                                                required
-                                            />
+                                            <div className="relative">
+                                                <input
+                                                    type={showConfirmPassword ? "text" : "password"} name="confirmPassword" minLength={6}
+                                                    value={passwordData.confirmPassword} onChange={handlePasswordChange}
+                                                    className="w-full px-4 py-2.5 pr-10 bg-white/70 border border-slate-200/80 rounded-xl text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white placeholder:text-slate-400 transition-all outline-none shadow-inner font-medium text-sm"
+                                                    required
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-450 hover:text-slate-600 transition-colors cursor-pointer"
+                                                >
+                                                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                                </button>
+                                            </div>
                                         </div>
 
                                         <div className="pt-4">

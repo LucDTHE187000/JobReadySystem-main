@@ -91,7 +91,82 @@ export default function CreditShopPage() {
   const [verifyMessage, setVerifyMessage] = useState('');
   const [copiedField, setCopiedField] = useState('');
 
+  const [timeLeft, setTimeLeft] = useState(600);
+  const [timerExpired, setTimerExpired] = useState(false);
+  const timerRef = useRef(null);
+  const pollingRef = useRef(null);
+
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+  const clearTimers = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  useEffect(() => {
+    return () => clearTimers();
+  }, []);
+
+  useEffect(() => {
+    if (payment) {
+      setTimeLeft(600);
+      setTimerExpired(false);
+      clearTimers();
+
+      // Start countdown timer
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+            setTimerExpired(true);
+            setVerifyState('error');
+            setVerifyMessage('Mã QR thanh toán đã hết hạn. Vui lòng tạo mã QR mới.');
+            if (pollingRef.current) {
+              clearInterval(pollingRef.current);
+              pollingRef.current = null;
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      // Start automatic polling every 5 seconds
+      pollingRef.current = setInterval(async () => {
+        try {
+          const response = await axios.get(`${API_URL}/api/payment/verify/${payment.orderCode}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (response.data.success) {
+            clearTimers();
+            setVerifyState('success');
+            setVerifyMessage(`Thanh toán thành công! Bạn đã nhận ${response.data.creditAmount.toLocaleString()} credit.`);
+            if (refreshUser) await refreshUser();
+          }
+        } catch (error) {
+          console.error("Auto polling verification error:", error);
+        }
+      }, 5000);
+    } else {
+      clearTimers();
+    }
+
+    return () => clearTimers();
+  }, [payment]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -319,23 +394,41 @@ export default function CreditShopPage() {
                 </div>
 
                 {/* ─── QR IMAGE ─── */}
-                <div className="rounded-3xl bg-white p-6 flex items-center justify-center border border-slate-200 shadow-sm">
-                  {payment.qrCode ? (
-                    <QRCodeImage value={payment.qrCode} size={260} />
-                  ) : (
-                    // Fallback: không có qrCode → nhúng iframe checkout PayOS
-                    <div className="flex flex-col items-center gap-3 text-slate-400 py-8">
-                      <p className="text-sm">Không nhận được mã QR từ PayOS.</p>
-                      {payment.checkoutUrl && (
-                        <a
-                          href={payment.checkoutUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="rounded-2xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-700"
-                        >
-                          Mở trang thanh toán PayOS →
-                        </a>
-                      )}
+                <div className="rounded-3xl bg-white p-6 flex flex-col items-center justify-center border border-slate-200 shadow-sm relative overflow-hidden">
+                  <div className={`transition-all duration-300 ${timerExpired ? 'filter blur-md opacity-20 pointer-events-none' : ''}`}>
+                    {payment.qrCode ? (
+                      <QRCodeImage value={payment.qrCode} size={260} />
+                    ) : (
+                      // Fallback: không có qrCode → nhúng iframe checkout PayOS
+                      <div className="flex flex-col items-center gap-3 text-slate-400 py-8">
+                        <p className="text-sm">Không nhận được mã QR từ PayOS.</p>
+                        {payment.checkoutUrl && (
+                          <a
+                            href={payment.checkoutUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="rounded-2xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-700"
+                          >
+                            Mở trang thanh toán PayOS →
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {timerExpired && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-white/40 backdrop-blur-sm">
+                      <div className="bg-red-50 border border-red-200 rounded-2xl p-4 shadow-md max-w-xs">
+                        <p className="text-red-700 font-bold text-sm">Mã QR đã hết hạn</p>
+                        <p className="text-slate-500 text-xs mt-1">Vui lòng tạo mã QR mới để tiếp tục giao dịch.</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {!timerExpired && (
+                    <div className="mt-4 flex items-center gap-2 px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-full text-xs font-bold shadow-sm">
+                      <Clock3 className="h-3.5 w-3.5 animate-pulse" />
+                      <span>Hiệu lực QR còn lại: {formatTime(timeLeft)}</span>
                     </div>
                   )}
                 </div>

@@ -105,6 +105,104 @@ export default function Learning() {
         localStorage.setItem('completedLessons', JSON.stringify(updated));
     };
 
+    const levelWeight = { 'Advanced': 3, 'Intermediate': 2, 'Beginner': 1 };
+    const sortCoursesByLevel = (list) => {
+        return [...list].sort((a, b) => (levelWeight[b.level] || 0) - (levelWeight[a.level] || 0));
+    };
+
+    const renderCourseCard = (course) => {
+        const completedCount = (completedLessons[course._id] || []).length;
+        const isFinished = completedCount === course.lessonsCount;
+        return (
+            <div
+                key={course._id}
+                className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl overflow-hidden hover:bg-white hover:-translate-y-1 transition-all duration-300 flex flex-col group text-slate-800 shadow-md h-full"
+            >
+                {/* Gradient Header Thumbnail */}
+                <div 
+                    style={getGradientStyle(course.thumbnail)} 
+                    className="h-40 p-6 flex flex-col justify-between text-white relative"
+                >
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-xl group-hover:scale-110 transition-transform duration-500"></div>
+                    <div className="flex justify-between items-center z-10">
+                        <span className="text-[10px] bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-lg font-bold border border-white/10 uppercase tracking-wider text-white">
+                            {course.field === 'IT' ? 'Công nghệ & Code' :
+                             course.field === 'Sales' ? 'Kinh doanh & Sales' :
+                             course.field === 'Marketing' ? 'Marketing & Ads' :
+                             course.field === 'Finance' ? 'Tài chính & Đầu tư' :
+                             course.field === 'HR' ? 'Quản trị Nhân sự' : course.field}
+                        </span>
+                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase z-10 bg-white/25 backdrop-blur-md border border-white/10 text-white">
+                            {course.level === 'Beginner' ? 'Cơ bản' : 
+                             course.level === 'Intermediate' ? 'Trung cấp' : 
+                             course.level === 'Advanced' ? 'Nâng cao' : course.level}
+                        </span>
+                    </div>
+                    <div className="z-10">
+                        <h3 className="font-heading font-extrabold text-lg leading-snug line-clamp-2 drop-shadow-md text-white group-hover:text-[#F5C518] transition-colors duration-300">
+                            {course.title}
+                        </h3>
+                    </div>
+                </div>
+
+                {/* Description & Info */}
+                <div className="p-5 flex-1 flex flex-col justify-between bg-transparent">
+                    <div>
+                        <p className="text-slate-600 text-xs sm:text-sm line-clamp-3 mb-5 leading-relaxed">
+                            {course.description}
+                        </p>
+                        {/* Author */}
+                        <div className="flex items-center gap-2.5 mb-5">
+                            <div 
+                                style={getGradientStyle(course.thumbnail)} 
+                                className="w-9 h-9 rounded-full text-white flex items-center justify-center font-bold text-sm shadow-sm"
+                            >
+                                {course.instructor?.name?.charAt(0) || 'I'}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <p className="text-xs font-bold text-slate-800 truncate">{course.instructor?.name}</p>
+                                <p className="text-[10px] text-slate-500 truncate">{course.instructor?.title}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Details & Action */}
+                    <div className="border-t border-slate-200 pt-4 flex items-center justify-between">
+                        <div className="flex items-center gap-3 text-xs text-slate-500 font-medium">
+                            <span className="flex items-center gap-1">
+                                <Clock className="w-3.5 h-3.5 text-slate-400" />
+                                {course.duration}
+                            </span>
+                            <span className="flex items-center gap-1">
+                                <BookOpen className="w-3.5 h-3.5 text-slate-400" />
+                                {course.lessonsCount} bài
+                            </span>
+                        </div>
+                        {isFinished ? (
+                            <span className="text-xs text-emerald-700 font-bold flex items-center gap-1 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-lg shadow-sm">
+                                <CheckCircle className="w-3.5 h-3.5" /> Hoàn thành
+                            </span>
+                        ) : completedCount > 0 ? (
+                            <span className="text-xs text-[#F5C518] font-bold bg-slate-100 px-2 py-1 rounded-lg border border-slate-200 text-slate-700">
+                                Đang học ({completedCount}/{course.lessonsCount})
+                            </span>
+                        ) : null}
+                    </div>
+                </div>
+
+                {/* Play Button Action */}
+                <div className="px-5 pb-5 bg-transparent">
+                    <button
+                        onClick={() => handleSelectCourse(course._id)}
+                        className="w-full py-2.5 bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group-hover:bg-[#F5C518] group-hover:text-[#0A2463] group-hover:border-[#F5C518] hover:bg-[#F5C518] hover:text-[#0A2463] hover:shadow-md cursor-pointer"
+                    >
+                        <PlayCircle className="w-4 h-4" /> Bắt đầu học
+                    </button>
+                </div>
+            </div>
+        );
+    };
+
     const filteredCourses = activeCategory === 'all'
         ? courses
         : courses.filter(c => c.field === activeCategory);
@@ -147,11 +245,41 @@ export default function Learning() {
                         ))}
                     </div>
 
-                    {/* Courses grid */}
+                    {/* Courses catalog */}
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-3">
                             <Loader2 className="w-10 h-10 animate-spin text-[#0A2463]" />
                             <p className="text-sm text-slate-500 font-medium">Đang tải danh sách bài học...</p>
+                        </div>
+                    ) : activeCategory === 'all' ? (
+                        <div className="space-y-12">
+                            {CATEGORIES.filter(cat => cat.key !== 'all').map(cat => {
+                                const catCourses = courses.filter(c => c.field === cat.key);
+                                if (catCourses.length === 0) return null;
+                                const sortedCatCourses = sortCoursesByLevel(catCourses);
+                                return (
+                                    <div key={cat.key} className="space-y-4">
+                                        <div className="flex items-center justify-between border-b border-slate-200/80 pb-2">
+                                            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                                {cat.label}
+                                                <span className="text-xs font-semibold bg-slate-100/80 text-slate-500 px-2 py-0.5 rounded-full border border-slate-200">
+                                                    {catCourses.length} khóa học
+                                                </span>
+                                            </h3>
+                                        </div>
+                                        <div 
+                                            className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide snap-x snap-mandatory"
+                                            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                                        >
+                                            {sortedCatCourses.map(course => (
+                                                <div key={course._id} className="w-[300px] sm:w-[340px] flex-shrink-0 snap-start">
+                                                    {renderCourseCard(course)}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     ) : filteredCourses.length === 0 ? (
                         <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-12 text-center shadow-md text-slate-700">
@@ -161,98 +289,11 @@ export default function Learning() {
                         </div>
                     ) : (
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {filteredCourses.map(course => {
-                                const completedCount = (completedLessons[course._id] || []).length;
-                                const isFinished = completedCount === course.lessonsCount;
-                                return (
-                                    <div
-                                        key={course._id}
-                                        className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl overflow-hidden hover:bg-white hover:-translate-y-1 transition-all duration-300 flex flex-col group text-slate-800 shadow-md"
-                                    >
-                                        {/* Gradient Header Thumbnail */}
-                                        <div 
-                                            style={getGradientStyle(course.thumbnail)} 
-                                            className="h-40 p-6 flex flex-col justify-between text-white relative"
-                                        >
-                                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-xl group-hover:scale-110 transition-transform duration-500"></div>
-                                            <div className="flex justify-between items-center z-10">
-                                                <span className="text-[10px] bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-lg font-bold border border-white/10 uppercase tracking-wider text-white">
-                                                    {course.field === 'IT' ? 'Công nghệ & Code' :
-                                                     course.field === 'Sales' ? 'Kinh doanh & Sales' :
-                                                     course.field === 'Marketing' ? 'Marketing & Ads' :
-                                                     course.field === 'Finance' ? 'Tài chính & Đầu tư' :
-                                                     course.field === 'HR' ? 'Quản trị Nhân sự' : course.field}
-                                                </span>
-                                                <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase z-10 bg-white/25 backdrop-blur-md border border-white/10 text-white">
-                                                    {course.level === 'Beginner' ? 'Cơ bản' : 
-                                                     course.level === 'Intermediate' ? 'Trung cấp' : 
-                                                     course.level === 'Advanced' ? 'Nâng cao' : course.level}
-                                                </span>
-                                            </div>
-                                            <div className="z-10">
-                                                <h3 className="font-heading font-extrabold text-lg leading-snug line-clamp-2 drop-shadow-md text-white group-hover:text-[#F5C518] transition-colors duration-300">
-                                                    {course.title}
-                                                </h3>
-                                            </div>
-                                        </div>
-
-                                        {/* Description & Info */}
-                                        <div className="p-5 flex-1 flex flex-col justify-between bg-transparent">
-                                            <div>
-                                                <p className="text-slate-600 text-xs sm:text-sm line-clamp-3 mb-5 leading-relaxed">
-                                                    {course.description}
-                                                </p>
-                                                {/* Author */}
-                                                <div className="flex items-center gap-2.5 mb-5">
-                                                    <div 
-                                                        style={getGradientStyle(course.thumbnail)} 
-                                                        className="w-9 h-9 rounded-full text-white flex items-center justify-center font-bold text-sm shadow-sm"
-                                                    >
-                                                        {course.instructor?.name?.charAt(0) || 'I'}
-                                                    </div>
-                                                    <div className="min-w-0">
-                                                        <p className="text-xs font-bold text-slate-800 truncate">{course.instructor?.name}</p>
-                                                        <p className="text-[10px] text-slate-500 truncate">{course.instructor?.title}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Details & Action */}
-                                            <div className="border-t border-slate-200 pt-4 flex items-center justify-between">
-                                                <div className="flex items-center gap-3 text-xs text-slate-500 font-medium">
-                                                    <span className="flex items-center gap-1">
-                                                        <Clock className="w-3.5 h-3.5 text-slate-400" />
-                                                        {course.duration}
-                                                    </span>
-                                                    <span className="flex items-center gap-1">
-                                                        <BookOpen className="w-3.5 h-3.5 text-slate-400" />
-                                                        {course.lessonsCount} bài
-                                                    </span>
-                                                </div>
-                                                {isFinished ? (
-                                                    <span className="text-xs text-emerald-700 font-bold flex items-center gap-1 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-lg shadow-sm">
-                                                        <CheckCircle className="w-3.5 h-3.5" /> Hoàn thành
-                                                    </span>
-                                                ) : completedCount > 0 ? (
-                                                    <span className="text-xs text-[#F5C518] font-bold bg-slate-100 px-2 py-1 rounded-lg border border-slate-200 text-slate-700">
-                                                        Đang học ({completedCount}/{course.lessonsCount})
-                                                    </span>
-                                                ) : null}
-                                            </div>
-                                        </div>
-
-                                        {/* Play Button Action */}
-                                        <div className="px-5 pb-5 bg-transparent">
-                                            <button
-                                                onClick={() => handleSelectCourse(course._id)}
-                                                className="w-full py-2.5 bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group-hover:bg-[#F5C518] group-hover:text-[#0A2463] group-hover:border-[#F5C518] hover:bg-[#F5C518] hover:text-[#0A2463] hover:shadow-md"
-                                            >
-                                                <PlayCircle className="w-4 h-4" /> Bắt đầu học
-                                            </button>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                            {sortCoursesByLevel(filteredCourses).map(course => (
+                                <div key={course._id}>
+                                    {renderCourseCard(course)}
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>

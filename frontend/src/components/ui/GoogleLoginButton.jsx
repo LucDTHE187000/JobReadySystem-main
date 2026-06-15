@@ -25,7 +25,7 @@ export default function GoogleLoginButton({ role, onSuccessCallback }) {
         let script = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
         
         const initializeGoogleSignIn = () => {
-            if (window.google && buttonRef.current) {
+            if (window.google && window.google.accounts && window.google.accounts.id && buttonRef.current) {
                 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
                 if (!clientId) {
                     console.error("VITE_GOOGLE_CLIENT_ID is not configured in frontend .env");
@@ -33,46 +33,53 @@ export default function GoogleLoginButton({ role, onSuccessCallback }) {
                     return;
                 }
 
-                window.google.accounts.id.initialize({
-                    client_id: clientId,
-                    callback: async (response) => {
-                        setLoading(true);
-                        setError('');
-                        try {
-                            const result = await signInWithGoogle(response.credential, roleRef.current);
-                            if (result.error) {
-                                setError(result.error.message || 'Đăng nhập Google thất bại');
-                            } else {
-                                if (callbackRef.current) {
-                                    callbackRef.current(result.user);
+                try {
+                    window.google.accounts.id.initialize({
+                        client_id: clientId,
+                        callback: async (response) => {
+                            setLoading(true);
+                            setError('');
+                            try {
+                                const result = await signInWithGoogle(response.credential, roleRef.current);
+                                if (result.error) {
+                                    setError(result.error.message || 'Đăng nhập Google thất bại');
                                 } else {
-                                    // Default navigation logic
-                                    const userRole = result.user?.role;
-                                    if (userRole === 'ADMIN') navigate('/admin/dashboard', { replace: true });
-                                    else if (userRole === 'EMPLOYER') navigate('/dashboard', { replace: true });
-                                    else navigate('/', { replace: true });
+                                    if (callbackRef.current) {
+                                        callbackRef.current(result.user);
+                                    } else {
+                                        // Default navigation logic
+                                        const userRole = result.user?.role;
+                                        if (userRole === 'ADMIN') navigate('/admin/dashboard', { replace: true });
+                                        else if (userRole === 'EMPLOYER') navigate('/dashboard', { replace: true });
+                                        else navigate('/', { replace: true });
+                                    }
                                 }
+                            } catch (err) {
+                                console.error(err);
+                                setError('Đã xảy ra lỗi khi đăng nhập');
+                            } finally {
+                                setLoading(false);
                             }
-                        } catch (err) {
-                            console.error(err);
-                            setError('Đã xảy ra lỗi khi đăng nhập');
-                        } finally {
-                            setLoading(false);
                         }
-                    }
-                });
+                    });
 
-                window.google.accounts.id.renderButton(
-                    buttonRef.current,
-                    { 
-                        theme: 'outline', 
-                        size: 'large', 
-                        width: '320',
-                        text: 'signin_with',
-                        shape: 'pill',
-                        logo_alignment: 'left'
-                    }
-                );
+                    window.google.accounts.id.renderButton(
+                        buttonRef.current,
+                        { 
+                            theme: 'outline', 
+                            size: 'large', 
+                            width: '320',
+                            text: 'signin_with',
+                            shape: 'pill',
+                            logo_alignment: 'left'
+                        }
+                    );
+                } catch (err) {
+                    console.error("Google accounts initialization error:", err);
+                    setError("Trình duyệt hoặc tiện ích mở rộng chặn quảng cáo đã ngăn cản tải Google Login. Vui lòng tắt trình chặn quảng cáo và thử lại.");
+                }
+            } else if (window.google && (!window.google.accounts || !window.google.accounts.id)) {
+                setError("Trình duyệt hoặc tiện ích mở rộng chặn quảng cáo đã ngăn cản tải Google Login. Vui lòng tắt trình chặn quảng cáo và thử lại.");
             }
         };
 
