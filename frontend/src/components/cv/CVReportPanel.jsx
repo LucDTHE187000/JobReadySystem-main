@@ -136,11 +136,15 @@ export default function CVReportPanel({ analysis, fileName, onClose }) {
     const strengthsSource = (analysis.skillDetails && Array.isArray(analysis.skillDetails.strengths) && analysis.skillDetails.strengths.length > 0)
         ? analysis.skillDetails.strengths
         : (analysis.strengths || []);
+    const weaknessesSource = (analysis.skillDetails && Array.isArray(analysis.skillDetails.weaknesses) && analysis.skillDetails.weaknesses.length > 0)
+        ? analysis.skillDetails.weaknesses
+        : (analysis.weaknesses || []);
     const suggestionsSource = (analysis.skillDetails && Array.isArray(analysis.skillDetails.suggestions) && analysis.skillDetails.suggestions.length > 0)
         ? analysis.skillDetails.suggestions
         : (analysis.suggestions || []);
 
     const strengthsList = expandToCount(strengthsSource, [analysis.overallFeedback, analysis.rawPreview], 10);
+    const weaknessesList = expandToCount(weaknessesSource, [analysis.overallFeedback, analysis.rawPreview], 10);
     const suggestionsList = expandToCount(suggestionsSource, [analysis.overallFeedback, analysis.rawPreview], 10);
 
     return (
@@ -225,17 +229,27 @@ export default function CVReportPanel({ analysis, fileName, onClose }) {
                 </div>
             </div>
 
-            {(analysis.strengths?.length > 0 || analysis.suggestions?.length > 0) && (
-                <div className="grid md:grid-cols-2 gap-6">
-                    {strengthsList.length > 0 && (
-                        <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
-                            <h4 className="font-semibold text-green-700 mb-3">Điểm mạnh</h4>
-                            <ul className="space-y-2 text-sm text-slate-500">
-                                {strengthsList.map((s, i) => <li key={i}>✓ {s}</li>)}
-                            </ul>
-                        </div>
-                    )}
-                    {analysis.suggestions?.length > 0 && (
+            {(strengthsList.length > 0 || weaknessesList.length > 0 || suggestionsList.length > 0) && (
+                <div className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                        {strengthsList.length > 0 && (
+                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
+                                <h4 className="font-semibold text-green-700 mb-3">Điểm mạnh</h4>
+                                <ul className="space-y-2 text-sm text-slate-500">
+                                    {strengthsList.map((s, i) => <li key={i}>✓ {s}</li>)}
+                                </ul>
+                            </div>
+                        )}
+                        {weaknessesList.length > 0 && (
+                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
+                                <h4 className="font-semibold text-amber-700 mb-3">Điểm yếu</h4>
+                                <ul className="space-y-2 text-sm text-slate-500">
+                                    {weaknessesList.map((s, i) => <li key={i}>✗ {s}</li>)}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+                    {suggestionsList.length > 0 && (
                         <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
                             <h4 className="font-semibold text-slate-800 mb-3">Gợi ý cải thiện</h4>
                             <ul className="space-y-2 text-sm text-slate-500">

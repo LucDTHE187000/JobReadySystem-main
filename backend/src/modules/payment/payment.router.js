@@ -4,6 +4,7 @@ import { authMiddleware } from "../../middleware/auth.middleware.js";
 import { UserModel } from "../users/user.model.js";
 import { CreditPaymentModel } from "./creditPayment.model.js";
 import { addCredits } from "../../utils/credit.util.js";
+import { sendPaymentSuccessEmail } from "../../utils/email.util.js";
 
 const router = Router();
 
@@ -58,6 +59,22 @@ async function settlePayment(order, paymentData) {
       order.amountPaid = paymentData.amountPaid;
     }
     await order.save();
+
+    // Gửi email thông báo nạp credit thành công
+    try {
+      const user = await UserModel.findById(order.user);
+      if (user && user.email) {
+        await sendPaymentSuccessEmail(
+          user.email,
+          user.name || "User",
+          order.amount,
+          order.creditAmount,
+          String(order.payosOrderCode)
+        );
+      }
+    } catch (emailErr) {
+      console.error("Failed to send payment success email:", emailErr);
+    }
   }
 
   return order;

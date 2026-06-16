@@ -247,6 +247,33 @@ const responseText = completion.choices[0]?.message?.content;
     }
 
     /**
+     * Chat with history using Groq with retry
+     * @param {Array} messages - Array of message objects { role, content }
+     * @returns {Promise<String>} - Assistant response text
+     */
+    async chat(messages) {
+        return this.retryWithBackoff(async () => {
+            try {
+                const completion = await getGroqClient().chat.completions.create({
+                    messages: messages,
+                    model: 'llama-3.3-70b-versatile',
+                    temperature: 0.7,
+                    max_tokens: 1000,
+                });
+
+                const responseText = completion.choices[0]?.message?.content;
+                if (!responseText) {
+                    throw new Error('Groq API trả về response rỗng');
+                }
+                return responseText;
+            } catch (error) {
+                console.error('Groq chat error:', error.message);
+                throw new Error(`Không thể sinh câu trả lời: ${error.message}`);
+            }
+        });
+    }
+
+    /**
      * Helper: Parse JSON from response text
      * @param {String} text - Response text
      * @returns {Object|null} - Parsed JSON or null

@@ -36,6 +36,7 @@ import CandidateSearch from './pages/Job/CandidateSearch';
 import AdminDashboard from './pages/AdminDashboard';
 import WriteBlog from './pages/WriteBlog';
 import CursorFollower from './components/ui/CursorFollower';
+import ChatbotWidget from './components/ui/ChatbotWidget';
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
         <BrowserRouter>
           <ScrollToTop />
           <CursorFollower />
+          <ChatbotWidget />
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />

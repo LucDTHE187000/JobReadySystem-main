@@ -378,3 +378,123 @@ export const sendContactEmail = async (to, subject, body, recruiterName = "Recru
         return { success: false, error: error.message };
     }
 };
+
+/**
+ * Send payment success email
+ * @param {string} to - Recipient email
+ * @param {string} name - Recipient name
+ * @param {number} amountPaid - Paid amount in VND
+ * @param {number} creditsAdded - Added credits
+ * @param {string} orderCode - PayOS Order Code
+ * @returns {Promise<Object>} Send result
+ */
+export const sendPaymentSuccessEmail = async (to, name, amountPaid, creditsAdded, orderCode) => {
+    const hasResendConfig = !!process.env.RESEND_API_KEY;
+    const isDevModeOnly = process.env.EMAIL_DEV_MODE === "true" || !hasResendConfig;
+
+    if (isDevModeOnly) {
+        console.log("\n" + "=".repeat(60));
+        console.log("📧 [DEV MODE] Payment Success Email (Not sent - Development mode)");
+        console.log("=".repeat(60));
+        console.log(`To: ${to}`);
+        console.log(`Name: ${name}`);
+        console.log(`Order Code: ${orderCode}`);
+        console.log(`Amount: ${amountPaid.toLocaleString("vi-VN")} VND`);
+        console.log(`Credits Added: ${creditsAdded.toLocaleString("vi-VN")}`);
+        console.log("=".repeat(60) + "\n");
+        return { success: true, messageId: "dev-mode", devMode: true };
+    }
+
+    try {
+        const resendInstance = getResendInstance();
+        const sender = getSender();
+
+        const html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f6fb; margin: 0; padding: 0; }
+                    .container { max-width: 600px; margin: 30px auto; padding: 0; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; }
+                    .header { background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; padding: 40px 20px; text-align: center; }
+                    .header h1 { margin: 0; font-size: 28px; font-weight: bold; }
+                    .header p { margin: 10px 0 0 0; opacity: 0.9; font-size: 16px; }
+                    .content { padding: 40px; }
+                    .greeting { font-size: 18px; font-weight: bold; color: #111827; margin-bottom: 20px; }
+                    .info-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 25px 0; }
+                    .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; }
+                    .info-row:last-child { margin-bottom: 0; border-top: 1px solid #e5e7eb; padding-top: 12px; font-weight: bold; }
+                    .info-label { color: #6b7280; }
+                    .info-value { color: #111827; text-align: right; }
+                    .btn-container { text-align: center; margin-top: 30px; }
+                    .btn { display: inline-block; background-color: #10B981; color: white !important; font-weight: 600; text-decoration: none; padding: 12px 30px; border-radius: 8px; font-size: 15px; transition: background-color 0.2s; }
+                    .btn:hover { background-color: #059669; }
+                    .footer { text-align: center; padding: 25px; background-color: #f9fafb; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 12px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>Giao dịch thành công</h1>
+                        <p>Cảm ơn bạn đã đồng hành cùng JobReady!</p>
+                    </div>
+                    <div class="content">
+                        <div class="greeting">Xin chào ${name},</div>
+                        <p>Chúng tôi xin xác nhận rằng thanh toán của bạn cho đơn hàng <strong>#${orderCode}</strong> đã được thực hiện thành công. Tài khoản của bạn đã được cộng thêm credit tương ứng để tiếp tục trải nghiệm các tính năng AI xịn xò.</p>
+                        
+                        <div class="info-box">
+                            <div class="info-row">
+                                <span class="info-label">Mã đơn hàng:</span>
+                                <span class="info-value">#${orderCode}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Sản phẩm:</span>
+                                <span class="info-value">Nạp credit JobReady</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Số tiền thanh toán:</span>
+                                <span class="info-value">${amountPaid.toLocaleString("vi-VN")} VND</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Số credit được cộng:</span>
+                                <span class="info-value" style="color: #10B981; font-weight: bold;">+${creditsAdded.toLocaleString("vi-VN")} Credit</span>
+                            </div>
+                        </div>
+                        
+                        <p>Bây giờ bạn đã có thể bắt đầu sử dụng các tính năng như <strong>Chấm điểm CV bằng AI</strong>, <strong>Luyện tập Phỏng vấn AI</strong> và nhiều tính năng khác.</p>
+                        
+                        <div class="btn-container">
+                            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}" class="btn">Trải nghiệm ngay</a>
+                        </div>
+                    </div>
+                    <div class="footer">
+                        <p>© ${new Date().getFullYear()} JobReady System. Tất cả các quyền được bảo lưu.</p>
+                        <p>Email này được gửi tự động, vui lòng không phản hồi trực tiếp.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+
+        const mailOptions = {
+            from: `JobReady <${sender}>`,
+            to: to,
+            subject: `[JobReady] Nạp credit thành công - Đơn hàng #${orderCode}`,
+            html,
+            text: `Xin chào ${name},\n\nChúng tôi xác nhận đơn hàng #${orderCode} đã thanh toán thành công.\nSố tiền: ${amountPaid.toLocaleString("vi-VN")} VND.\nSố credit đã cộng: +${creditsAdded.toLocaleString("vi-VN")} Credit.\n\nCảm ơn bạn đã tin dùng JobReady!\nJobReady System.`
+        };
+
+        const { data, error } = await resendInstance.emails.send(mailOptions);
+        
+        if (error) {
+            throw new Error(error.message || JSON.stringify(error));
+        }
+
+        console.log(`📬 Payment success email sent to ${to}. ID: ${data.id}`);
+        return { success: true, messageId: data.id };
+    } catch (error) {
+        console.error("❌ Error sending payment success email:", error.message);
+        return { success: false, error: error.message };
+    }
+};
