@@ -170,7 +170,7 @@ export default function ChatbotWidget() {
     'Làm sao để CV nổi bật chuẩn ATS?',
     'Mẹo phỏng vấn hành vi (STAR)?',
     'Lộ trình trở thành React Developer?',
-    'Cách nhận credit miễn phí?',
+    'Xu hướng tuyển dụng nghề nghiệp 2026'
   ];
 
   return (
