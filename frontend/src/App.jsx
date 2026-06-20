@@ -30,7 +30,6 @@ import InterviewResult from './pages/InterviewResult';
 import InterviewHistory from './pages/InterviewHistory';
 import InterviewAnalytics from './pages/InterviewAnalytics';
 import Feedback from './pages/Feedback';
-import FeedbackReview from './pages/FeedbackReview';
 import Learning from './pages/Learning';
 import CandidateSearch from './pages/Job/CandidateSearch';
 import AdminDashboard from './pages/AdminDashboard';
@@ -110,9 +109,6 @@ function App() {
             } />
             <Route path="/write-blog" element={
               <JobSeekerRoute><WriteBlog /></JobSeekerRoute>
-            } />
-            <Route path="/employer/feedback" element={
-              <EmployerRoute><FeedbackReview /></EmployerRoute>
             } />
             <Route path="/interview/:sessionId" element={
               <JobSeekerRoute><InterviewSession /></JobSeekerRoute>

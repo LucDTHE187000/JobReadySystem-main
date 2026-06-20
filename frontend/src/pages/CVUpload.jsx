@@ -604,7 +604,7 @@ export default function CVUpload() {
         <SeekerLayout breadcrumb="Activity Hub › Chấm CV" title={showAnalysis ? '' : 'Chấm & phân tích CV'}>
             {!showAnalysis && (
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 -mt-4">
-                    <p className="text-slate-700 font-semibold">Phân tích ATS, kỹ năng và mở khóa luyện phỏng vấn AI (500 credit/lần)</p>
+                    <p className="text-slate-700 font-medium text-sm sm:text-base">Hệ thống AI tự động đánh giá độ tương thích ATS, đề xuất cải thiện kỹ năng.</p>
                     
                     {/* Tabs Selector */}
                     <div className="flex bg-slate-200/50 p-1 rounded-xl border border-slate-300/60 self-start sm:self-auto shadow-sm">
@@ -720,34 +720,45 @@ export default function CVUpload() {
                                 </div>
                             </div>
 
-                            {/* Features - 1 column */}
-                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-3xl p-8 shadow-lg text-slate-800">
-                                <h3 className="font-bold text-[#0A2463] mb-4 flex items-center gap-2 text-lg">
-                                    <CheckCircle className="w-5 h-5 text-emerald-400" />
-                                    Tính Năng
-                                </h3>
-                                <ul className="space-y-3.5 text-sm text-slate-600">
-                                    <li className="flex items-center gap-2.5">
-                                        <Sparkles className="w-4 h-4 text-orange-400 flex-shrink-0" />
-                                        <span>Upload nhiều CV cùng lúc</span>
-                                    </li>
-                                    <li className="flex items-center gap-2.5">
-                                        <BarChart3 className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                                        <span>Đánh giá chi tiết theo tiêu chí</span>
-                                    </li>
-                                    <li className="flex items-center gap-2.5">
-                                        <Target className="w-4 h-4 text-red-400 flex-shrink-0" />
-                                        <span>Gợi ý cụ thể cải thiện</span>
-                                    </li>
-                                    <li className="flex items-center gap-2.5">
-                                        <Zap className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                                        <span>Phân tích AI 3-5 giây</span>
-                                    </li>
-                                    <li className="flex items-center gap-2.5">
-                                        <TrendingUp className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                                        <span>So sánh điểm các CV</span>
-                                    </li>
-                                </ul>
+                            {/* Features & Cost - 1 column */}
+                            <div className="space-y-6">
+                                <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-3xl p-6 text-slate-800 shadow-md">
+                                    <p className="text-xs uppercase text-slate-500 mb-1 font-semibold">Chi phí phân tích</p>
+                                    <p className="text-3xl font-bold text-[#0A2463]">500 credit / lần</p>
+                                    <p className="text-sm text-slate-500 mt-2">Số dư: <span className="text-[#0A2463] font-bold">{(user?.credits ?? 0).toLocaleString('vi-VN')}</span></p>
+                                    {(user?.credits ?? 0) < 500 && (
+                                        <p className="text-red-650 text-xs mt-2 font-bold">Không đủ credit — hãy nạp thêm tại Pricing.</p>
+                                    )}
+                                </div>
+
+                                <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-3xl p-8 shadow-lg text-slate-800">
+                                    <h3 className="font-bold text-[#0A2463] mb-4 flex items-center gap-2 text-lg">
+                                        <CheckCircle className="w-5 h-5 text-emerald-400" />
+                                        Tính Năng
+                                    </h3>
+                                    <ul className="space-y-3.5 text-sm text-slate-600">
+                                        <li className="flex items-center gap-2.5">
+                                            <Sparkles className="w-4 h-4 text-orange-400 flex-shrink-0" />
+                                            <span>Upload nhiều CV cùng lúc</span>
+                                        </li>
+                                        <li className="flex items-center gap-2.5">
+                                            <BarChart3 className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                                            <span>Đánh giá chi tiết theo tiêu chí</span>
+                                        </li>
+                                        <li className="flex items-center gap-2.5">
+                                            <Target className="w-4 h-4 text-red-400 flex-shrink-0" />
+                                            <span>Gợi ý cụ thể cải thiện</span>
+                                        </li>
+                                        <li className="flex items-center gap-2.5">
+                                            <Zap className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                                            <span>Phân tích AI 3-5 giây</span>
+                                        </li>
+                                        <li className="flex items-center gap-2.5">
+                                            <TrendingUp className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                                            <span>So sánh điểm các CV</span>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
 

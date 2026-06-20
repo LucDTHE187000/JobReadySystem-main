@@ -23,10 +23,17 @@ export default function Footer({ theme = 'light' }) {
                             Nâng cao kỹ năng phỏng vấn cùng AI — tự tin chinh phục mọi nhà tuyển dụng.
                         </p>
                         <div className="flex gap-2">
-                            {[Facebook, Linkedin, Twitter, Instagram].map((Icon, i) => (
+                            {[
+                                { Icon: Facebook, href: "https://www.facebook.com/profile.php?id=61590049576099" },
+                                { Icon: Linkedin, href: "#" },
+                                { Icon: Twitter, href: "#" },
+                                { Icon: Instagram, href: "#" }
+                            ].map(({ Icon, href }, i) => (
                                 <a 
                                     key={i} 
-                                    href="#" 
+                                    href={href}
+                                    target={href !== "#" ? "_blank" : undefined}
+                                    rel={href !== "#" ? "noopener noreferrer" : undefined}
                                     className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
                                         isDark 
                                             ? 'bg-white/5 text-white/40 hover:text-[#F5C518]'

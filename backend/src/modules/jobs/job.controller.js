@@ -9,6 +9,18 @@ import { UserModel } from "../users/user.model.js";
 /* ========================= */
 const createJob = async (req, res) => {
   try {
+    // 🔥 Kiểm tra xem tài khoản nhà tuyển dụng đã được Admin phê duyệt chưa
+    const userObj = await UserModel.findById(req.user.userId);
+    if (!userObj) {
+      return res.status(404).json({ message: "Không tìm thấy thông tin tài khoản tuyển dụng." });
+    }
+
+    if (userObj.role === "EMPLOYER" && !userObj.isApproved) {
+      return res.status(403).json({
+        message: "Tài khoản của bạn chưa được Admin phê duyệt. Vui lòng liên hệ Admin hoặc đợi duyệt thông tin doanh nghiệp trước khi đăng tin tuyển dụng.",
+      });
+    }
+
     const job = await Job.create({
       ...req.body,
       recruiterId: req.user.userId, // lấy từ middleware

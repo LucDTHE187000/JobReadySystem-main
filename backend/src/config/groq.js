@@ -234,7 +234,7 @@ class GroqService {
                     max_tokens: 1000,
                 });
 
-const responseText = completion.choices[0]?.message?.content;
+                const responseText = completion.choices[0]?.message?.content;
                 if (!responseText) {
                     throw new Error('Groq API trả về response rỗng');
                 }
@@ -242,6 +242,35 @@ const responseText = completion.choices[0]?.message?.content;
             } catch (error) {
                 console.error('Groq generateWithPrompt error:', error.message);
                 throw new Error(`Không thể sinh response: ${error.message}`);
+            }
+        });
+    }
+
+    /**
+     * Fast safety classifier using a smaller model (llama-3.1-8b-instant)
+     */
+    async classifySafety(prompt) {
+        return this.retryWithBackoff(async () => {
+            try {
+                const completion = await getGroqClient().chat.completions.create({
+                    messages: [
+                        {
+                            role: 'user',
+                            content: prompt,
+                        },
+                    ],
+                    model: 'llama-3.1-8b-instant',
+                    temperature: 0.0,
+                    max_tokens: 60,
+                });
+                const responseText = completion.choices[0]?.message?.content;
+                if (!responseText) {
+                    throw new Error('Groq API safety classification returned empty response');
+                }
+                return responseText;
+            } catch (error) {
+                console.warn('Groq classifySafety error, falling back to 70B versatile:', error.message);
+                return this.generateWithPrompt(prompt);
             }
         });
     }

@@ -36,6 +36,14 @@ const JobSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    externalUrl: {
+      type: String,
+      default: "",
+    },
+    sourcePlatform: {
+      type: String,
+      default: "JobReady",
+    },
 
     status: {
       type: String,

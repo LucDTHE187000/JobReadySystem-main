@@ -1,71 +1,116 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { MessageSquare, X, Send, Sparkles, Trash2, ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
-// A simple and robust Markdown formatter to display bold, code, and bullet lists beautifully
-const formatMessageContent = (text) => {
-  if (!text) return '';
-  
-  // Replace newlines with <br /> and split into sections
-  const lines = text.split('\n');
-  
-  return lines.map((line, idx) => {
-    let formattedLine = line;
-    
-    // Handle separator lines like ===, ---, ***
-    if (/^[=\-*_]{3,}$/.test(line.trim())) {
-      return <hr key={idx} className="border-slate-800/60 my-2.5" />;
-    }
-    
-    // 1. Handle lists
-    const listMatch = line.match(/^(\s*)[-*+]\s+(.*)/);
-    const numListMatch = line.match(/^(\s*)\d+\.\s+(.*)/);
-    
-    // 2. Format bold text (**bold**)
-    const formatBold = (str) => {
-      const parts = str.split('**');
-      return parts.map((part, i) => i % 2 === 1 ? <strong key={i} className="font-bold text-emerald-400">{part}</strong> : part);
-    };
-
-    // 3. Format inline code (`code`)
-    const formatCode = (str) => {
-      const parts = str.split('`');
-      return parts.map((part, i) => i % 2 === 1 ? <code key={i} className="bg-slate-900 px-1.5 py-0.5 rounded text-rose-400 font-mono text-[11px]">{part}</code> : formatBold(part));
-    };
-
-    if (listMatch) {
-      return (
-        <li key={idx} className="list-disc ml-4 mb-1 text-slate-200 text-xs sm:text-xs select-text" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-          {formatCode(listMatch[2])}
-        </li>
-      );
-    }
-    
-    if (numListMatch) {
-      return (
-        <li key={idx} className="list-decimal ml-4 mb-1 text-slate-200 text-xs sm:text-xs select-text" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-          {formatCode(numListMatch[2])}
-        </li>
-      );
-    }
-
-    if (line.trim() === '') {
-      return <div key={idx} className="h-1.5" />;
-    }
-
-    return (
-      <p key={idx} className="mb-1.5 leading-relaxed text-slate-200 text-xs sm:text-xs select-text" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-        {formatCode(line)}
-      </p>
-    );
-  });
-};
-
 export default function ChatbotWidget() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  // A simple and robust Markdown formatter to display bold, code, bullet lists, and links beautifully
+  const formatMessageContent = (text) => {
+    if (!text) return '';
+    
+    // Replace newlines with <br /> and split into sections
+    const lines = text.split('\n');
+    
+    return lines.map((line, idx) => {
+      // Handle separator lines like ===, ---, ***
+      if (/^[=\-*_]{3,}$/.test(line.trim())) {
+        return <hr key={idx} className="border-slate-800/60 my-2.5" />;
+      }
+      
+      // 1. Handle lists
+      const listMatch = line.match(/^(\s*)[-*+]\s+(.*)/);
+      const numListMatch = line.match(/^(\s*)\d+\.\s+(.*)/);
+      
+      // 2. Format bold text (**bold**)
+      const formatBold = (str) => {
+        const parts = str.split('**');
+        return parts.map((part, i) => i % 2 === 1 ? <strong key={i} className="font-bold text-emerald-400">{part}</strong> : part);
+      };
+
+      // 3. Format inline code (`code`)
+      const formatCode = (str) => {
+        const parts = str.split('`');
+        return parts.map((part, i) => i % 2 === 1 ? <code key={i} className="bg-slate-900 px-1.5 py-0.5 rounded text-rose-400 font-mono text-[11px]">{part}</code> : formatBold(part));
+      };
+
+      // 4. Format markdown links: [Text](Url)
+      const formatLinks = (str) => {
+        if (!str) return '';
+        const linkRegex = /(\[[^\]]+\]\([^)]+\))/g;
+        const parts = str.split(linkRegex);
+        return parts.map((part, i) => {
+          const match = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+          if (match) {
+            const textContent = match[1];
+            const url = match[2];
+            const isExternal = url.startsWith('http://') || url.startsWith('https://');
+            
+            if (isExternal) {
+              return (
+                <a 
+                  key={i} 
+                  href={url} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-emerald-400 hover:text-emerald-300 underline font-semibold transition-colors decoration-dotted"
+                >
+                  {textContent}
+                </a>
+              );
+            } else {
+              return (
+                <button 
+                  key={i}
+                  type="button"
+                  onClick={() => {
+                    navigate(url);
+                  }}
+                  className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 px-1.5 py-0.5 rounded underline font-semibold transition-all inline-block align-baseline text-left border-0 bg-transparent cursor-pointer decoration-dotted"
+                  style={{ padding: '2px 4px', margin: '0 2px' }}
+                >
+                  {textContent}
+                </button>
+              );
+            }
+          }
+          return formatCode(part);
+        });
+      };
+
+      if (listMatch) {
+        return (
+          <li key={idx} className="list-disc ml-4 mb-1 text-slate-200 text-xs sm:text-xs select-text" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+            {formatLinks(listMatch[2])}
+          </li>
+        );
+      }
+      
+      if (numListMatch) {
+        return (
+          <li key={idx} className="list-decimal ml-4 mb-1 text-slate-200 text-xs sm:text-xs select-text" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+            {formatLinks(numListMatch[2])}
+          </li>
+        );
+      }
+
+      if (line.trim() === '') {
+        return <div key={idx} className="h-1.5" />;
+      }
+
+      return (
+        <p key={idx} className="mb-1.5 leading-relaxed text-slate-200 text-xs sm:text-xs select-text" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+          {formatLinks(line)}
+        </p>
+      );
+    });
+  };
+
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   
@@ -136,10 +181,16 @@ export default function ChatbotWidget() {
     setIsLoading(true);
 
     try {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const headers = {};
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
       const response = await axios.post(`${API_URL}/api/chat`, {
         message: activeText,
         history: history,
-      });
+      }, { headers });
 
       if (response.data && response.data.success) {
         const assistantMessage = { role: 'assistant', content: response.data.response };

@@ -18,6 +18,7 @@ import {
     MessageSquare,
     ChevronRight,
     Search,
+    AlertCircle,
     Image as ImageIcon
 } from 'lucide-react';
 import SideBar from "../components/SideBar";
@@ -357,8 +358,21 @@ export default function Dashboard() {
                         </div>
                     </header>
 
-                    <div className="p-4 lg:p-8">
-                        <div className="mb-8 bg-white/60 backdrop-blur-md p-6 rounded-2xl border border-white/50 shadow-xl shadow-slate-900/5 inline-block">
+                    <div className="p-4 lg:p-8 space-y-6">
+                        {user?.role === "EMPLOYER" && !user?.isApproved && (
+                            <div className="p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl flex items-start gap-3 shadow-sm">
+                                <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                                <div>
+                                    <h4 className="font-bold text-sm">Tài khoản tuyển dụng chưa được kiểm duyệt</h4>
+                                    <p className="text-xs text-amber-700 mt-1 font-medium leading-relaxed">
+                                        Doanh nghiệp của bạn hiện đang chờ Admin xác thực thông tin (tra cứu công ty, kiểm duyệt giấy phép kinh doanh...). 
+                                        Bạn có thể xem trước các tính năng, nhưng sẽ chưa thể đăng tin tuyển dụng mới lên hệ thống.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="bg-white/60 backdrop-blur-md p-6 rounded-2xl border border-white/50 shadow-xl shadow-slate-900/5 inline-block w-full sm:w-auto">
                             <h1 className="text-2xl lg:text-3xl text-slate-800 font-bold tracking-tight mb-1">CHÀO MỪNG TRỞ LẠI!</h1>
                             <p className="text-sm text-slate-600 font-medium">Hôm nay có 45 ứng viên mới đang chờ bạn xem xét</p>
                         </div>

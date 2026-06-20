@@ -498,3 +498,231 @@ export const sendPaymentSuccessEmail = async (to, name, amountPaid, creditsAdded
         return { success: false, error: error.message };
     }
 };
+
+/**
+ * Send feedback confirmation email to the user
+ * @param {string} toEmail - Recipient email
+ * @param {string} userName - Recipient name
+ * @param {Object} feedbackDetails - { type, subject, message, rating, checkedOptions }
+ * @returns {Promise<Object>} Send result
+ */
+export const sendFeedbackConfirmationEmail = async (toEmail, userName, feedbackDetails) => {
+    const { type, subject, message, rating, checkedOptions } = feedbackDetails;
+    const hasResendConfig = !!process.env.RESEND_API_KEY;
+    const isDevModeOnly = process.env.EMAIL_DEV_MODE === "true" || !hasResendConfig;
+
+    if (isDevModeOnly) {
+        console.log("\n" + "=".repeat(60));
+        console.log("📧 [DEV MODE] Feedback Confirmation Email (Not sent - Development mode)");
+        console.log("=".repeat(60));
+        console.log(`To: ${toEmail}`);
+        console.log(`User: ${userName}`);
+        console.log(`Type: ${type}`);
+        console.log(`Subject: ${subject}`);
+        console.log(`Rating: ${rating || 'N/A'}`);
+        console.log(`Checked options: ${checkedOptions ? checkedOptions.join(', ') : 'None'}`);
+        console.log(`Message: ${message}`);
+        console.log("=".repeat(60) + "\n");
+        return { success: true, messageId: "dev-mode", devMode: true };
+    }
+
+    try {
+        const resendInstance = getResendInstance();
+        const sender = getSender();
+
+        const optionsHtml = (checkedOptions && checkedOptions.length > 0)
+            ? `<div style="margin: 15px 0; padding: 12px; background: #f0f4f8; border-radius: 8px;">
+                <strong>Chi tiết đã chọn:</strong>
+                <ul style="margin: 5px 0 0 0; padding-left: 20px;">
+                    ${checkedOptions.map(o => `<li>${o}</li>`).join('')}
+                </ul>
+               </div>`
+            : '';
+
+        const ratingHtml = rating 
+            ? `<p><strong>Đánh giá của bạn:</strong> ${rating} / 5 ⭐</p>`
+            : '';
+
+        const html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f6fb; margin: 0; padding: 0; }
+                    .container { max-width: 600px; margin: 30px auto; padding: 0; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; }
+                    .header { background: linear-gradient(135deg, #0A2463 0%, #1e40af 100%); color: white; padding: 40px 20px; text-align: center; }
+                    .header h1 { margin: 0; font-size: 26px; font-weight: bold; }
+                    .content { padding: 40px; }
+                    .greeting { font-size: 18px; font-weight: bold; color: #111827; margin-bottom: 20px; }
+                    .message-box { background: #f9fafb; border: 1px solid #e5e7eb; border-left: 4px solid #F5C518; border-radius: 8px; padding: 16px; font-size: 14px; color: #111827; margin: 20px 0; white-space: pre-wrap; }
+                    .footer { text-align: center; padding: 25px; background-color: #f9fafb; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 12px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>Cảm ơn phản hồi của bạn</h1>
+                    </div>
+                    <div class="content">
+                        <div class="greeting">Xin chào ${userName},</div>
+                        <p>JobReady đã nhận được phản hồi loại <strong>${type}</strong> của bạn với tiêu đề: <strong>${subject}</strong>.</p>
+                        
+                        ${ratingHtml}
+                        ${optionsHtml}
+                        
+                        <p><strong>Nội dung ý kiến bạn đã gửi:</strong></p>
+                        <div class="message-box">${message}</div>
+                        
+                        <p>Chúng tôi luôn lắng nghe ý kiến đóng góp từ người dùng để không ngừng nâng cao chất lượng dịch vụ. Đội ngũ kỹ thuật của JobReady sẽ xem xét phản hồi này trong thời gian sớm nhất.</p>
+                    </div>
+                    <div class="footer">
+                        <p>© ${new Date().getFullYear()} JobReady System. Tất cả các quyền được bảo lưu.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+
+        const mailOptions = {
+            from: `JobReady <${sender}>`,
+            to: toEmail,
+            subject: `[JobReady] Xác nhận đã nhận phản hồi của bạn - ${type}`,
+            html
+        };
+
+        const { data, error } = await resendInstance.emails.send(mailOptions);
+        if (error) {
+            throw new Error(error.message || JSON.stringify(error));
+        }
+
+        console.log(`📬 Feedback confirmation email sent to ${toEmail}. ID: ${data.id}`);
+        return { success: true, messageId: data.id };
+    } catch (error) {
+        console.error("❌ Error sending feedback confirmation email:", error.message);
+        return { success: false, error: error.message };
+    }
+};
+
+/**
+ * Send feedback notification email to Admin inbox
+ * @param {string} userEmail - Submitter email
+ * @param {string} userName - Submitter name
+ * @param {Object} feedbackDetails - { type, subject, message, rating, checkedOptions }
+ * @returns {Promise<Object>} Send result
+ */
+export const sendAdminFeedbackNotificationEmail = async (userEmail, userName, feedbackDetails) => {
+    const adminEmail = process.env.EMAIL_USER || process.env.RESEND_SENDER;
+    const { type, subject, message, rating, checkedOptions } = feedbackDetails;
+    const hasResendConfig = !!process.env.RESEND_API_KEY;
+    const isDevModeOnly = process.env.EMAIL_DEV_MODE === "true" || !hasResendConfig;
+
+    if (isDevModeOnly) {
+        console.log("\n" + "=".repeat(60));
+        console.log("📧 [DEV MODE] Admin Feedback Notification Email (Not sent - Development mode)");
+        console.log("=".repeat(60));
+        console.log(`To: ${adminEmail}`);
+        console.log(`Submitter: ${userName} <${userEmail}>`);
+        console.log(`Type: ${type}`);
+        console.log(`Subject: ${subject}`);
+        console.log(`Rating: ${rating || 'N/A'}`);
+        console.log(`Checked options: ${checkedOptions ? checkedOptions.join(', ') : 'None'}`);
+        console.log(`Message: ${message}`);
+        console.log("=".repeat(60) + "\n");
+        return { success: true, messageId: "dev-mode", devMode: true };
+    }
+
+    try {
+        const resendInstance = getResendInstance();
+        const sender = getSender();
+
+        const optionsHtml = (checkedOptions && checkedOptions.length > 0)
+            ? `<div style="margin-bottom: 20px;">
+                <div style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; margin-bottom: 6px;">Vấn đề / Góp ý đã chọn</div>
+                <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px;">
+                    <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #111827;">
+                        ${checkedOptions.map(o => `<li>${o}</li>`).join('')}
+                    </ul>
+                </div>
+               </div>`
+            : '';
+
+        const ratingHtml = rating 
+            ? `<div style="margin-bottom: 20px;">
+                <div style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; margin-bottom: 6px;">Đánh giá</div>
+                <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px; font-size: 14px; color: #111827;">
+                    ${rating} / 5 ⭐
+                </div>
+               </div>`
+            : '';
+
+        const html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; margin: 0; padding: 0; }
+                    .wrapper { max-width: 600px; margin: 30px auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+                    .header { background: linear-gradient(135deg, #0A2463 0%, #1e40af 100%); color: white; padding: 32px 30px; text-align: center; }
+                    .header h1 { margin: 0; font-size: 22px; font-weight: 700; }
+                    .header p { margin: 8px 0 0; font-size: 13px; opacity: 0.8; }
+                    .badge { display: inline-block; background: rgba(245,197,24,0.2); border: 1px solid rgba(245,197,24,0.5); color: #F5C518; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+                    .content { padding: 30px; }
+                    .field { margin-bottom: 20px; }
+                    .field-label { font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; margin-bottom: 6px; }
+                    .field-value { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px; font-size: 14px; color: #111827; }
+                    .message-box { background: #f9fafb; border: 1px solid #e5e7eb; border-left: 4px solid #F5C518; border-radius: 8px; padding: 16px; font-size: 14px; color: #111827; white-space: pre-wrap; line-height: 1.7; }
+                    .footer { background: #f9fafb; padding: 20px 30px; text-align: center; border-top: 1px solid #e5e7eb; font-size: 12px; color: #9ca3af; }
+                </style>
+            </head>
+            <body>
+                <div class="wrapper">
+                    <div class="header">
+                        <div class="badge">📢 Feedback Mới (${type})</div>
+                        <h1>JobReady – Thông báo Feedback</h1>
+                        <p>Hệ thống vừa nhận được phản hồi mới từ người dùng</p>
+                    </div>
+                    <div class="content">
+                        <div class="field">
+                            <div class="field-label">Người gửi</div>
+                            <div class="field-value">${userName} (${userEmail})</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Tiêu đề</div>
+                            <div class="field-value">${subject}</div>
+                        </div>
+                        ${ratingHtml}
+                        ${optionsHtml}
+                        <div class="field">
+                            <div class="field-label">Nội dung chi tiết</div>
+                            <div class="message-box">${message}</div>
+                        </div>
+                    </div>
+                    <div class="footer">
+                        <p>© ${new Date().getFullYear()} JobReady System. Tất cả các quyền được bảo lưu.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+
+        const mailOptions = {
+            from: `JobReady <${sender}>`,
+            to: adminEmail,
+            subject: `[JobReady-Admin] Feedback mới từ người dùng - ${type}`,
+            html
+        };
+
+        const { data, error } = await resendInstance.emails.send(mailOptions);
+        if (error) {
+            throw new Error(error.message || JSON.stringify(error));
+        }
+
+        console.log(`📬 Admin feedback notification email sent to ${adminEmail}. ID: ${data.id}`);
+        return { success: true, messageId: data.id };
+    } catch (error) {
+        console.error("❌ Error sending admin feedback notification email:", error.message);
+        return { success: false, error: error.message };
+    }
+};

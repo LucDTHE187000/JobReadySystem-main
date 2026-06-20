@@ -23,6 +23,8 @@ function CreateJob() {
     currency: "VND",
     city: "",
     isPremium: false,
+    externalUrl: "",
+    sourcePlatform: "JobReady",
   });
 
   useEffect(() => {
@@ -52,6 +54,8 @@ function CreateJob() {
               currency: job.salary?.currency || "VND",
               city: job.location?.city || "",
               isPremium: job.isPremium || false,
+              externalUrl: job.externalUrl || "",
+              sourcePlatform: job.sourcePlatform || "JobReady",
             });
           }
         } catch (err) {
@@ -96,6 +100,8 @@ function CreateJob() {
         country: "Vietnam",
       },
       isPremium: form.isPremium,
+      externalUrl: form.externalUrl,
+      sourcePlatform: form.sourcePlatform,
     };
 
     try {
@@ -236,6 +242,25 @@ function CreateJob() {
                 value={form.city}
                 onChange={handleChange}
               />
+            </Section>
+
+            <Section title="Thông tin tuyển dụng ngoài (Không bắt buộc)">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  label="Link ứng tuyển bên thứ 3 (ví dụ: TopCV, LinkedIn...)"
+                  name="externalUrl"
+                  placeholder="https://www.topcv.vn/..."
+                  value={form.externalUrl}
+                  onChange={handleChange}
+                />
+                <Input
+                  label="Tên nguồn / nền tảng tuyển dụng"
+                  name="sourcePlatform"
+                  placeholder="Ví dụ: TopCV, VietnamWorks, LinkedIn"
+                  value={form.sourcePlatform}
+                  onChange={handleChange}
+                />
+              </div>
             </Section>
 
             <div className="flex justify-end gap-3">

@@ -61,9 +61,11 @@ function CompanyLogo({ company, avatar, size = 'lg' }) {
 function ApplyModal({ job, user, onClose, onSuccess }) {
     const navigate = useNavigate();
     const backdropRef = useRef(null);
+    const fileInputRef = useRef(null);
 
     const [cvInfo, setCvInfo] = useState(null);
     const [cvLoading, setCvLoading] = useState(true);
+    const [uploadingCv, setUploadingCv] = useState(false);
     const [coverLetter, setCoverLetter] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [step, setStep] = useState('form');
@@ -80,13 +82,77 @@ function ApplyModal({ job, user, onClose, onSuccess }) {
 
     useEffect(() => {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (!token) {
+            setCvLoading(false);
+            return;
+        }
         axios.get(`${API_URL}/api/cv/my-cv`, {
             headers: { Authorization: `Bearer ${token}` }
         })
-            .then(res => setCvInfo(res.data))
+            .then(res => {
+                if (res.data && res.data.hasCVs && res.data.cvs.length > 0) {
+                    const latest = res.data.cvs[res.data.cvs.length - 1];
+                    setCvInfo({
+                        resumeUrl: latest.filePath,
+                        fileName: latest.fileName
+                    });
+                } else if (user?.resume) {
+                    setCvInfo({
+                        resumeUrl: user.resume,
+                        fileName: 'CV của tôi'
+                    });
+                } else {
+                    setCvInfo(null);
+                }
+            })
             .catch(() => setCvInfo(null))
             .finally(() => setCvLoading(false));
-    }, []);
+    }, [user]);
+
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.type !== 'application/pdf') {
+            setErrorMsg('Chỉ chấp nhận tệp định dạng PDF.');
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            setErrorMsg('Kích thước tệp phải nhỏ hơn 5MB.');
+            return;
+        }
+
+        setErrorMsg('');
+        setUploadingCv(true);
+
+        const formData = new FormData();
+        formData.append('cv', file);
+
+        try {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            const res = await axios.post(`${API_URL}/api/cv/upload`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (res.data && res.data.cv) {
+                setCvInfo({
+                    resumeUrl: res.data.cv.filePath,
+                    fileName: res.data.cv.fileName,
+                });
+            } else {
+                setErrorMsg('Không nhận dạng được file vừa tải lên.');
+            }
+        } catch (err) {
+            console.error(err);
+            setErrorMsg(err.response?.data?.message || 'Không thể tải lên CV. Vui lòng thử lại.');
+        } finally {
+            setUploadingCv(false);
+        }
+    };
 
     const handleSubmit = async () => {
         setErrorMsg('');
@@ -213,23 +279,45 @@ function ApplyModal({ job, user, onClose, onSuccess }) {
                         {/* CV section */}
                         <div>
                             <p className="text-xs font-bold text-white/50 uppercase tracking-wide mb-2.5">CV của bạn</p>
+                            
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileUpload}
+                                accept=".pdf"
+                                className="hidden"
+                            />
+
                             {cvLoading ? (
                                 <div className="border border-white/10 rounded-xl p-4 flex items-center gap-3">
                                     <Loader2 className="w-4 h-4 animate-spin text-white/40" />
                                     <span className="text-sm text-white/40">Đang tải thông tin CV...</span>
                                 </div>
+                            ) : uploadingCv ? (
+                                <div className="border border-cyan-500/20 bg-cyan-500/5 rounded-xl p-4 flex items-center gap-3">
+                                    <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
+                                    <span className="text-sm text-cyan-300">Đang tải lên CV của bạn...</span>
+                                </div>
                             ) : cvInfo?.resumeUrl ? (
-                                <div className="border border-green-500/30 bg-green-500/10 rounded-xl p-4 flex items-center gap-3">
-                                    <div className="w-9 h-9 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                                        <FileText className="w-4 h-4 text-green-400" />
+                                <div className="border border-green-500/30 bg-green-500/10 rounded-xl p-4 flex items-center justify-between gap-3">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <div className="w-9 h-9 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <FileText className="w-4 h-4 text-green-400" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-semibold text-green-300 truncate">
+                                                {cvInfo.fileName || 'CV của tôi'}
+                                            </p>
+                                            <p className="text-xs text-green-400/70 mt-0.5">CV đã sẵn sàng ✓</p>
+                                        </div>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-semibold text-green-300 truncate">
-                                            {cvInfo.fileName || 'CV của tôi'}
-                                        </p>
-                                        <p className="text-xs text-green-400/70 mt-0.5">CV đã sẵn sàng để gửi ✓</p>
-                                    </div>
-                                    <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0" />
+                                    <button
+                                        type="button"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="text-xs font-semibold text-cyan-300 bg-cyan-500/20 hover:bg-cyan-500/30 px-3 py-1.5 rounded-lg transition-colors flex-shrink-0 flex items-center gap-1.5"
+                                    >
+                                        <Upload className="w-3.5 h-3.5" /> Thay đổi
+                                    </button>
                                 </div>
                             ) : (
                                 <div className="border border-orange-500/30 bg-orange-500/10 rounded-xl p-4">
@@ -237,18 +325,18 @@ function ApplyModal({ job, user, onClose, onSuccess }) {
                                         <AlertCircle className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
                                         <div className="flex-1">
                                             <p className="text-sm font-semibold text-orange-300">Chưa có CV</p>
-                                            <p className="text-xs text-orange-400/70 mt-0.5 leading-relaxed">
+                                            <p className="text-xs text-orange-400/70 mt-0.5 leading-relaxed mb-3">
                                                 Tải lên CV để tăng cơ hội được nhà tuyển dụng chú ý.
                                             </p>
-                                            <Link
-                                                to="/cv-upload"
-                                                target="_blank"
-                                                className="inline-flex items-center gap-1.5 mt-2 text-xs font-semibold text-orange-300 bg-orange-500/20 hover:bg-orange-500/30 px-3 py-1.5 rounded-lg transition-colors"
+                                            <button
+                                                type="button"
+                                                onClick={() => fileInputRef.current?.click()}
+                                                className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-300 bg-cyan-500/20 hover:bg-cyan-500/30 px-3.5 py-2 rounded-lg transition-colors"
                                             >
                                                 <Upload className="w-3.5 h-3.5" />
                                                 Tải lên CV ngay
-                                                <ArrowRight className="w-3 h-3" />
-                                            </Link>
+                                                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -403,6 +491,10 @@ export default function PublicJobDetail() {
     };
 
     const handleOpenApply = () => {
+        if (job && job.externalUrl) {
+            window.open(job.externalUrl, '_blank', 'noopener,noreferrer');
+            return;
+        }
         if (!user) {
             navigate(`/login?redirect=/jobs/${jobId}`);
             return;
@@ -493,19 +585,25 @@ export default function PublicJobDetail() {
                                 <div className="flex items-center gap-2 flex-shrink-0">
                                     <button
                                         onClick={handleOpenApply}
-                                        disabled={applyDone || !isOpen}
+                                        disabled={!job?.externalUrl && (applyDone || !isOpen)}
                                         className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
-                                            applyDone
+                                            applyDone && !job?.externalUrl
                                                 ? 'bg-green-500/80 text-white cursor-default'
                                                 : !isOpen
                                                     ? 'bg-white/10 text-white/40 cursor-not-allowed'
                                                     : 'bg-gradient-to-r from-[#F5C518] to-[#D4A800] text-[#0A2463] shadow-md hover:scale-105 active:scale-95'
                                         }`}
                                     >
-                                        {applyDone
-                                            ? <><CheckCircle2 className="w-4 h-4" /> Đã ứng tuyển</>
-                                            : <><Send className="w-4 h-4" /> Ứng tuyển ngay</>
-                                        }
+                                        {job?.externalUrl ? (
+                                            <>
+                                                <ExternalLink className="w-4 h-4" />
+                                                Ứng tuyển nguồn ngoài {job.sourcePlatform ? `(${job.sourcePlatform})` : ''}
+                                            </>
+                                        ) : applyDone ? (
+                                            <><CheckCircle2 className="w-4 h-4" /> Đã ứng tuyển</>
+                                        ) : (
+                                            <><Send className="w-4 h-4" /> Ứng tuyển ngay</>
+                                        )}
                                     </button>
                                     <button
                                         onClick={handleSave}

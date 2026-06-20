@@ -35,7 +35,6 @@ const Sidebar = ({
       return "jobs";
     if (currentPath === "/candidate") return "candidates";
     if (currentPath === "/candidate-search") return "candidate-search";
-    if (currentPath === "/employer/feedback") return "feedback";
     return "";
   };
 
@@ -109,15 +108,6 @@ const Sidebar = ({
           onClick={() => {
             setActiveMenu?.("candidate-search");
             navigate("/candidate-search");
-          }}
-        />
-        <MenuItem
-          icon={<MessageSquare size={20} />}
-          label="Feedback"
-          active={active === "feedback"}
-          onClick={() => {
-            setActiveMenu?.("feedback");
-            navigate("/employer/feedback");
           }}
         />
       </nav>

@@ -2,8 +2,24 @@ import { API_URL } from '@/config';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Download, RotateCcw, ArrowRight, TrendingUp, ChevronDown, ChevronUp, CheckCircle, XCircle, Target, Brain, MessageSquare, Award } from 'lucide-react';
+import { Download, RotateCcw, ArrowRight, TrendingUp, ChevronDown, ChevronUp, CheckCircle, XCircle, Target, Brain, MessageSquare, Award, Briefcase } from 'lucide-react';
 import SeekerLayout from '../components/layout/SeekerLayout';
+
+function formatSalary(salary) {
+    if (!salary) return 'Thỏa thuận';
+    let { min, max, currency } = salary;
+    if (!min && !max) return 'Thỏa thuận';
+    const isVND = currency === 'VND' || !currency || currency.toUpperCase() === 'VND';
+    const unit = isVND ? ' triệu' : ` ${currency}`;
+    if (isVND) {
+        if (min >= 100000) min = min / 1000000;
+        if (max >= 100000) max = max / 1000000;
+    }
+    if (min && max) return `${min.toLocaleString()} - ${max.toLocaleString()}${unit}`;
+    if (min) return `Từ ${min.toLocaleString()}${unit}`;
+    if (max) return `Đến ${max.toLocaleString()}${unit}`;
+    return 'Thỏa thuận';
+}
 
 export default function InterviewResult() {
     const { sessionId } = useParams();
@@ -14,6 +30,8 @@ export default function InterviewResult() {
     const [questions, setQuestions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [expandedQuestions, setExpandedQuestions] = useState({});
+    const [recommendedJobs, setRecommendedJobs] = useState([]);
+    const [jobsLoading, setJobsLoading] = useState(false);
 
     useEffect(() => {
         fetchSessionDetails();
@@ -30,11 +48,31 @@ export default function InterviewResult() {
             if (response.data.success) {
                 setSession(response.data.data.session);
                 setQuestions(response.data.data.questions);
+                
+                // Fetch AI recommended jobs based on interview job title
+                const jobTitle = response.data.data.session?.jobTitle;
+                if (jobTitle) {
+                    fetchRecommendedJobs(jobTitle);
+                }
             }
         } catch (error) {
             console.error('Error fetching results:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchRecommendedJobs = async (title) => {
+        try {
+            setJobsLoading(true);
+            const res = await axios.get(`${API_URL}/api/jobs/search`, {
+                params: { keyword: title, limit: 3 }
+            });
+            setRecommendedJobs(res.data.data || []);
+        } catch (err) {
+            console.error("Error fetching recommended jobs:", err);
+        } finally {
+            setJobsLoading(false);
         }
     };
 
@@ -337,6 +375,74 @@ export default function InterviewResult() {
                         )}
                     </div>
                 )}
+
+                {/* AI Recommended Jobs Section */}
+                <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-3xl p-8 shadow-xl space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                                <Briefcase className="w-6 h-6 text-[#F5C518]" />
+                                AI Gợi Ý Việc Làm Phù Hợp Nhất
+                            </h3>
+                            <p className="text-xs text-white/60 mt-1">Dựa trên kết quả phỏng vấn vị trí: <span className="font-semibold text-white/80">{session.jobTitle}</span></p>
+                        </div>
+                        <a
+                            href={`https://www.topcv.vn/viec-lam?keyword=${encodeURIComponent(session.jobTitle)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all self-start sm:self-auto"
+                        >
+                            🔍 Tìm trên TopCV
+                            <ArrowRight className="w-3.5 h-3.5" />
+                        </a>
+                    </div>
+
+                    {jobsLoading ? (
+                        <div className="text-center py-6">
+                            <p className="text-sm text-white/60">Đang tìm kiếm cơ hội phù hợp...</p>
+                        </div>
+                    ) : recommendedJobs.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {recommendedJobs.map((job) => (
+                                <div
+                                    key={job._id}
+                                    className="bg-white/5 border border-white/10 hover:border-white/25 rounded-2xl p-4 flex flex-col justify-between hover:bg-white/10 transition-all cursor-pointer"
+                                    onClick={() => {
+                                        if (job.externalUrl) {
+                                            window.open(job.externalUrl, '_blank', 'noopener,noreferrer');
+                                        } else {
+                                            navigate(`/jobs/${job._id}`);
+                                        }
+                                    }}
+                                >
+                                    <div>
+                                        <div className="flex items-center justify-between gap-2 mb-2">
+                                            <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                                                {job.jobType === 'full-time' ? 'Fulltime' : job.jobType === 'part-time' ? 'Parttime' : job.jobType === 'remote' ? 'Remote' : 'Internship'}
+                                            </span>
+                                            {job.externalUrl && (
+                                                <span className="text-[10px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full font-bold">
+                                                    🌐 {job.sourcePlatform || 'Nguồn ngoài'}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <h4 className="font-bold text-white text-sm line-clamp-1 group-hover:text-[#F5C518] transition-colors">{job.title}</h4>
+                                        <p className="text-xs text-white/60 mt-1 truncate">{job.recruiterId?.companyName || job.recruiterId?.name || 'Công ty'}</p>
+                                    </div>
+                                    <div className="flex items-center justify-between border-t border-white/5 mt-4 pt-3 text-[11px] text-white/70">
+                                        <span className="font-semibold text-[#F5C518]">💵 {formatSalary(job.salary)}</span>
+                                        <span className="text-white/40">📍 {job.location?.city || 'Việt Nam'}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="bg-white/5 rounded-2xl p-6 text-center text-white/50 text-sm">
+                            <p>Không tìm thấy tin tuyển dụng giả lập phù hợp vị trí này trên hệ thống.</p>
+                            <p className="text-xs text-white/40 mt-1">Bấm nút "Tìm trên TopCV" phía trên để kết nối trực tiếp cơ hội thật từ TopCV!</p>
+                        </div>
+                    )}
+                </div>
 
                 {/* Action Buttons */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

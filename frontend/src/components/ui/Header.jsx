@@ -120,19 +120,19 @@ export default function Header({ variant = 'dark' }) {
                         ) : (
                             <>
                                 {!isEmployer && (
-                                    <Link to="/jobs" className="px-3 py-2 text-sm text-white/80 hover:text-gold font-medium whitespace-nowrap">{t('navigation.jobSearch')}</Link>
+                                    <Link to="/jobs" className="px-3 py-2 text-sm text-white/80 hover:text-gold font-medium whitespace-nowrap">Tìm việc làm</Link>
                                 )}
                                 {user?.role === 'JOB_SEEKER' && (
                                     <>
-                                        <Link to="/cv-upload" className="px-3 py-2 text-sm text-white/80 hover:text-gold font-medium whitespace-nowrap">{t('navigation.myCV')}</Link>
-                                        <Link to="/my-applications" className="px-3 py-2 text-sm text-white/80 hover:text-gold font-medium whitespace-nowrap">{t('navigation.myApplications')}</Link>
+                                        <Link to="/cv-upload" className="px-3 py-2 text-sm text-white/80 hover:text-gold font-medium whitespace-nowrap">CV của tôi</Link>
+                                        <Link to="/my-applications" className="px-3 py-2 text-sm text-white/80 hover:text-gold font-medium whitespace-nowrap">Việc đã ứng tuyển</Link>
                                         <Link to="/interview" className="flex items-center gap-1.5 px-3 py-2 text-sm text-[#F5C518] font-semibold whitespace-nowrap nav-link-underline">
-                                            <BrainCircuit size={16} className="text-[#F5C518]" />{t('navigation.interview')}
+                                            <BrainCircuit size={16} className="text-[#F5C518]" />Luyện phỏng vấn
                                         </Link>
                                     </>
                                 )}
                                 {isEmployer && (
-                                    <Link to="/dashboard" className="px-3 py-2 text-sm text-white/80 hover:text-[#F5C518] font-medium whitespace-nowrap">Dashboard</Link>
+                                    <Link to="/dashboard" className="px-3 py-2 text-sm text-white/80 hover:text-[#F5C518] font-medium whitespace-nowrap">Trang quản lý</Link>
                                 )}
                             </>
                         )}
@@ -201,25 +201,25 @@ export default function Header({ variant = 'dark' }) {
                                             {user.role === 'JOB_SEEKER' ? (
                                                 <>
                                                     <Link to="/my-applications" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                                        <ClipboardList size={15} /> {t('navigation.myApplications')}
+                                                        <ClipboardList size={15} /> Việc đã ứng tuyển
                                                     </Link>
                                                     <Link to="/cv-upload" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                                        <FileText size={15} /> {t('navigation.myCV')}
+                                                        <FileText size={15} /> CV của tôi
                                                     </Link>
                                                     <Link to="/interview" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-navy hover:bg-gold/10">
-                                                        <BrainCircuit size={15} /> {t('navigation.interview')}
+                                                        <BrainCircuit size={15} /> Luyện phỏng vấn
                                                     </Link>
                                                 </>
                                             ) : (
                                                 <Link to="/dashboard" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                                    <User size={15} /> Dashboard
+                                                    <User size={15} /> Trang quản lý
                                                 </Link>
                                             )}
                                             <Link to="/profile" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                                <SettingsIcon size={15} /> {t('navigation.settings')}
+                                                <SettingsIcon size={15} /> Cài đặt
                                             </Link>
                                             <button onClick={handleSignOut} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                                                <LogOut size={15} /> {t('navigation.signOut')}
+                                                <LogOut size={15} /> Đăng xuất
                                             </button>
                                         </div>
                                     )}
@@ -229,12 +229,12 @@ export default function Header({ variant = 'dark' }) {
                             <div className="hidden sm:flex items-center gap-3">
                                 <Magnetic>
                                     <Link to="/login" className="px-4 py-2 text-sm border border-white/30 text-white rounded-md hover:bg-white/10 font-medium transition-colors">
-                                        {t('auth.login')}
+                                        Đăng nhập
                                     </Link>
                                 </Magnetic>
                                 <Magnetic>
                                     <Link to="/register" className="px-5 py-2 text-sm bg-[#F5C518] text-[#0A2463] font-semibold rounded-md hover:bg-[#D4A800] transition-colors">
-                                        {t('auth.register')}
+                                        Đăng ký
                                     </Link>
                                 </Magnetic>
                             </div>
@@ -261,13 +261,13 @@ export default function Header({ variant = 'dark' }) {
                         ) : (
                             <>
                                 {!isEmployer && (
-                                    <Link to="/jobs" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-white/80 hover:bg-white/5 rounded-lg">{t('navigation.jobSearch')}</Link>
+                                    <Link to="/jobs" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-white/80 hover:bg-white/5 rounded-lg">Tìm việc làm</Link>
                                 )}
                                 {user?.role === 'JOB_SEEKER' && (
                                     <>
-                                        <Link to="/cv-upload" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-white/80 hover:bg-white/5 rounded-lg">{t('navigation.myCV')}</Link>
+                                        <Link to="/cv-upload" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-white/80 hover:bg-white/5 rounded-lg">CV của tôi</Link>
                                         <Link to="/interview" onClick={() => setIsOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-gold font-medium hover:bg-white/5 rounded-lg">
-                                            <BrainCircuit size={16} /> {t('navigation.interview')}
+                                            <BrainCircuit size={16} /> Luyện phỏng vấn
                                         </Link>
                                     </>
                                 )}
@@ -276,17 +276,17 @@ export default function Header({ variant = 'dark' }) {
                         {user ? (
                             <>
                                 {isEmployer && (
-                                    <Link to="/dashboard" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-white/80 hover:bg-white/5 rounded-lg">Dashboard</Link>
+                                    <Link to="/dashboard" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-white/80 hover:bg-white/5 rounded-lg">Trang quản lý</Link>
                                 )}
                                 {!isEmployer && (
-                                    <Link to="/jobs" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-white/80 hover:bg-white/5 rounded-lg">{t('navigation.jobSearch')}</Link>
+                                    <Link to="/jobs" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-white/80 hover:bg-white/5 rounded-lg">Tìm việc làm</Link>
                                 )}
-                                <button onClick={handleSignOut} className="w-full text-left px-3 py-2.5 text-sm text-red-400 hover:bg-white/5 rounded-lg">{t('navigation.signOut')}</button>
+                                <button onClick={handleSignOut} className="w-full text-left px-3 py-2.5 text-sm text-red-400 hover:bg-white/5 rounded-lg">Đăng xuất</button>
                             </>
                         ) : (
                             <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/10">
-                                <Link to="/login" onClick={() => setIsOpen(false)} className="text-center px-4 py-2.5 text-sm font-medium text-white border border-white/20 rounded-lg hover:bg-white/5">{t('auth.login')}</Link>
-                                <Link to="/register" onClick={() => setIsOpen(false)} className="text-center px-4 py-2.5 text-sm font-bold btn-gold rounded-lg">{t('auth.register')}</Link>
+                                <Link to="/login" onClick={() => setIsOpen(false)} className="text-center px-4 py-2.5 text-sm font-medium text-white border border-white/20 rounded-lg hover:bg-white/5">Đăng nhập</Link>
+                                <Link to="/register" onClick={() => setIsOpen(false)} className="text-center px-4 py-2.5 text-sm font-bold btn-gold rounded-lg">Đăng ký</Link>
                             </div>
                         )}
                     </nav>

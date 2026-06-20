@@ -7,7 +7,8 @@ import {
     Users, Briefcase, BarChart3, Shield, Search, ChevronLeft, ChevronRight,
     Lock, Unlock, Trash2, CheckCircle, XCircle, Clock, TrendingUp,
     UserCheck, FileText, LayoutDashboard, LogOut, AlertTriangle,
-    Building2, CheckCircle2, Ban, Eye, Bell, CreditCard
+    Building2, CheckCircle2, Ban, Eye, Bell, CreditCard, MessageSquare,
+    Star, Check
 } from "lucide-react";
 
 const API = `${API_URL}/api/admin`;
@@ -29,6 +30,7 @@ const ADMIN_NAV = [
     { id: "employers", label: "Duyệt doanh nghiệp", icon: Building2 },
     { id: "jobs", label: "Tin tuyển dụng", icon: Briefcase },
     { id: "payments", label: "Quản lý thanh toán", icon: CreditCard },
+    { id: "feedback", label: "Phản hồi & Đánh giá", icon: MessageSquare },
 ];
 
 function AdminSidebar({ active, setActive, user, onLogout, pendingCount }) {
@@ -1175,6 +1177,169 @@ function PaymentsTab() {
 }
 
 // ============================================================
+// FEEDBACK TAB
+// ============================================================
+function FeedbackTab() {
+    const [feedbacks, setFeedbacks] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [typeFilter, setTypeFilter] = useState("");
+    const [search, setSearch] = useState("");
+
+    const fetchFeedbacks = useCallback(async () => {
+        setLoading(true);
+        try {
+            const res = await axios.get(`${API_URL}/api/feedback`, { headers: authHeader() });
+            setFeedbacks(res.data.feedbacks || []);
+        } catch (e) {
+            console.error("Fetch feedbacks error:", e);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchFeedbacks();
+    }, [fetchFeedbacks]);
+
+    const filtered = feedbacks.filter(fb => {
+        const matchesType = !typeFilter || fb.type === typeFilter;
+        const matchesSearch = !search || 
+            (fb.userEmail && fb.userEmail.toLowerCase().includes(search.toLowerCase())) ||
+            (fb.subject && fb.subject.toLowerCase().includes(search.toLowerCase())) ||
+            (fb.message && fb.message.toLowerCase().includes(search.toLowerCase()));
+        return matchesType && matchesSearch;
+    });
+
+    const renderStars = (count) => {
+        return (
+            <div className="flex items-center gap-0.5">
+                {[1, 2, 3, 4, 5].map(star => (
+                    <Star 
+                        key={star} 
+                        size={15}
+                        className={`w-4 h-4 ${star <= count ? 'fill-[#F5C518] text-[#F5C518]' : 'text-slate-350'}`} 
+                    />
+                ))}
+            </div>
+        );
+    };
+
+    return (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-white/60 shadow-xl shadow-slate-900/5">
+                <div>
+                    <h2 className="text-2xl font-bold tracking-tight text-slate-800">Phản hồi & Đánh giá</h2>
+                    <p className="text-sm text-slate-500 font-medium mt-1">
+                        Tổng số: <span className="font-bold text-indigo-650">{filtered.length}</span> ý kiến phản hồi
+                    </p>
+                </div>
+                <button 
+                    onClick={fetchFeedbacks} 
+                    className="flex items-center gap-1.5 px-4 py-2.5 bg-white/85 border border-slate-250/70 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 hover:text-slate-900 shadow-sm transition-all text-sm cursor-pointer"
+                >
+                    Tải lại dữ liệu
+                </button>
+            </div>
+
+            {/* Filter controls */}
+            <div className="bg-white/80 border border-white/60 backdrop-blur-md p-4 rounded-2xl shadow-xl shadow-slate-900/5 flex flex-wrap gap-3">
+                <div className="relative flex-1 min-w-[200px]">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    <input
+                        type="text"
+                        placeholder="Tìm kiếm email, tiêu đề, nội dung..."
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 border border-slate-200/80 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 placeholder-slate-400 bg-white/70 font-medium transition-all shadow-inner outline-none focus:border-transparent"
+                    />
+                </div>
+                <div className="flex gap-1.5 flex-wrap">
+                    {[
+                        { value: "", label: "Tất cả" },
+                        { value: "Bug", label: "Bug 🐛" },
+                        { value: "Góp ý", label: "Góp ý 💡" },
+                        { value: "Đánh giá", label: "Đánh giá ⭐" }
+                    ].map(tab => (
+                        <button
+                            key={tab.value}
+                            onClick={() => setTypeFilter(tab.value)}
+                            className={`px-4 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-sm ${
+                                typeFilter === tab.value
+                                    ? "bg-indigo-600 text-white border-indigo-650"
+                                    : "bg-white/85 text-slate-605 border-slate-205 hover:bg-white"
+                            }`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Content List */}
+            {loading ? (
+                <div className="flex justify-center items-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-650" />
+                </div>
+            ) : filtered.length === 0 ? (
+                <div className="bg-white/80 border border-white/60 rounded-2xl p-12 text-center shadow-md">
+                    <MessageSquare size={40} className="text-slate-300 mx-auto mb-3" />
+                    <p className="text-slate-500 font-semibold">Chưa có phản hồi nào phù hợp bộ lọc</p>
+                </div>
+            ) : (
+                <div className="space-y-4">
+                    {filtered.map(fb => (
+                        <div key={fb._id} className="bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl p-5 shadow-xl shadow-slate-900/5 hover:-translate-y-0.5 transition-all duration-200">
+                            <div className="flex items-start justify-between flex-wrap gap-2 mb-3 border-b border-slate-100 pb-3">
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${
+                                            fb.type === 'Bug'
+                                                ? 'bg-red-50 text-red-700 border-red-100'
+                                                : fb.type === 'Góp ý'
+                                                ? 'bg-amber-50 text-amber-700 border-amber-100'
+                                                : 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                                        }`}>
+                                            {fb.type === 'Bug' ? '🐛 Bug' : fb.type === 'Góp ý' ? '💡 Góp ý' : '⭐ Đánh giá'}
+                                        </span>
+                                        <p className="font-semibold text-slate-800 text-sm">{fb.userEmail}</p>
+                                    </div>
+                                    <p className="text-[11px] text-slate-400 font-semibold mt-1">
+                                        Gửi lúc: {new Date(fb.createdAt).toLocaleString("vi-VN")}
+                                    </p>
+                                </div>
+                                {fb.rating && renderStars(fb.rating)}
+                            </div>
+
+                            <p className="font-bold text-slate-800 text-base mb-2">{fb.subject}</p>
+
+                            {fb.checkedOptions && fb.checkedOptions.length > 0 && (
+                                <div className="mb-3 bg-slate-50 border border-slate-100 rounded-xl p-3">
+                                    <p className="text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wide">Các mục đã chọn:</p>
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {fb.checkedOptions.map((opt, i) => (
+                                            <span key={i} className="inline-flex items-center gap-1 text-xs bg-white border border-slate-200 text-slate-700 px-2.5 py-1 rounded-lg font-medium shadow-sm">
+                                                <Check size={12} className="text-[#10B981] stroke-[3px]" /> {opt}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="bg-slate-50/50 border border-slate-100/50 rounded-xl p-4">
+                                <p className="text-xs font-bold text-slate-500 mb-1 uppercase tracking-wide">
+                                    {fb.type === 'Đánh giá' ? 'Nội dung chi tiết:' : 'Ý kiến riêng / Mô tả chi tiết:'}
+                                </p>
+                                <p className="text-sm text-slate-750 font-medium whitespace-pre-wrap mt-1 leading-relaxed">{fb.message}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+// ============================================================
 // MAIN ADMIN PAGE
 // ============================================================
 export default function AdminDashboard() {
@@ -1226,6 +1391,7 @@ export default function AdminDashboard() {
         employers: <EmployersTab />,
         jobs: <JobsTab />,
         payments: <PaymentsTab />,
+        feedback: <FeedbackTab />,
     };
 
     return (
