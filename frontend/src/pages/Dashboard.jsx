@@ -329,7 +329,7 @@ export default function Dashboard() {
                                 <button
                                     ref={bellRef}
                                     onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                                    className={`relative p-2 rounded-xl hidden sm:block transition-all ${isNotificationOpen ? 'bg-indigo-50 text-indigo-650 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800'}`}
+                                    className={`relative p-2 rounded-xl hidden sm:block transition-all ${isNotificationOpen ? 'bg-indigo-50 text-indigo-600 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800'}`}
                                 >
                                     <Bell size={22} className={isNotificationOpen ? "fill-indigo-600 text-indigo-600" : ""} />
                                     {notifications.some(n => !n.isRead) && (
@@ -345,7 +345,7 @@ export default function Dashboard() {
                             </div>
                             <button 
                                 onClick={() => navigate('/employer/feedback')}
-                                className="relative p-2 text-slate-650 hover:bg-slate-100 hover:text-slate-800 rounded-xl hidden sm:block transition-all"
+                                className="relative p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-800 rounded-xl hidden sm:block transition-all"
                             >
                                 <MessageSquare size={22} />
                             </button>
@@ -455,7 +455,7 @@ export default function Dashboard() {
                                                             setCampaignFileName('');
                                                             setCampaignTitle('');
                                                         }}
-                                                        className="px-3 py-1.5 border border-slate-200 text-slate-650 text-xs font-semibold rounded-lg hover:bg-slate-50 bg-white shadow-sm transition-all"
+                                                        className="px-3 py-1.5 border border-slate-200 text-slate-600 text-xs font-semibold rounded-lg hover:bg-slate-50 bg-white shadow-sm transition-all"
                                                     >
                                                         Hủy
                                                     </button>

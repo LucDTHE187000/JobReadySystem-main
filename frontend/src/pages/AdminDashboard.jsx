@@ -113,7 +113,7 @@ function DashboardTab({ onNavigate }) {
             .finally(() => setLoading(false));
     }, []);
 
-    if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-650" /></div>;
+    if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600" /></div>;
 
     const cards = [
         { label: "Tổng người dùng", value: stats?.totalUsers, icon: Users, color: "bg-blue-500", light: "bg-blue-50", textColor: "text-blue-600" },
@@ -238,7 +238,7 @@ function UsersTab() {
                 <div>
                     <h2 className="text-2xl font-bold tracking-tight text-slate-800">Quản lý người dùng</h2>
                     <p className="text-sm text-slate-500 font-medium mt-1">
-                        Tổng <span className="font-bold text-indigo-650 underline decoration-indigo-500/30">{total}</span> người dùng
+                        Tổng <span className="font-bold text-indigo-600 underline decoration-indigo-500/30">{total}</span> người dùng
                     </p>
                 </div>
             </div>
@@ -302,7 +302,7 @@ function UsersTab() {
                                             {roleLabel[u.role] || u.role}
                                         </span>
                                     </td>
-                                    <td className="p-4 font-mono text-indigo-650 font-bold">
+                                    <td className="p-4 font-mono text-indigo-600 font-bold">
                                         {u.credits?.toLocaleString() ?? "—"}
                                     </td>
                                     <td className="p-4 text-slate-500 font-medium">
@@ -419,7 +419,7 @@ function EmployersTab() {
                             key={tab.key}
                             onClick={() => { setFilter(tab.key); setPage(1); }}
                             className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${filter === tab.key
-                                ? 'bg-indigo-650 text-white shadow-sm'
+                                ? 'bg-indigo-600 text-white shadow-sm'
                                 : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'
                                 }`}
                         >
@@ -607,7 +607,7 @@ function JobsTab() {
             <div className="flex items-center justify-between bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-white/60 shadow-xl shadow-slate-900/5">
                 <div>
                     <h2 className="text-2xl font-bold tracking-tight text-slate-800">Quản lý tin tuyển dụng</h2>
-                    <p className="text-sm text-slate-500 font-medium mt-1">Tổng <span className="font-bold text-indigo-650 underline decoration-indigo-500/30">{total}</span> tin tuyển dụng</p>
+                    <p className="text-sm text-slate-500 font-medium mt-1">Tổng <span className="font-bold text-indigo-600 underline decoration-indigo-500/30">{total}</span> tin tuyển dụng</p>
                 </div>
             </div>
 
@@ -661,7 +661,7 @@ function JobsTab() {
                                     <td className="p-4 text-slate-700 font-medium truncate" title={j.recruiterId?.companyName || j.recruiterId?.name || ""}>
                                         {j.recruiterId?.companyName || j.recruiterId?.name || "—"}
                                     </td>
-                                    <td className="p-4 text-slate-505 truncate">
+                                    <td className="p-4 text-slate-500 truncate">
                                         {j.location?.city
                                             ? `${j.location.city}${j.location.country ? ', ' + j.location.country : ''}`
                                             : "—"}
@@ -682,7 +682,7 @@ function JobsTab() {
                                             <select
                                                 value={j.status}
                                                 onChange={e => updateStatus(j._id, e.target.value)}
-                                                className="text-xs font-semibold bg-white/80 border border-slate-205 rounded-xl px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
+                                                className="text-xs font-semibold bg-white/80 border border-slate-200 rounded-xl px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
                                             >
                                                 <option value="open">Mở</option>
                                                 <option value="closed">Đóng</option>
@@ -957,7 +957,7 @@ function PaymentsTab() {
                 </div>
                 <button 
                     onClick={fetchPayments} 
-                    className="flex items-center gap-1.5 px-4 py-2.5 bg-white/85 border border-slate-250/70 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 hover:text-slate-900 shadow-sm transition-all text-sm cursor-pointer self-start sm:self-center"
+                    className="flex items-center gap-1.5 px-4 py-2.5 bg-white/85 border border-slate-200/70 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 hover:text-slate-900 shadow-sm transition-all text-sm cursor-pointer self-start sm:self-center"
                 >
                     Tải lại dữ liệu
                 </button>
@@ -980,7 +980,7 @@ function PaymentsTab() {
                 <div className="bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl p-5 shadow-xl shadow-slate-900/5 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-between">
                     <div className="space-y-1">
                         <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tổng đơn hàng</p>
-                        <p className="text-2xl font-bold text-indigo-650">{(stats.totalCount || 0).toLocaleString("vi-VN")}</p>
+                        <p className="text-2xl font-bold text-indigo-600">{(stats.totalCount || 0).toLocaleString("vi-VN")}</p>
                     </div>
                     <div className="bg-indigo-50 p-3 rounded-xl">
                         <FileText size={24} className="text-indigo-600" />
@@ -1045,7 +1045,7 @@ function PaymentsTab() {
                                 onClick={() => handleFilterStatus(opt.value)}
                                 className={`px-4 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-sm ${
                                     statusFilter === opt.value
-                                        ? "bg-indigo-600 text-white border-indigo-650"
+                                        ? "bg-indigo-600 text-white border-indigo-600"
                                         : "bg-white/85 text-slate-605 border-slate-200 hover:bg-white"
                                 }`}
                             >
@@ -1069,7 +1069,7 @@ function PaymentsTab() {
                 {/* Table */}
                 <div className="overflow-x-auto">
                     <table className="w-full table-fixed text-left text-sm">
-                        <thead className="bg-slate-50/50 border-b border-slate-100 text-slate-505 font-semibold text-xs uppercase tracking-wider">
+                        <thead className="bg-slate-50/50 border-b border-slate-100 text-slate-500 font-semibold text-xs uppercase tracking-wider">
                             <tr>
                                 <th className="p-4 font-semibold w-[16%]">Mã đơn hàng</th>
                                 <th className="p-4 font-semibold w-[26%]">Người dùng</th>
@@ -1084,14 +1084,14 @@ function PaymentsTab() {
                                 <tr>
                                     <td colSpan="6" className="text-center p-8 font-bold text-slate-500">
                                         <div className="flex justify-center items-center gap-2">
-                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-650" />
+                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600" />
                                             <span className="text-xs text-slate-500 font-semibold">Đang tải lịch sử giao dịch...</span>
                                         </div>
                                     </td>
                                 </tr>
                             ) : payments.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6" className="text-center p-8 font-bold text-slate-505">Không tìm thấy giao dịch nào</td>
+                                    <td colSpan="6" className="text-center p-8 font-bold text-slate-500">Không tìm thấy giao dịch nào</td>
                                 </tr>
                             ) : (
                                 payments.map(p => (
@@ -1102,13 +1102,13 @@ function PaymentsTab() {
                                         <td className="p-4 min-w-0">
                                             <div className="truncate">
                                                 <p className="font-semibold text-slate-800 truncate" title={p.user?.name}>{p.user?.name || "Người dùng ẩn"}</p>
-                                                <p className="text-xs text-slate-505 font-medium truncate" title={p.user?.email}>{p.user?.email || "—"}</p>
+                                                <p className="text-xs text-slate-500 font-medium truncate" title={p.user?.email}>{p.user?.email || "—"}</p>
                                             </div>
                                         </td>
                                         <td className="p-4 min-w-0">
                                             <div className="truncate">
                                                 <p className="font-semibold text-slate-800 truncate" title={p.packageName}>{p.packageName}</p>
-                                                <p className="text-xs text-slate-505 font-medium mt-0.5">+{p.creditAmount?.toLocaleString()} Credits</p>
+                                                <p className="text-xs text-slate-500 font-medium mt-0.5">+{p.creditAmount?.toLocaleString()} Credits</p>
                                             </div>
                                         </td>
                                         <td className="p-4 font-semibold text-slate-800 font-mono">
@@ -1152,7 +1152,7 @@ function PaymentsTab() {
                 {/* Pagination */}
                 {totalPages > 1 && (
                     <div className="flex items-center justify-between p-4 border-t border-slate-100">
-                        <p className="text-xs text-slate-505 font-medium">Trang {page} / {totalPages}</p>
+                        <p className="text-xs text-slate-500 font-medium">Trang {page} / {totalPages}</p>
                         <div className="flex gap-2">
                             <button 
                                 onClick={() => setPage(p => Math.max(1, p - 1))} 
@@ -1217,7 +1217,7 @@ function FeedbackTab() {
                     <Star 
                         key={star} 
                         size={15}
-                        className={`w-4 h-4 ${star <= count ? 'fill-[#F5C518] text-[#F5C518]' : 'text-slate-350'}`} 
+                        className={`w-4 h-4 ${star <= count ? 'fill-[#F5C518] text-[#F5C518]' : 'text-slate-300'}`} 
                     />
                 ))}
             </div>
@@ -1230,12 +1230,12 @@ function FeedbackTab() {
                 <div>
                     <h2 className="text-2xl font-bold tracking-tight text-slate-800">Phản hồi & Đánh giá</h2>
                     <p className="text-sm text-slate-500 font-medium mt-1">
-                        Tổng số: <span className="font-bold text-indigo-650">{filtered.length}</span> ý kiến phản hồi
+                        Tổng số: <span className="font-bold text-indigo-600">{filtered.length}</span> ý kiến phản hồi
                     </p>
                 </div>
                 <button 
                     onClick={fetchFeedbacks} 
-                    className="flex items-center gap-1.5 px-4 py-2.5 bg-white/85 border border-slate-250/70 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 hover:text-slate-900 shadow-sm transition-all text-sm cursor-pointer"
+                    className="flex items-center gap-1.5 px-4 py-2.5 bg-white/85 border border-slate-200/70 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 hover:text-slate-900 shadow-sm transition-all text-sm cursor-pointer"
                 >
                     Tải lại dữ liệu
                 </button>
@@ -1265,8 +1265,8 @@ function FeedbackTab() {
                             onClick={() => setTypeFilter(tab.value)}
                             className={`px-4 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-sm ${
                                 typeFilter === tab.value
-                                    ? "bg-indigo-600 text-white border-indigo-650"
-                                    : "bg-white/85 text-slate-605 border-slate-205 hover:bg-white"
+                                    ? "bg-indigo-600 text-white border-indigo-600"
+                                    : "bg-white/85 text-slate-605 border-slate-200 hover:bg-white"
                             }`}
                         >
                             {tab.label}
@@ -1278,7 +1278,7 @@ function FeedbackTab() {
             {/* Content List */}
             {loading ? (
                 <div className="flex justify-center items-center py-12">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-650" />
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
                 </div>
             ) : filtered.length === 0 ? (
                 <div className="bg-white/80 border border-white/60 rounded-2xl p-12 text-center shadow-md">

@@ -134,7 +134,7 @@ function ApplicationCard({ app }) {
                             <p className="text-sm text-slate-800 font-bold mt-0.5 flex items-center gap-1">
                                 <Building2 className="w-3.5 h-3.5 flex-shrink-0 text-slate-700" />
                                 <span className="truncate">{companyName}</span>
-                                {city && <><span className="text-slate-400 mx-1">•</span><MapPin className="w-3.5 h-3.5 flex-shrink-0 text-slate-650" /><span className="truncate">{city}</span></>}
+                                {city && <><span className="text-slate-400 mx-1">•</span><MapPin className="w-3.5 h-3.5 flex-shrink-0 text-slate-600" /><span className="truncate">{city}</span></>}
                             </p>
                         </div>
                         <span className={`inline-flex items-center gap-1.5 text-xs font-extrabold px-3 py-1.5 rounded-full flex-shrink-0 ${cfg.color}`}>
@@ -143,7 +143,7 @@ function ApplicationCard({ app }) {
                         </span>
                     </div>
 
-                    <div className="flex items-center gap-3 mt-2 text-xs text-slate-650 font-bold">
+                    <div className="flex items-center gap-3 mt-2 text-xs text-slate-600 font-bold">
                         <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-slate-600" /> Đã ứng tuyển {timeAgo(app.createdAt)}</span>
                         {app.status === 'interview' && app.interviewDate && (
                             <span className="flex items-center gap-1 text-purple-900 font-bold">
@@ -322,7 +322,7 @@ export default function MyApplications() {
                         </div>
 
                         {/* Tabs */}
-                        <div className="flex gap-1 bg-slate-350 border border-slate-400 rounded-xl p-1 shadow-sm overflow-x-auto">
+                        <div className="flex gap-1 bg-slate-300 border border-slate-400 rounded-xl p-1 shadow-sm overflow-x-auto">
                             {TABS.map(tab => (
                                 <button
                                     key={tab.key}
@@ -330,12 +330,12 @@ export default function MyApplications() {
                                     className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-extrabold whitespace-nowrap transition-all ${
                                         activeTab === tab.key
                                             ? 'bg-[#0A2463] text-white shadow-sm font-black'
-                                            : 'text-slate-805 hover:text-slate-950 hover:bg-slate-400/40'
+                                            : 'text-slate-800 hover:text-slate-950 hover:bg-slate-400/40'
                                     }`}
                                 >
                                     {tab.label}
                                     <span className={`text-xs px-1.5 py-0.5 rounded-full font-extrabold ${
-                                        activeTab === tab.key ? 'bg-white/20 text-white' : 'bg-slate-400/40 text-slate-850'
+                                        activeTab === tab.key ? 'bg-white/20 text-white' : 'bg-slate-400/40 text-slate-800'
                                     }`}>
                                         {tabCounts[tab.key]}
                                     </span>
@@ -349,7 +349,7 @@ export default function MyApplications() {
                                 <Loader2 className="w-8 h-8 animate-spin text-[#0A2463]" />
                             </div>
                         ) : paginated.length === 0 ? (
-                            <div className="bg-white border border-slate-350 backdrop-blur-md rounded-2xl p-12 text-center text-slate-900 shadow-md">
+                            <div className="bg-white border border-slate-300 backdrop-blur-md rounded-2xl p-12 text-center text-slate-900 shadow-md">
                                 <ClipboardList className="w-12 h-12 text-slate-500 mx-auto mb-3" />
                                 <p className="text-slate-950 font-black text-base">Chưa có đơn ứng tuyển nào</p>
                                 <p className="text-sm text-slate-700 font-semibold mt-1">Hãy ứng tuyển để bắt đầu hành trình sự nghiệp!</p>
@@ -410,7 +410,7 @@ export default function MyApplications() {
                                 <Loader2 className="w-8 h-8 animate-spin text-[#0A2463]" />
                             </div>
                         ) : savedJobs.length === 0 ? (
-                            <div className="bg-white border border-slate-350 backdrop-blur-md rounded-2xl p-12 text-center text-slate-900 shadow-md">
+                            <div className="bg-white border border-slate-300 backdrop-blur-md rounded-2xl p-12 text-center text-slate-900 shadow-md">
                                 <Heart className="w-12 h-12 text-slate-500 mx-auto mb-3" />
                                 <p className="text-slate-950 font-black text-base">Chưa có việc làm nào được lưu</p>
                                 <p className="text-sm text-slate-700 font-semibold mt-1">Lưu các việc làm yêu thích khi xem tin tuyển dụng để nộp đơn ứng tuyển sau!</p>
@@ -437,7 +437,7 @@ export default function MyApplications() {
                                                     <p className="text-sm text-slate-800 font-bold mt-0.5 flex items-center gap-1 flex-wrap">
                                                         <Building2 className="w-3.5 h-3.5 flex-shrink-0 text-slate-700" />
                                                         <span>{companyName}</span>
-                                                        {city && <><span className="text-slate-400 font-bold">•</span><MapPin className="w-3.5 h-3.5 flex-shrink-0 text-slate-650" /><span>{city}</span></>}
+                                                        {city && <><span className="text-slate-400 font-bold">•</span><MapPin className="w-3.5 h-3.5 flex-shrink-0 text-slate-600" /><span>{city}</span></>}
                                                     </p>
                                                     <div className="flex flex-wrap gap-2 mt-2">
                                                         <span className="text-xs px-2 py-1 bg-blue-100 text-blue-900 border border-blue-200 rounded-lg font-extrabold">{job.jobType}</span>

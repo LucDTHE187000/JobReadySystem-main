@@ -60,7 +60,7 @@ export default function SeekerLayout({ children, title, breadcrumb }) {
             style={{ backgroundImage: `url('/background3.jpg')` }}
         >
             {/* Premium backdrop-blur and dark-gradient overlay */}
-            <div className="absolute inset-0 bg-[#030a21]/20 backdrop-blur-[0.5px] pointer-events-none" />
+            <div className="absolute inset-0 bg-[#030a21]/30 backdrop-blur-[1px] pointer-events-none" />
 
             <aside className="relative z-10 hidden lg:flex w-64 min-h-screen bg-[#030A21]/75 backdrop-blur-md flex-col flex-shrink-0 border-r border-white/10">
                 <div className="p-5 border-b border-white/10">

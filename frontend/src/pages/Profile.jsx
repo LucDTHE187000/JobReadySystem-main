@@ -158,8 +158,8 @@ export default function Profile() {
 
     const tabBtn = (key) =>
         activeTab === key
-            ? 'bg-indigo-50 text-indigo-700 border-l-2 border-indigo-500 font-semibold'
-            : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50 border-l-2 border-transparent';
+            ? 'bg-indigo-50 text-indigo-700 border-l-2 border-indigo-500 font-semibold shadow-sm'
+            : 'text-slate-700 hover:text-indigo-700 hover:bg-indigo-50/50 border-l-2 border-transparent font-medium';
 
     const isEmployer = isEmployerRole(user?.role);
     const isNotSeeker = user?.role === 'EMPLOYER' || user?.role === 'ADMIN';
@@ -196,7 +196,7 @@ export default function Profile() {
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={handleBack}
-                                className="flex items-center gap-2 px-4 py-2.5 bg-white/85 border border-slate-250/70 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 hover:text-slate-900 shadow-sm transition-all text-sm flex-shrink-0 cursor-pointer"
+                                className="flex items-center gap-2 px-4 py-2.5 bg-white/85 border border-slate-200/70 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 hover:text-slate-900 shadow-sm transition-all text-sm flex-shrink-0 cursor-pointer"
                             >
                                 <ArrowLeft size={16} /> Quay lại
                             </button>
@@ -215,13 +215,13 @@ export default function Profile() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="md:col-span-2 bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-xl shadow-slate-900/5">
                             <p className="text-xs uppercase tracking-wider text-slate-500 mb-1 font-semibold">Số dư credit</p>
-                            <p className="text-4xl font-bold text-indigo-650">{credits.toLocaleString('vi-VN')}</p>
+                            <p className="text-4xl font-bold text-indigo-600">{credits.toLocaleString('vi-VN')}</p>
                         </div>
                     </div>
                 )}
 
                 {isEmployer && (
-                    <div className="mb-6">
+                    <div className="bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl p-3 shadow-xl shadow-slate-900/5 mb-6 animate-in fade-in duration-300">
                         <div className="flex flex-wrap gap-2">
                             <button
                                 onClick={() => { setActiveTab('general'); setMessage({ type: '', text: '' }) }}
@@ -272,7 +272,7 @@ export default function Profile() {
 
                     {/* Sidebar Tabs */}
                     {!isEmployer && (
-                        <div className="md:col-span-1 space-y-1">
+                        <div className="md:col-span-1 bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl p-4 space-y-1.5 shadow-xl shadow-slate-900/5 h-fit animate-in fade-in duration-300">
                             <button
                                 onClick={() => { setActiveTab('general'); setMessage({ type: '', text: '' }) }}
                                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${tabBtn('general')}`}
@@ -322,7 +322,7 @@ export default function Profile() {
 
                     {/* Content Area */}
                     <div className={isEmployer ? '' : 'md:col-span-3'}>
-                        <div className="bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl p-6 sm:p-8 text-slate-850 shadow-xl shadow-slate-900/5">
+                        <div className="bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl p-6 sm:p-8 text-slate-800 shadow-xl shadow-slate-900/5">
 
                             {message.text && (
                                 <div className={`p-4 rounded-xl mb-6 text-sm flex items-center gap-2 backdrop-blur-md ${message.type === 'success' ? 'bg-emerald-50/60 text-emerald-700 border border-emerald-200 shadow-sm' : 'bg-red-50/60 text-red-700 border border-red-200 shadow-sm'
@@ -344,7 +344,7 @@ export default function Profile() {
                                                     <img src={formData.avatar} alt="Avatar" className="w-full h-full object-cover" />
                                                 </div>
                                             ) : (
-                                                <div className="w-24 h-24 bg-gradient-to-br from-indigo-650 to-violet-650 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-md">
+                                                <div className="w-24 h-24 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-md">
                                                     {formData.name.charAt(0) || 'U'}
                                                 </div>
                                             )}
@@ -441,7 +441,7 @@ export default function Profile() {
 
                             {activeTab === 'professional' && (
                                 <form onSubmit={handleSaveProfile} className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                    <div className="bg-indigo-50 border border-indigo-150 rounded-xl p-4 text-xs text-indigo-800 leading-relaxed shadow-sm">
+                                    <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 text-xs text-indigo-800 leading-relaxed shadow-sm">
                                         <span className="font-semibold block mb-1">💡 Tại sao cần cập nhật thông tin nghề nghiệp?</span>
                                         Các thông tin Kỹ năng, Kinh nghiệm và Học vấn này sẽ được sử dụng làm cơ sở để AI hỗ trợ bạn chấm điểm CV, đề xuất khóa học phù hợp và tối ưu hóa câu hỏi phỏng vấn thử nghiệm. Hãy điền đầy đủ và chi tiết nhất có thể!
                                     </div>
@@ -491,7 +491,7 @@ export default function Profile() {
                                                     <img src={formData.avatar} alt="Logo công ty" className="w-full h-full object-cover" />
                                                 </div>
                                             ) : (
-                                                <div className="w-24 h-24 bg-gradient-to-br from-indigo-600 to-violet-650 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-md">
+                                                <div className="w-24 h-24 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-md">
                                                     {formData.companyName?.charAt(0) || 'C'}
                                                 </div>
                                             )}
@@ -651,7 +651,7 @@ export default function Profile() {
                                         </h3>
                                         {billingLoading ? (
                                             <div className="text-center py-8">
-                                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-650 mx-auto"></div>
+                                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
                                                 <p className="text-sm text-slate-500 mt-2">Đang tải lịch sử giao dịch...</p>
                                             </div>
                                         ) : billingHistory.length > 0 ? (
@@ -709,12 +709,12 @@ export default function Profile() {
                                                 </table>
                                             </div>
                                         ) : (
-                                            <div className="text-center py-10 bg-slate-50 rounded-xl border border-dashed border-slate-350">
+                                            <div className="text-center py-10 bg-slate-50 rounded-xl border border-dashed border-slate-300">
                                                 <p className="text-sm text-slate-500 font-medium">Bạn chưa thực hiện giao dịch nào.</p>
                                                 <button
                                                     type="button"
                                                     onClick={() => navigate('/credits')}
-                                                    className="mt-3 text-xs bg-indigo-650 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg cursor-pointer"
+                                                    className="mt-3 text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg cursor-pointer"
                                                 >
                                                     Nạp credit đầu tiên
                                                 </button>

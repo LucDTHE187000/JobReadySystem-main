@@ -112,7 +112,7 @@ export default function Feedback() {
           <div className="mb-6">
             <p className="text-sm uppercase tracking-[0.3em] text-slate-400 mb-2">Feedback</p>
             <h2 className="text-3xl font-bold text-slate-800">Chia sẻ trải nghiệm của bạn</h2>
-            <p className="mt-3 text-sm text-slate-650 leading-relaxed font-medium">
+            <p className="mt-3 text-sm text-slate-600 leading-relaxed font-medium">
               Chọn loại phản hồi để gửi báo lỗi, góp ý phát triển hoặc đánh giá dịch vụ. Chúng tôi trân trọng mọi ý kiến từ bạn.
             </p>
           </div>
@@ -126,7 +126,7 @@ export default function Feedback() {
                   className={`cursor-pointer rounded-3xl border p-4 text-center transition-all duration-200 select-none ${
                     type === option
                       ? 'border-[#F5C518] bg-white/30 text-[#F5C518] shadow-sm font-bold scale-[1.02]'
-                      : 'border-slate-250 bg-white/50 text-slate-600 hover:border-[#F5C518]/60 hover:bg-white/10'
+                      : 'border-slate-200 bg-white/50 text-slate-600 hover:border-[#F5C518]/60 hover:bg-white/10'
                   }`}
                 >
                   <input
@@ -227,7 +227,7 @@ export default function Feedback() {
                         </button>
                       );
                     })}
-                    <span className="ml-4 text-sm font-bold text-slate-650 min-w-[150px]">
+                    <span className="ml-4 text-sm font-bold text-slate-600 min-w-[150px]">
                       {rating} / 5 sao ({rating === 5 ? 'Tuyệt vời!' : rating === 4 ? 'Rất tốt' : rating === 3 ? 'Bình thường' : rating === 2 ? 'Tệ' : 'Rất tệ'})
                     </span>
                   </div>

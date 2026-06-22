@@ -210,7 +210,7 @@ function ApplicationsList() {
 
             <button
               onClick={clearFilters}
-              className="px-4 py-2 text-sm bg-white/80 border border-slate-200 text-slate-650 font-semibold rounded-xl hover:bg-slate-50 shadow-sm transition-all"
+              className="px-4 py-2 text-sm bg-white/80 border border-slate-200 text-slate-600 font-semibold rounded-xl hover:bg-slate-50 shadow-sm transition-all"
             >
               Xóa bộ lọc
             </button>

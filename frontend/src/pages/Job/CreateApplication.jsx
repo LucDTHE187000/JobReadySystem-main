@@ -306,7 +306,7 @@ const Input = ({ label, ...props }) => (
 const Textarea = ({ label, ...props }) => (
   <div className="space-y-1 text-left">
     <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{label}</label>
-    <textarea {...props} rows={5} className="w-full bg-white/70 border border-slate-200 focus:border-indigo-500 focus:bg-white rounded-xl p-2.5 text-slate-850 placeholder-slate-400 font-medium transition-all shadow-inner focus:ring-0 outline-none" />
+    <textarea {...props} rows={5} className="w-full bg-white/70 border border-slate-200 focus:border-indigo-500 focus:bg-white rounded-xl p-2.5 text-slate-800 placeholder-slate-400 font-medium transition-all shadow-inner focus:ring-0 outline-none" />
   </div>
 );
 

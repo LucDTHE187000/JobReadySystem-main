@@ -337,7 +337,7 @@ export default function CreditShopPage() {
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <p className="text-sm font-semibold text-slate-650">{pack.label}</p>
+                      <p className="text-sm font-semibold text-slate-600">{pack.label}</p>
                       <h3 className="mt-2 text-2xl font-bold text-[#0A2463]">{pack.credits.toLocaleString()} credit</h3>
                     </div>
                     <div className="text-right">

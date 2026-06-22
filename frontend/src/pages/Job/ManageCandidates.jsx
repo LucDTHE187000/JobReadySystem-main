@@ -213,7 +213,7 @@ export default function ManageCandidates() {
                             </h1>
                             <p className="text-sm text-slate-500 font-medium">
                                 Tổng cộng{" "}
-                                <span className="text-indigo-650 font-bold bg-indigo-50 px-2.5 py-0.5 rounded-lg border border-indigo-100/50 shadow-sm">
+                                <span className="text-indigo-600 font-bold bg-indigo-50 px-2.5 py-0.5 rounded-lg border border-indigo-100/50 shadow-sm">
                                     {filteredCandidates.length}
                                 </span>{" "}
                                 ứng viên
@@ -304,12 +304,12 @@ export default function ManageCandidates() {
                                                 <td className="p-4 font-semibold text-slate-800">
                                                     {c.jobId?.title}
                                                 </td>
-                                                <td className="p-4 text-slate-650 font-medium">
+                                                <td className="p-4 text-slate-600 font-medium">
                                                     {c.appliedAt
                                                         ? new Date(c.appliedAt).toLocaleDateString("vi-VN")
                                                         : "—"}
                                                 </td>
-                                                <td className="p-4 text-slate-655 font-medium">
+                                                <td className="p-4 text-slate-600 font-medium">
                                                     {c.interviewDate
                                                         ? new Date(c.interviewDate).toLocaleDateString("vi-VN")
                                                         : "—"}
@@ -333,7 +333,7 @@ export default function ManageCandidates() {
                                                                 href={c.resumeUrl}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
-                                                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 border border-indigo-150/60 text-indigo-650 text-xs font-semibold rounded-lg hover:bg-indigo-100/80 shadow-sm transition"
+                                                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 border border-indigo-200/60 text-indigo-600 text-xs font-semibold rounded-lg hover:bg-indigo-100/80 shadow-sm transition"
                                                             >
                                                                 <FileText size={14} />
                                                                 CV
@@ -354,7 +354,7 @@ export default function ManageCandidates() {
                                                         {/* LIÊN HỆ GỬI MAIL */}
                                                         <button
                                                             onClick={() => handleContactClick(c)}
-                                                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-violet-50 border border-violet-150/60 text-violet-650 text-xs font-semibold rounded-lg hover:bg-violet-100/80 shadow-sm transition"
+                                                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-violet-50 border border-violet-150/60 text-violet-600 text-xs font-semibold rounded-lg hover:bg-violet-100/80 shadow-sm transition"
                                                             title="Gửi email liên hệ"
                                                         >
                                                             <Mail size={14} />
@@ -365,7 +365,7 @@ export default function ManageCandidates() {
                                                         <select
                                                             value={c.status}
                                                             onChange={(e) => handleUpdateStatus(c._id, e.target.value)}
-                                                            className="px-2.5 py-1 text-xs border border-slate-205 focus:border-indigo-500 rounded-lg bg-white/70 text-slate-700 font-semibold cursor-pointer outline-none transition-all"
+                                                            className="px-2.5 py-1 text-xs border border-slate-200 focus:border-indigo-500 rounded-lg bg-white/70 text-slate-700 font-semibold cursor-pointer outline-none transition-all"
                                                         >
                                                             <option value="pending">Pending</option>
                                                             <option value="interview">Interview</option>
@@ -397,7 +397,7 @@ export default function ManageCandidates() {
                                     Xếp lịch phỏng vấn
                                 </h2>
 
-                                <p className="text-sm text-slate-650 font-semibold mb-3">
+                                <p className="text-sm text-slate-600 font-semibold mb-3">
                                     Ứng viên: {selectedCandidate.jobseekerId?.name}
                                 </p>
 
@@ -467,7 +467,7 @@ export default function ManageCandidates() {
                     {/* Gmail-style Compose Email Modal */}
                     {contactModalOpen && contactCandidate && contactCandidate.jobseekerId && (
                         <div
-                            className={`fixed bottom-0 right-4 lg:right-12 z-50 w-full max-w-lg bg-white/95 backdrop-blur-md rounded-t-2xl shadow-2xl border border-slate-250 flex flex-col transition-all duration-300 ${
+                            className={`fixed bottom-0 right-4 lg:right-12 z-50 w-full max-w-lg bg-white/95 backdrop-blur-md rounded-t-2xl shadow-2xl border border-slate-200 flex flex-col transition-all duration-300 ${
                                 isMinimized ? "h-11" : "h-[450px]"
                             }`}
                         >
@@ -523,7 +523,7 @@ export default function ManageCandidates() {
                                             onChange={e => setEmailBody(e.target.value)}
                                             placeholder="Nhập nội dung thư liên hệ..."
                                             required
-                                            className="w-full h-full resize-none focus:outline-none text-slate-805 font-medium text-sm leading-relaxed"
+                                            className="w-full h-full resize-none focus:outline-none text-slate-800 font-medium text-sm leading-relaxed"
                                         />
                                     </div>
 
@@ -533,7 +533,7 @@ export default function ManageCandidates() {
                                             <button
                                                 type="submit"
                                                 disabled={sendingEmail}
-                                                className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-xl text-sm font-semibold hover:bg-indigo-750 shadow-md"
+                                                className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-xl text-sm font-semibold shadow-md"
                                             >
                                                 {sendingEmail ? "Đang gửi..." : (
                                                     <>

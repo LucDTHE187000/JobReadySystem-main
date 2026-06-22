@@ -148,7 +148,7 @@ export default function FeedbackReview() {
                           </div>
                         </div>
                       </div>
-                      <p className="text-sm leading-relaxed text-slate-650 font-medium whitespace-pre-line bg-white/40 border border-white/30 rounded-xl p-4">{item.message}</p>
+                      <p className="text-sm leading-relaxed text-slate-600 font-medium whitespace-pre-line bg-white/40 border border-white/30 rounded-xl p-4">{item.message}</p>
                     </div>
                   ))
                 )}

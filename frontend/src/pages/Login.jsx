@@ -228,6 +228,8 @@ export default function Login() {
                 setError(msg);
             }
             setLoading(false);
+        } else {
+            setLoading(false);
             navigate('/', { replace: true });
         }
     };

@@ -895,7 +895,7 @@ export default function CVUpload() {
                                                         href={`${API_URL}${cv.filePath}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg border border-slate-350 transition-all flex items-center gap-2 cursor-pointer text-sm"
+                                                        className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg border border-slate-300 transition-all flex items-center gap-2 cursor-pointer text-sm"
                                                     >
                                                         Xem CV
                                                     </a>
@@ -1268,7 +1268,7 @@ export default function CVUpload() {
                                                 </h3>
                                                 <span className="text-xs text-slate-400 font-medium">Kéo để sắp xếp</span>
                                             </div>
-                                            <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase font-semibold text-slate-655">Danh sách kỹ năng (ngăn cách bằng dấu phẩy)</label>
+                                            <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase font-semibold text-slate-600">Danh sách kỹ năng (ngăn cách bằng dấu phẩy)</label>
                                             <input
                                                 type="text"
                                                 value={cvForm.skills}

@@ -150,7 +150,7 @@ export default function CandidateSearch() {
                         <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-800 mb-1">
                             Tìm kiếm ứng viên
                         </h1>
-                        <p className="text-sm text-slate-650 font-medium">
+                        <p className="text-sm text-slate-600 font-medium">
                             Tìm ứng viên phù hợp với vị trí tuyển dụng của bạn
                         </p>
                     </div>
@@ -227,7 +227,7 @@ export default function CandidateSearch() {
                                                 key={skill}
                                                 type="button"
                                                 onClick={() => addSkill(skill)}
-                                                className="px-3 py-1 border border-slate-200 bg-white/60 rounded-full text-xs text-slate-650 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 font-medium shadow-sm transition-all"
+                                                className="px-3 py-1 border border-slate-200 bg-white/60 rounded-full text-xs text-slate-600 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 font-medium shadow-sm transition-all"
                                             >
                                                 + {skill}
                                             </button>
@@ -250,7 +250,7 @@ export default function CandidateSearch() {
                                         <button
                                             type="button"
                                             onClick={() => { if (skillInput.trim()) addSkill(skillInput.trim()); }}
-                                            className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-750 text-white rounded-xl text-sm font-semibold transition-all shadow-sm"
+                                            className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition-all shadow-sm"
                                         >
                                             Thêm
                                         </button>
@@ -269,7 +269,7 @@ export default function CandidateSearch() {
                                                 className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                                                     experience === opt 
                                                         ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-100/30' 
-                                                        : 'border-slate-200 text-slate-650 bg-white/80 hover:bg-slate-50 shadow-sm'
+                                                        : 'border-slate-200 text-slate-600 bg-white/80 hover:bg-slate-50 shadow-sm'
                                                 }`}
                                             >
                                                 {opt}
@@ -283,7 +283,7 @@ export default function CandidateSearch() {
 
                     {/* Results Count */}
                     <div className="flex items-center justify-between mb-4">
-                        <p className="text-sm text-slate-650 font-medium bg-white/80 backdrop-blur-md px-4 py-2 rounded-xl border border-white/60 shadow-lg shadow-slate-900/5">
+                        <p className="text-sm text-slate-600 font-medium bg-white/80 backdrop-blur-md px-4 py-2 rounded-xl border border-white/60 shadow-lg shadow-slate-900/5">
                             Tìm thấy <span className="font-bold text-indigo-600 underline decoration-indigo-500/30">{total}</span> ứng viên
                         </p>
                     </div>
@@ -458,7 +458,7 @@ function CandidateCard({ candidate, onContactClick }) {
     const colorClass = colors[candidate.name?.charCodeAt(0) % colors.length] || "bg-indigo-500";
 
     return (
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-white/60 p-5 hover:shadow-xl hover:shadow-indigo-150/10 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between h-[230px] shadow-sm">
+        <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-white/60 p-5 hover:shadow-xl hover:shadow-indigo-200/10 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between h-[230px] shadow-sm">
             <div>
                 {/* Avatar & Name */}
                 <div className="flex items-center gap-3 mb-3">
@@ -477,7 +477,7 @@ function CandidateCard({ candidate, onContactClick }) {
 
                 {/* Experience */}
                 {candidate.experience && (
-                    <div className="flex items-center gap-1.5 text-xs text-slate-650 font-medium mb-1.5">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium mb-1.5">
                         <Briefcase size={12} className="text-slate-400 flex-shrink-0" />
                         <span className="truncate">{candidate.experience}</span>
                     </div>
@@ -485,7 +485,7 @@ function CandidateCard({ candidate, onContactClick }) {
 
                 {/* Education */}
                 {candidate.education && (
-                    <div className="flex items-center gap-1.5 text-xs text-slate-650 font-medium mb-2">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium mb-2">
                         <BookOpen size={12} className="text-slate-400 flex-shrink-0" />
                         <span className="truncate">{candidate.education}</span>
                     </div>

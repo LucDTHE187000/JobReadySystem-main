@@ -108,11 +108,11 @@ const JobDetail = () => {
                 <div className="flex-1 p-8 overflow-y-auto">
                     {/* Header & Back Button */}
                     <div className="flex items-center justify-between mb-8 bg-white/60 backdrop-blur-md p-4 rounded-2xl border border-white/50 shadow-xl shadow-slate-900/5">
-                        <button onClick={() => navigate(-1)} className="flex items-center text-slate-700 hover:text-indigo-650 transition-colors font-semibold text-sm">
-                            <ArrowLeft className="w-5 h-5 mr-2 text-slate-650" /> Quay lại
+                        <button onClick={() => navigate(-1)} className="flex items-center text-slate-700 hover:text-indigo-600 transition-colors font-semibold text-sm">
+                            <ArrowLeft className="w-5 h-5 mr-2 text-slate-600" /> Quay lại
                         </button>
                         <div className="flex gap-2">
-                            <span className="text-xs text-slate-650 font-semibold bg-white/80 border border-slate-200 px-3 py-1.5 rounded-xl flex items-center shadow-sm">
+                            <span className="text-xs text-slate-600 font-semibold bg-white/80 border border-slate-200 px-3 py-1.5 rounded-xl flex items-center shadow-sm">
                                 <Eye className="w-3.5 h-3.5 mr-1.5 text-slate-500" /> {data.views || 0} lượt xem
                             </span>
                         </div>
@@ -138,7 +138,7 @@ const JobDetail = () => {
 
                                 <div className="space-y-8 mt-10">
                                     <div>
-                                        <h3 className="text-base font-bold text-slate-805 flex items-center mb-4 border-b border-slate-100 pb-2">
+                                        <h3 className="text-base font-bold text-slate-800 flex items-center mb-4 border-b border-slate-100 pb-2">
                                             <span className="w-1.5 h-6 bg-indigo-500 rounded-full mr-3"></span>
                                             Mô tả công việc
                                         </h3>
@@ -148,7 +148,7 @@ const JobDetail = () => {
                                     </div>
 
                                     <div>
-                                        <h3 className="text-base font-bold text-slate-805 flex items-center mb-4 border-b border-slate-100 pb-2">
+                                        <h3 className="text-base font-bold text-slate-800 flex items-center mb-4 border-b border-slate-100 pb-2">
                                             <span className="w-1.5 h-6 bg-indigo-500 rounded-full mr-3"></span>
                                             Yêu cầu ứng viên
                                         </h3>
