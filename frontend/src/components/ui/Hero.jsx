@@ -3,21 +3,29 @@ import { ArrowRight, Play, Zap } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { ScrollReveal, AnimatedCounter } from './ScrollAnimations';
 import Magnetic from './Magnetic';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const HERO_IMAGE = '/abc.jpg';
+const HERO_IMAGES = ['/abc.jpg', '/bcd.jpg', '/cde.jpg', '/efg.jpg', '/ghi.jpg', '/ijk.jpg', '/jkl.jpg'];
 
 const stats = [
-    { value: '100+', label: 'người dùng' },
-    { value: '20+', label: 'doanh nghiệp' },
-    { value: '100+', label: 'câu hỏi AI' },
-    { value: '75%', label: 'hài lòng' },
+    { value: '250+', label: 'người dùng' },
+    { value: '30+', label: 'doanh nghiệp' },
+    { value: '150+', label: 'câu hỏi AI' },
+    { value: '85%', label: 'hài lòng' },
 ];
 
 export default function Hero() {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [parallaxOffset, setParallaxOffset] = useState({ x: 0, y: 0 });
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentImageIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+        }, 3000);
+        return () => clearInterval(timer);
+    }, []);
 
     const handleMouseMove = (e) => {
         const { clientX, clientY } = e;
@@ -155,12 +163,37 @@ export default function Hero() {
                             {/* Decorative ambient background halo behind image */}
                             <div className="absolute inset-0 bg-[#F5C518]/10 rounded-[32px] filter blur-xl scale-95 opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10" />
 
-                            <div className="rounded-3xl overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 p-3 shadow-2xl transition-all duration-500 group-hover:border-white/20 group-hover:bg-white/10">
-                                <img
-                                    src={HERO_IMAGE}
-                                    alt="Professional interview"
-                                    className="w-full h-[430px] object-cover rounded-2xl transition-all duration-700 group-hover:scale-[1.02]"
-                                />
+                             <div className="rounded-3xl overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 p-3 shadow-2xl transition-all duration-500 group-hover:border-white/20 group-hover:bg-white/10">
+                                <div className="relative w-full h-[430px] overflow-hidden rounded-2xl bg-slate-950">
+                                    {HERO_IMAGES.map((img, idx) => {
+                                        const isCurrent = idx === currentImageIndex;
+                                        const isPrevious = idx === ((currentImageIndex - 1 + HERO_IMAGES.length) % HERO_IMAGES.length);
+                                        const isTransitioning = isCurrent || isPrevious;
+
+                                        return (
+                                            <img
+                                                key={img}
+                                                src={img}
+                                                alt={`Professional interview slide ${idx}`}
+                                                className="absolute inset-0 w-full h-full object-cover rounded-2xl"
+                                                style={{
+                                                    transform: isCurrent 
+                                                        ? 'translateX(0) scale(1)' 
+                                                        : isPrevious 
+                                                            ? 'translateX(-100%) scale(0.95)' 
+                                                            : 'translateX(100%) scale(1.05)',
+                                                    opacity: isCurrent ? 1 : 0,
+                                                    filter: isCurrent ? 'blur(0px)' : 'blur(8px)',
+                                                    transition: isTransitioning 
+                                                        ? 'transform 1.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.4s ease-in-out, filter 1.4s ease-in-out' 
+                                                        : 'none',
+                                                    zIndex: isCurrent ? 10 : 0,
+                                                    pointerEvents: isCurrent ? 'auto' : 'none',
+                                                }}
+                                            />
+                                        );
+                                    })}
+                                </div>
                             </div>
 
                             {/* Bottom-left badge (glassmorphic) */}

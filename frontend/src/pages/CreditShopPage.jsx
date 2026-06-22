@@ -170,8 +170,37 @@ export default function CreditShopPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
+    const orderCode = params.get('orderCode');
     const pkg = params.get('package');
-    if (pkg) {
+
+    if (orderCode) {
+      if (token) {
+        const fetchOrderDetails = async () => {
+          setLoading(true);
+          setVerifyState('idle');
+          setVerifyMessage('');
+          try {
+            const response = await axios.get(
+              `${API_URL}/api/payment/details/${orderCode}`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setPayment(response.data);
+            // Map selected package matching the credit amount
+            const foundPkg = PACKAGES.find((p) => p.credits === response.data.creditAmount) || PACKAGES[1];
+            setSelectedPackage(foundPkg);
+          } catch (error) {
+            console.error("Load order details error:", error);
+            setVerifyState('error');
+            setVerifyMessage(error.response?.data?.message || 'Không thể lấy thông tin đơn hàng.');
+          } finally {
+            setLoading(false);
+          }
+        };
+        fetchOrderDetails();
+      } else {
+        navigate('/login');
+      }
+    } else if (pkg) {
       const found = PACKAGES.find((p) => p.id === pkg);
       if (found) {
         setSelectedPackage(found);

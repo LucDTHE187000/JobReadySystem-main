@@ -145,6 +145,9 @@ router.patch("/:jobId/toggle-status", authMiddleware, controller.toggleJobStatus
 router.put("/:jobId", authMiddleware, controller.updateJob);
 router.delete("/:jobId", authMiddleware, controller.deleteJob);
 
+/* ===== PUBLIC: Gợi ý việc làm AI dựa trên buổi phỏng vấn ===== */
+router.get("/recommendations/:sessionId", authMiddleware, controller.getJobRecommendationsBySession);
+
 /* ===== SAVED JOBS: Lưu và lấy tin tuyển dụng đã lưu ===== */
 router.get("/saved", authMiddleware, controller.getSavedJobs);
 router.post("/:jobId/save", authMiddleware, controller.saveJob);

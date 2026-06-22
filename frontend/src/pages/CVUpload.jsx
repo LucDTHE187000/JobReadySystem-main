@@ -44,7 +44,8 @@ export default function CVUpload() {
         education: [{ school: '', major: '', duration: '', desc: '' }],
         skills: '',
         projects: [{ name: '', desc: '' }],
-        template: 'standard'
+        template: 'standard',
+        sectionOrder: ['summary', 'experience', 'education', 'skills', 'projects']
     });
 
     const handleAddExperience = () => {
@@ -116,6 +117,26 @@ export default function CVUpload() {
         });
     };
 
+    const handleFormDragStart = (e, index) => {
+        e.dataTransfer.setData("text/plain", index.toString());
+        e.dataTransfer.effectAllowed = "move";
+    };
+
+    const handleFormDrop = (e, destIndex) => {
+        e.preventDefault();
+        const sourceIndex = parseInt(e.dataTransfer.getData("text/plain"), 10);
+        if (isNaN(sourceIndex) || sourceIndex === destIndex) return;
+        
+        const newOrder = [...(cvForm.sectionOrder || ['summary', 'experience', 'education', 'skills', 'projects'])];
+        const [movedItem] = newOrder.splice(sourceIndex, 1);
+        newOrder.splice(destIndex, 0, movedItem);
+        
+        setCvForm(prev => ({
+            ...prev,
+            sectionOrder: newOrder
+        }));
+    };
+
     const handleDownloadPDF = (isPrint = true) => {
         const printWindow = window.open('', '_blank');
         
@@ -175,7 +196,69 @@ export default function CVUpload() {
         }
 
         let cvHTML = '';
+        const order = cvForm.sectionOrder || ['summary', 'experience', 'education', 'skills', 'projects'];
+
         if (cvForm.template === 'modern') {
+            let mainContentHTML = '';
+            order.forEach((secId) => {
+                if (secId === 'summary') {
+                    mainContentHTML += `
+                        <div class="main-section">
+                            <div class="main-title">Giới thiệu bản thân</div>
+                            <p style="font-size: 13px; color: #475569; margin: 0; text-align: justify; white-space: pre-line;">${cvForm.summary || 'Chưa cung cấp thông tin giới thiệu.'}</p>
+                        </div>
+                    `;
+                } else if (secId === 'experience') {
+                    mainContentHTML += `
+                        <div class="main-section">
+                            <div class="main-title">Kinh nghiệm làm việc</div>
+                            ${cvForm.experience.map(exp => `
+                                <div class="item">
+                                    <div class="item-header">
+                                        <span>${exp.role || 'Vị trí'}</span>
+                                        <span style="font-size: 12px; color: #64748b; font-weight: normal;">${exp.duration || 'Thời gian'}</span>
+                                    </div>
+                                    <div class="item-sub">${exp.company || 'Tên công ty'}</div>
+                                    <div class="item-desc">${exp.desc || 'Mô tả công việc'}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else if (secId === 'education') {
+                    mainContentHTML += `
+                        <div class="main-section">
+                            <div class="main-title">Học vấn</div>
+                            ${cvForm.education.map(edu => `
+                                <div class="item">
+                                    <div class="item-header">
+                                        <span>${edu.school || 'Tên trường học'}</span>
+                                        <span style="font-size: 12px; color: #64748b; font-weight: normal;">${edu.duration || 'Thời gian'}</span>
+                                    </div>
+                                    <div class="item-sub">${edu.major || 'Chuyên ngành'}</div>
+                                    <div class="item-desc">${edu.desc || ''}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else if (secId === 'projects') {
+                    if (cvForm.projects.some(p => p.name || p.desc)) {
+                        mainContentHTML += `
+                            <div class="main-section">
+                                <div class="main-title">Dự án cá nhân</div>
+                                ${cvForm.projects.map(p => `
+                                    <div class="item">
+                                        <div class="item-header">
+                                            <span>${p.name || 'Tên dự án'}</span>
+                                        </div>
+                                        <div class="item-desc">${p.desc || ''}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+                }
+            });
+
             cvHTML = `
                 <div class="container">
                     <div class="sidebar">
@@ -197,56 +280,80 @@ export default function CVUpload() {
                         </div>
                     </div>
                     <div class="main-content">
-                        <div class="main-section">
-                            <div class="main-title">Giới thiệu bản thân</div>
-                            <p style="font-size: 13px; color: #475569; margin: 0; text-align: justify; white-space: pre-line;">${cvForm.summary || 'Chưa cung cấp thông tin giới thiệu.'}</p>
+                        ${mainContentHTML}
+                    </div>
+                </div>
+            `;
+        } else {
+            let sectionsHTML = '';
+            order.forEach((secId) => {
+                if (secId === 'summary') {
+                    sectionsHTML += `
+                        <div class="section">
+                            <div class="section-title">Giới thiệu bản thân</div>
+                            <p style="font-size: 13px; margin: 0; text-align: justify; white-space: pre-line;">${cvForm.summary || 'Chưa cung cấp thông tin giới thiệu.'}</p>
                         </div>
-                        
-                        <div class="main-section">
-                            <div class="main-title">Kinh nghiệm làm việc</div>
+                    `;
+                } else if (secId === 'experience') {
+                    sectionsHTML += `
+                        <div class="section">
+                            <div class="section-title">Kinh nghiệm làm việc</div>
                             ${cvForm.experience.map(exp => `
                                 <div class="item">
                                     <div class="item-header">
-                                        <span>${exp.role || 'Vị trí'}</span>
-                                        <span style="font-size: 12px; color: #64748b; font-weight: normal;">${exp.duration || 'Thời gian'}</span>
+                                        <span>${exp.company || 'Tên công ty'}</span>
+                                        <span style="font-size: 12px; font-weight: normal; color: #64748b;">${exp.duration || 'Thời gian'}</span>
                                     </div>
-                                    <div class="item-sub">${exp.company || 'Tên công ty'}</div>
+                                    <div class="item-sub">${exp.role || 'Vị trí'}</div>
                                     <div class="item-desc">${exp.desc || 'Mô tả công việc'}</div>
                                 </div>
                             `).join('')}
                         </div>
-                        
-                        <div class="main-section">
-                            <div class="main-title">Học vấn</div>
+                    `;
+                } else if (secId === 'education') {
+                    sectionsHTML += `
+                        <div class="section">
+                            <div class="section-title">Học vấn</div>
                             ${cvForm.education.map(edu => `
                                 <div class="item">
                                     <div class="item-header">
                                         <span>${edu.school || 'Tên trường học'}</span>
-                                        <span style="font-size: 12px; color: #64748b; font-weight: normal;">${edu.duration || 'Thời gian'}</span>
+                                        <span style="font-size: 12px; font-weight: normal; color: #64748b;">${edu.duration || 'Thời gian'}</span>
                                     </div>
                                     <div class="item-sub">${edu.major || 'Chuyên ngành'}</div>
                                     <div class="item-desc">${edu.desc || ''}</div>
                                 </div>
                             `).join('')}
                         </div>
-
-                        ${cvForm.projects.some(p => p.name || p.desc) ? `
-                        <div class="main-section">
-                            <div class="main-title">Dự án cá nhân</div>
-                            ${cvForm.projects.map(p => `
-                                <div class="item">
-                                    <div class="item-header">
-                                        <span>${p.name || 'Tên dự án'}</span>
+                    `;
+                } else if (secId === 'projects') {
+                    if (cvForm.projects.some(p => p.name || p.desc)) {
+                        sectionsHTML += `
+                            <div class="section">
+                                <div class="section-title">Dự án cá nhân</div>
+                                ${cvForm.projects.map(p => `
+                                    <div class="item">
+                                        <div class="item-header">
+                                            <span>${p.name || 'Tên dự án'}</span>
+                                        </div>
+                                        <div class="item-desc">${p.desc || ''}</div>
                                     </div>
-                                    <div class="item-desc">${p.desc || ''}</div>
-                                </div>
-                            `).join('')}
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+                } else if (secId === 'skills') {
+                    sectionsHTML += `
+                        <div class="section">
+                            <div class="section-title">Kỹ năng</div>
+                            <div class="skills-list">
+                                ${cvForm.skills.split(',').map(s => s.trim()).filter(Boolean).map(s => `<span class="skill-tag">${s}</span>`).join('') || 'Chưa cung cấp'}
+                            </div>
                         </div>
-                        ` : ''}
-                    </div>
-                </div>
-            `;
-        } else {
+                    `;
+                }
+            });
+
             cvHTML = `
                 <div class="header">
                     <div class="name">${cvForm.name || 'Họ và Tên'}</div>
@@ -257,60 +364,7 @@ export default function CVUpload() {
                         <span>📍 ${cvForm.address || 'Chưa cung cấp'}</span>
                     </div>
                 </div>
-                
-                <div class="section">
-                    <div class="section-title">Giới thiệu bản thân</div>
-                    <p style="font-size: 13px; margin: 0; text-align: justify; white-space: pre-line;">${cvForm.summary || 'Chưa cung cấp thông tin giới thiệu.'}</p>
-                </div>
-                
-                <div class="section">
-                    <div class="section-title">Kinh nghiệm làm việc</div>
-                    ${cvForm.experience.map(exp => `
-                        <div class="item">
-                            <div class="item-header">
-                                <span>${exp.company || 'Tên công ty'}</span>
-                                <span style="font-size: 12px; font-weight: normal; color: #64748b;">${exp.duration || 'Thời gian'}</span>
-                            </div>
-                            <div class="item-sub">${exp.role || 'Vị trí'}</div>
-                            <div class="item-desc">${exp.desc || 'Mô tả công việc'}</div>
-                        </div>
-                    `).join('')}
-                </div>
-                
-                <div class="section">
-                    <div class="section-title">Học vấn</div>
-                    ${cvForm.education.map(edu => `
-                        <div class="item">
-                            <div class="item-header">
-                                <span>${edu.school || 'Tên trường học'}</span>
-                                <span style="font-size: 12px; font-weight: normal; color: #64748b;">${edu.duration || 'Thời gian'}</span>
-                            </div>
-                            <div class="item-sub">${edu.major || 'Chuyên ngành'}</div>
-                            <div class="item-desc">${edu.desc || ''}</div>
-                        </div>
-                    `).join('')}
-                </div>
-
-                ${cvForm.projects.some(p => p.name || p.desc) ? `
-                <div class="section">
-                    <div class="section-title">Dự án cá nhân</div>
-                    ${cvForm.projects.map(p => `
-                        <div class="item">
-                            <div class="item-header">
-                                <span>${p.name || 'Tên dự án'}</span>
-                            </div>
-                            <div class="item-desc">${p.desc || ''}</div>
-                        </div>
-                    `).join('')}
-                </div>
-                ` : ''}
-                
-                <div class="section">
-                    <div class="section-title">Kỹ năng</div>
-                    <div class="skills-list">
-                        ${cvForm.skills.split(',').map(s => s.trim()).filter(Boolean).map(s => `<span class="skill-tag">${s}</span>`).join('') || 'Chưa cung cấp'}
-                    </div>
-                </div>
+                ${sectionsHTML}
             `;
         }
 
@@ -373,14 +427,18 @@ export default function CVUpload() {
                 education: [{ school: '', major: '', duration: '', desc: '' }],
                 skills: '',
                 projects: [{ name: '', desc: '' }],
-                template: 'standard'
+                template: 'standard',
+                sectionOrder: ['summary', 'experience', 'education', 'skills', 'projects']
             });
             setNewDesignName('');
             return;
         }
         const design = savedDesigns.find(d => d._id === id);
         if (design) {
-            setCvForm(design.data);
+            setCvForm({
+                ...design.data,
+                sectionOrder: design.data?.sectionOrder || ['summary', 'experience', 'education', 'skills', 'projects']
+            });
             setNewDesignName(design.name);
         }
     };
@@ -983,240 +1041,351 @@ export default function CVUpload() {
                                 </div>
                             </div>
 
-                            {/* Summary */}
-                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
-                                <h3 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 flex items-center gap-2">
-                                    <FileEdit className="w-5 h-5 text-indigo-500 flex-shrink-0" />
-                                    Giới thiệu bản thân
-                                </h3>
-                                <textarea
-                                    value={cvForm.summary}
-                                    onChange={(e) => setCvForm({ ...cvForm, summary: e.target.value })}
-                                    rows={4}
-                                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463] resize-none"
-                                    placeholder="Tóm tắt ngắn gọn về kinh nghiệm, thế mạnh và mục tiêu nghề nghiệp của bạn..."
-                                />
-                            </div>
-
-                            {/* Experience */}
-                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
-                                <div className="flex justify-between items-center mb-4 border-b pb-2">
-                                    <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <Briefcase className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                                        Kinh nghiệm làm việc
-                                    </h3>
-                                    <button
-                                        type="button"
-                                        onClick={handleAddExperience}
-                                        className="px-3 py-1.5 bg-slate-100 text-[#0A2463] border border-white/10 hover:bg-white/15 text-xs font-semibold rounded-lg transition"
-                                    >
-                                        + Thêm kinh nghiệm
-                                    </button>
-                                </div>
-                                <div className="space-y-6">
-                                    {cvForm.experience.map((exp, index) => (
-                                        <div key={index} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 relative">
-                                            {cvForm.experience.length > 1 && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleRemoveExperience(index)}
-                                                    className="absolute top-4 right-4 text-red-500 hover:text-red-700 font-bold text-xs"
-                                                >
-                                                    Xóa
-                                                </button>
-                                            )}
-                                            <div className="grid md:grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Tên công ty</label>
-                                                    <input
-                                                        type="text"
-                                                        value={exp.company}
-                                                        onChange={(e) => handleExperienceChange(index, 'company', e.target.value)}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
-                                                        placeholder="Google, FPT..."
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Vị trí/Chức danh</label>
-                                                    <input
-                                                        type="text"
-                                                        value={exp.role}
-                                                        onChange={(e) => handleExperienceChange(index, 'role', e.target.value)}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
-                                                        placeholder="VD: Senior Developer, Sales Executive..."
-                                                    />
-                                                </div>
-                                                <div className="md:col-span-2">
-                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Khoảng thời gian</label>
-                                                    <input
-                                                        type="text"
-                                                        value={exp.duration}
-                                                        onChange={(e) => handleExperienceChange(index, 'duration', e.target.value)}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
-                                                        placeholder="VD: 09/2023 - Hiện tại, 2021 - 2023..."
-                                                    />
-                                                </div>
-                                                <div className="md:col-span-2">
-                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Mô tả công việc</label>
-                                                    <textarea
-                                                        value={exp.desc}
-                                                        onChange={(e) => handleExperienceChange(index, 'desc', e.target.value)}
-                                                        rows={3}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463] resize-none"
-                                                        placeholder="Nêu chi tiết công việc, nhiệm vụ chính và các thành tích nổi bật của bạn..."
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Education */}
-                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
-                                <div className="flex justify-between items-center mb-4 border-b pb-2">
-                                    <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <GraduationCap className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                                        Học vấn
-                                    </h3>
-                                    <button
-                                        type="button"
-                                        onClick={handleAddEducation}
-                                        className="px-3 py-1.5 bg-slate-100 text-[#0A2463] border border-white/10 hover:bg-white/15 text-xs font-semibold rounded-lg transition"
-                                    >
-                                        + Thêm học vấn
-                                    </button>
-                                </div>
-                                <div className="space-y-6">
-                                    {cvForm.education.map((edu, index) => (
-                                        <div key={index} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 relative">
-                                            {cvForm.education.length > 1 && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleRemoveEducation(index)}
-                                                    className="absolute top-4 right-4 text-red-500 hover:text-red-700 font-bold text-xs"
-                                                >
-                                                    Xóa
-                                                </button>
-                                            )}
-                                            <div className="grid md:grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Tên trường học</label>
-                                                    <input
-                                                        type="text"
-                                                        value={edu.school}
-                                                        onChange={(e) => handleEducationChange(index, 'school', e.target.value)}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
-                                                        placeholder="Đại học Bách Khoa, FPT University..."
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Chuyên ngành</label>
-                                                    <input
-                                                        type="text"
-                                                        value={edu.major}
-                                                        onChange={(e) => handleEducationChange(index, 'major', e.target.value)}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
-                                                        placeholder="VD: Khoa học Máy tính, Quản trị Kinh doanh..."
-                                                    />
-                                                </div>
-                                                <div className="md:col-span-2">
-                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Khoảng thời gian</label>
-                                                    <input
-                                                        type="text"
-                                                        value={edu.duration}
-                                                        onChange={(e) => handleEducationChange(index, 'duration', e.target.value)}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
-                                                        placeholder="VD: 2019 - 2023..."
-                                                    />
-                                                </div>
-                                                <div className="md:col-span-2">
-                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Mô tả bổ sung (Tùy chọn)</label>
-                                                    <input
-                                                        type="text"
-                                                        value={edu.desc}
-                                                        onChange={(e) => handleEducationChange(index, 'desc', e.target.value)}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
-                                                        placeholder="VD: GPA: 3.6/4.0, Học bổng khuyến học..."
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Skills */}
-                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
-                                <h3 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 flex items-center gap-2">
-                                    <Wrench className="w-5 h-5 text-amber-500 flex-shrink-0" />
-                                    Kỹ năng chuyên môn
-                                </h3>
-                                <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase font-semibold text-slate-600">Danh sách kỹ năng (ngăn cách bằng dấu phẩy)</label>
-                                <input
-                                    type="text"
-                                    value={cvForm.skills}
-                                    onChange={(e) => setCvForm({ ...cvForm, skills: e.target.value })}
-                                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
-                                    placeholder="VD: ReactJS, NodeJS, JavaScript, Git, Communication..."
-                                />
-                            </div>
-
-                            {/* Projects */}
-                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
-                                <div className="flex justify-between items-center mb-4 border-b pb-2">
-                                    <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <Folder className="w-5 h-5 text-cyan-500 flex-shrink-0" />
-                                        Dự án cá nhân (Tùy chọn)
-                                    </h3>
-                                    <button
-                                        type="button"
-                                        onClick={handleAddProject}
-                                        className="px-3 py-1.5 bg-slate-100 text-[#0A2463] border border-white/10 hover:bg-white/15 text-xs font-semibold rounded-lg transition"
-                                    >
-                                        + Thêm dự án
-                                    </button>
-                                </div>
-                                <div className="space-y-6">
-                                    {cvForm.projects.map((p, index) => (
-                                        <div key={index} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 relative">
-                                            <button
-                                                type="button"
-                                                onClick={() => handleRemoveProject(index)}
-                                                className="absolute top-4 right-4 text-red-500 hover:text-red-700 font-bold text-xs"
+                            {(cvForm.sectionOrder || ['summary', 'experience', 'education', 'skills', 'projects']).map((secId, index) => {
+                                if (secId === 'summary') {
+                                    return (
+                                        <div 
+                                            key="summary"
+                                            className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md transition-all duration-300"
+                                            onDragOver={(e) => e.preventDefault()}
+                                            onDrop={(e) => handleFormDrop(e, index)}
+                                        >
+                                            <div 
+                                                draggable
+                                                onDragStart={(e) => handleFormDragStart(e, index)}
+                                                className="flex items-center justify-between mb-4 border-b border-slate-200 pb-2 cursor-grab active:cursor-grabbing group"
                                             >
-                                                Xóa
-                                            </button>
-                                            <div className="grid gap-4">
-                                                <div>
-                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Tên dự án</label>
-                                                    <input
-                                                        type="text"
-                                                        value={p.name}
-                                                        onChange={(e) => handleProjectChange(index, 'name', e.target.value)}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
-                                                        placeholder="VD: Website Bán Hàng E-Commerce, Ứng Dụng Chat realtime..."
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Mô tả dự án</label>
-                                                    <textarea
-                                                        value={p.desc}
-                                                        onChange={(e) => handleProjectChange(index, 'desc', e.target.value)}
-                                                        rows={2}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463] resize-none"
-                                                        placeholder="Nêu công nghệ sử dụng và kết quả của dự án..."
-                                                    />
+                                                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 select-none">
+                                                    <span className="text-slate-400 group-hover:text-[#F5C518] transition-colors font-bold text-xl mr-1">⋮⋮</span>
+                                                    <FileEdit className="w-5 h-5 text-indigo-500 flex-shrink-0" />
+                                                    Giới thiệu bản thân
+                                                </h3>
+                                                <span className="text-xs text-slate-400 font-medium">Kéo để sắp xếp</span>
+                                            </div>
+                                            <textarea
+                                                value={cvForm.summary}
+                                                onChange={(e) => setCvForm({ ...cvForm, summary: e.target.value })}
+                                                rows={4}
+                                                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463] resize-none"
+                                                placeholder="Tóm tắt ngắn gọn về kinh nghiệm, thế mạnh và mục tiêu nghề nghiệp của bạn..."
+                                            />
+                                        </div>
+                                    );
+                                }
+                                if (secId === 'experience') {
+                                    return (
+                                        <div 
+                                            key="experience"
+                                            className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md transition-all duration-300"
+                                            onDragOver={(e) => e.preventDefault()}
+                                            onDrop={(e) => handleFormDrop(e, index)}
+                                        >
+                                            <div 
+                                                draggable
+                                                onDragStart={(e) => handleFormDragStart(e, index)}
+                                                className="flex items-center justify-between mb-4 border-b border-slate-200 pb-2 cursor-grab active:cursor-grabbing group"
+                                            >
+                                                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 select-none">
+                                                    <span className="text-slate-400 group-hover:text-[#F5C518] transition-colors font-bold text-xl mr-1">⋮⋮</span>
+                                                    <Briefcase className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                                                    Kinh nghiệm làm việc
+                                                </h3>
+                                                <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleAddExperience}
+                                                        className="px-3 py-1.5 bg-slate-100 text-[#0A2463] border border-slate-200 hover:bg-slate-200 text-xs font-semibold rounded-lg transition"
+                                                    >
+                                                        + Thêm kinh nghiệm
+                                                    </button>
                                                 </div>
                                             </div>
+                                            <div className="space-y-6">
+                                                {cvForm.experience.map((exp, expIdx) => (
+                                                    <div key={expIdx} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 relative animate-fadeIn">
+                                                        {cvForm.experience.length > 1 && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleRemoveExperience(expIdx)}
+                                                                className="absolute top-4 right-4 text-red-500 hover:text-red-700 font-bold text-xs"
+                                                            >
+                                                                Xóa
+                                                            </button>
+                                                        )}
+                                                        <div className="grid md:grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Tên công ty</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={exp.company}
+                                                                    onChange={(e) => handleExperienceChange(expIdx, 'company', e.target.value)}
+                                                                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
+                                                                    placeholder="Google, FPT..."
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Vị trí/Chức danh</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={exp.role}
+                                                                    onChange={(e) => handleExperienceChange(expIdx, 'role', e.target.value)}
+                                                                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
+                                                                    placeholder="VD: Senior Developer, Sales Executive..."
+                                                                />
+                                                            </div>
+                                                            <div className="md:col-span-2">
+                                                                <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Khoảng thời gian</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={exp.duration}
+                                                                    onChange={(e) => handleExperienceChange(expIdx, 'duration', e.target.value)}
+                                                                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
+                                                                    placeholder="VD: 09/2023 - Hiện tại, 2021 - 2023..."
+                                                                />
+                                                            </div>
+                                                            <div className="md:col-span-2">
+                                                                <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Mô tả công việc</label>
+                                                                <textarea
+                                                                    value={exp.desc}
+                                                                    onChange={(e) => handleExperienceChange(expIdx, 'desc', e.target.value)}
+                                                                    rows={3}
+                                                                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463] resize-none"
+                                                                    placeholder="Nêu chi tiết công việc, nhiệm vụ chính và các thành tích nổi bật của bạn..."
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
+                                    );
+                                }
+                                if (secId === 'education') {
+                                    return (
+                                        <div 
+                                            key="education"
+                                            className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md transition-all duration-300"
+                                            onDragOver={(e) => e.preventDefault()}
+                                            onDrop={(e) => handleFormDrop(e, index)}
+                                        >
+                                            <div 
+                                                draggable
+                                                onDragStart={(e) => handleFormDragStart(e, index)}
+                                                className="flex items-center justify-between mb-4 border-b border-slate-200 pb-2 cursor-grab active:cursor-grabbing group"
+                                            >
+                                                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 select-none">
+                                                    <span className="text-slate-400 group-hover:text-[#F5C518] transition-colors font-bold text-xl mr-1">⋮⋮</span>
+                                                    <GraduationCap className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                                                    Học vấn
+                                                </h3>
+                                                <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleAddEducation}
+                                                        className="px-3 py-1.5 bg-slate-100 text-[#0A2463] border border-slate-200 hover:bg-slate-200 text-xs font-semibold rounded-lg transition"
+                                                    >
+                                                        + Thêm học vấn
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-6">
+                                                {cvForm.education.map((edu, eduIdx) => (
+                                                    <div key={eduIdx} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 relative animate-fadeIn">
+                                                        {cvForm.education.length > 1 && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleRemoveEducation(eduIdx)}
+                                                                className="absolute top-4 right-4 text-red-500 hover:text-red-700 font-bold text-xs"
+                                                            >
+                                                                Xóa
+                                                            </button>
+                                                        )}
+                                                        <div className="grid md:grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Tên trường học</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={edu.school}
+                                                                    onChange={(e) => handleEducationChange(eduIdx, 'school', e.target.value)}
+                                                                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
+                                                                    placeholder="Đại học Bách Khoa, FPT University..."
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Chuyên ngành</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={edu.major}
+                                                                    onChange={(e) => handleEducationChange(eduIdx, 'major', e.target.value)}
+                                                                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
+                                                                    placeholder="VD: Khoa học Máy tính, Quản trị Kinh doanh..."
+                                                                />
+                                                            </div>
+                                                            <div className="md:col-span-2">
+                                                                <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Khoảng thời gian</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={edu.duration}
+                                                                    onChange={(e) => handleEducationChange(eduIdx, 'duration', e.target.value)}
+                                                                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
+                                                                    placeholder="VD: 2019 - 2023..."
+                                                                />
+                                                            </div>
+                                                            <div className="md:col-span-2">
+                                                                <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Mô tả bổ sung (Tùy chọn)</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={edu.desc}
+                                                                    onChange={(e) => handleEducationChange(eduIdx, 'desc', e.target.value)}
+                                                                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
+                                                                    placeholder="VD: GPA: 3.6/4.0, Học bổng khuyến học..."
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                                if (secId === 'skills') {
+                                    return (
+                                        <div 
+                                            key="skills"
+                                            className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md transition-all duration-300"
+                                            onDragOver={(e) => e.preventDefault()}
+                                            onDrop={(e) => handleFormDrop(e, index)}
+                                        >
+                                            <div 
+                                                draggable
+                                                onDragStart={(e) => handleFormDragStart(e, index)}
+                                                className="flex items-center justify-between mb-4 border-b border-slate-200 pb-2 cursor-grab active:cursor-grabbing group"
+                                            >
+                                                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 select-none">
+                                                    <span className="text-slate-400 group-hover:text-[#F5C518] transition-colors font-bold text-xl mr-1">⋮⋮</span>
+                                                    <Wrench className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                                                    Kỹ năng chuyên môn
+                                                </h3>
+                                                <span className="text-xs text-slate-400 font-medium">Kéo để sắp xếp</span>
+                                            </div>
+                                            <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase font-semibold text-slate-655">Danh sách kỹ năng (ngăn cách bằng dấu phẩy)</label>
+                                            <input
+                                                type="text"
+                                                value={cvForm.skills}
+                                                onChange={(e) => setCvForm({ ...cvForm, skills: e.target.value })}
+                                                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
+                                                placeholder="VD: ReactJS, NodeJS, JavaScript, Git, Communication..."
+                                            />
+                                        </div>
+                                    );
+                                }
+                                if (secId === 'projects') {
+                                    return (
+                                        <div 
+                                            key="projects"
+                                            className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md transition-all duration-300"
+                                            onDragOver={(e) => e.preventDefault()}
+                                            onDrop={(e) => handleFormDrop(e, index)}
+                                        >
+                                            <div 
+                                                draggable
+                                                onDragStart={(e) => handleFormDragStart(e, index)}
+                                                className="flex items-center justify-between mb-4 border-b border-slate-200 pb-2 cursor-grab active:cursor-grabbing group"
+                                            >
+                                                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 select-none">
+                                                    <span className="text-slate-400 group-hover:text-[#F5C518] transition-colors font-bold text-xl mr-1">⋮⋮</span>
+                                                    <Folder className="w-5 h-5 text-cyan-500 flex-shrink-0" />
+                                                    Dự án cá nhân (Tùy chọn)
+                                                </h3>
+                                                <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleAddProject}
+                                                        className="px-3 py-1.5 bg-slate-100 text-[#0A2463] border border-slate-200 hover:bg-slate-200 text-xs font-semibold rounded-lg transition"
+                                                    >
+                                                        + Thêm dự án
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-6">
+                                                {cvForm.projects.map((p, projIdx) => (
+                                                    <div key={projIdx} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 relative animate-fadeIn">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveProject(projIdx)}
+                                                            className="absolute top-4 right-4 text-red-500 hover:text-red-700 font-bold text-xs"
+                                                        >
+                                                            Xóa
+                                                        </button>
+                                                        <div className="grid gap-4">
+                                                            <div>
+                                                                <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Tên dự án</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={p.name}
+                                                                    onChange={(e) => handleProjectChange(projIdx, 'name', e.target.value)}
+                                                                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463]"
+                                                                    placeholder="VD: Website Bán Hàng E-Commerce, Ứng Dụng Chat realtime..."
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Mô tả dự án</label>
+                                                                <textarea
+                                                                    value={p.desc}
+                                                                    onChange={(e) => handleProjectChange(projIdx, 'desc', e.target.value)}
+                                                                    rows={2}
+                                                                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#0A2463] resize-none"
+                                                                    placeholder="Nêu công nghệ sử dụng và kết quả của dự án..."
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                                return null;
+                            })}
                         </div>
 
                         {/* Sidebar templates & download */}
                         <div className="space-y-6">
+                            {/* Drag and Drop layout order panel */}
+                            <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md space-y-3">
+                                <h3 className="font-bold text-lg text-[#0A2463] flex items-center gap-2 border-b pb-2 border-slate-200 select-none">
+                                    <span className="p-1 rounded-lg bg-[#F5C518]/10 text-[#F5C518]">🔄</span>
+                                    Sắp Xếp Bố Cục CV
+                                </h3>
+                                <p className="text-xs text-slate-500 leading-relaxed">Kéo thả các phần dưới đây để sắp xếp lại thứ tự hiển thị của CV khi xuất PDF và trên form nhập liệu:</p>
+                                <div className="space-y-2">
+                                    {(cvForm.sectionOrder || ['summary', 'experience', 'education', 'skills', 'projects']).map((secId, idx) => {
+                                        const labels = {
+                                            summary: '📝 Giới thiệu bản thân',
+                                            experience: '💼 Kinh nghiệm làm việc',
+                                            education: '🎓 Học vấn & Trình độ',
+                                            skills: '🛠️ Kỹ năng chuyên môn',
+                                            projects: '📂 Dự án cá nhân'
+                                        };
+                                        return (
+                                            <div
+                                                key={secId}
+                                                draggable
+                                                onDragStart={(e) => handleFormDragStart(e, idx)}
+                                                onDragOver={(e) => e.preventDefault()}
+                                                onDrop={(e) => handleFormDrop(e, idx)}
+                                                className="flex items-center justify-between p-3 bg-white border border-slate-200 hover:border-[#F5C518] rounded-xl cursor-grab active:cursor-grabbing hover:bg-slate-50 transition-all shadow-sm group select-none"
+                                            >
+                                                <span className="text-xs font-semibold text-slate-700">{labels[secId]}</span>
+                                                <span className="text-slate-400 group-hover:text-[#F5C518] transition-colors font-bold">
+                                                    ⋮⋮
+                                                </span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
                             <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-2xl p-6 text-slate-800 shadow-md">
                                 <h3 className="font-bold text-lg mb-4 text-[#0A2463] flex items-center gap-2">
                                     <Palette className="w-5 h-5 text-[#F5C518] flex-shrink-0" />

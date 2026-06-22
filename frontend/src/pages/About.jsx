@@ -18,7 +18,7 @@ const milestones = [
     { year: '2026/03', event: 'Giúp 100+ người dùng luyện phỏng vấn' },
     { year: '2026/04', event: 'Hợp tác với 20+ doanh nghiệp hàng đầu' },
     { year: '2026/05', event: 'Đưa mô hình Gemini flast kết hợp Groq vào phỏng vấn và ScanCV' },
-    { year: '2026/06', event: 'Tiến tới mở rộng hơn 150 người dùng và 30+ doanh nghiệp' },
+    { year: '2026/06', event: 'Tiến tới mở rộng hơn 250 người dùng và 30+ doanh nghiệp' },
 ];
 
 
@@ -112,10 +112,10 @@ export default function About() {
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 text-center">
                         {[
-                            { icon: Users, value: '100+', label: 'Người dùng' },
-                            { icon: Award, value: '20+', label: 'Doanh nghiệp' },
-                            { icon: Zap, value: '100+', label: 'Câu hỏi AI' },
-                            { icon: Target, value: '75%', label: 'Hài lòng' },
+                            { icon: Users, value: '250+', label: 'Người dùng' },
+                            { icon: Award, value: '30+', label: 'Doanh nghiệp' },
+                            { icon: Zap, value: '150+', label: 'Câu hỏi AI' },
+                            { icon: Target, value: '85%', label: 'Hài lòng' },
                         ].map(({ icon: Icon, value, label }, i) => (
                             <ScrollReveal key={label} delay={100 * (i + 1)} type="scale">
                                 <Icon className="w-8 h-8 text-[#F5C518] mx-auto mb-4 animate-pulse" />

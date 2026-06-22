@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { isJobSeekerRole, isEmployerRole } from '../utils/roles';
-import { User, Lock, Briefcase, Camera, Building, Mail, Phone, MapPin, Save, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { User, Lock, Briefcase, Camera, Building, Mail, Phone, MapPin, Save, ArrowLeft, Eye, EyeOff, CreditCard } from 'lucide-react';
 import axios from 'axios';
 import SeekerLayout from '../components/layout/SeekerLayout';
 
@@ -11,6 +11,9 @@ export default function Profile() {
     const { user, refreshUser } = useAuth();
     const credits = user?.credits ?? 0;
     const [activeTab, setActiveTab] = useState('general');
+    const [billingHistory, setBillingHistory] = useState([]);
+    const [billingLoading, setBillingLoading] = useState(false);
+    const [activePackage, setActivePackage] = useState('');
 
     const [formData, setFormData] = useState({
         name: '',
@@ -54,6 +57,36 @@ export default function Profile() {
             });
         }
     }, [user]);
+
+    useEffect(() => {
+        if (user && activeTab === 'billing') {
+            fetchBillingHistory();
+        }
+    }, [user, activeTab]);
+
+    const fetchBillingHistory = async () => {
+        try {
+            setBillingLoading(true);
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            const response = await axios.get(`${API_URL}/api/payment/history`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const history = response.data.history || [];
+            setBillingHistory(history);
+            
+            // Tìm gói thanh toán thành công gần nhất
+            const paidOrders = history.filter(o => o.status === 'PAID');
+            if (paidOrders.length > 0) {
+                setActivePackage(paidOrders[0].packageName);
+            } else {
+                setActivePackage('Cơ bản');
+            }
+        } catch (err) {
+            console.error("Lỗi khi tải lịch sử giao dịch:", err);
+        } finally {
+            setBillingLoading(false);
+        }
+    };
 
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -222,6 +255,15 @@ export default function Profile() {
                                 <Lock size={18} />
                                 Bảo mật
                             </button>
+                            {user?.role !== 'ADMIN' && (
+                                <button
+                                    onClick={() => { setActiveTab('billing'); setMessage({ type: '', text: '' }) }}
+                                    className={`flex-1 min-w-[160px] flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${tabBtn('billing')}`}
+                                >
+                                    <CreditCard size={18} />
+                                    Gói & Giao dịch
+                                </button>
+                            )}
                         </div>
                     </div>
                 )}
@@ -266,6 +308,15 @@ export default function Profile() {
                                 <Lock size={18} />
                                 Bảo mật
                             </button>
+                            {user?.role !== 'ADMIN' && (
+                                <button
+                                    onClick={() => { setActiveTab('billing'); setMessage({ type: '', text: '' }) }}
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${tabBtn('billing')}`}
+                                >
+                                    <CreditCard size={18} />
+                                    Gói & Giao dịch
+                                </button>
+                            )}
                         </div>
                     )}
 
@@ -281,9 +332,9 @@ export default function Profile() {
                                 </div>
                             )}
 
-                            {activeTab === 'general' && (
+                             {activeTab === 'general' && (
                                 <form onSubmit={handleSaveProfile} className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                    <div className="flex items-center gap-6 pb-6 border-b border-gray-100">
+                                    <div className="flex items-center gap-6 pb-6 border-b border-gray-100 flex-wrap sm:flex-nowrap">
                                         <div
                                             className="relative group cursor-pointer"
                                             onClick={() => document.getElementById('avatar-upload').click()}
@@ -573,6 +624,104 @@ export default function Profile() {
                                         </div>
                                     </div>
                                 </form>
+                            )}
+
+                             {activeTab === 'billing' && (
+                                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                    <div className="bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-2xl p-6 border border-white/10 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                                        <div>
+                                            <p className="text-xs uppercase tracking-wider text-slate-400 font-semibold">Gói dịch vụ hiện tại</p>
+                                            <h3 className="text-2xl font-bold text-[#F5C518] mt-1">
+                                                {activePackage || 'Đang tải...'}
+                                            </h3>
+                                            <p className="text-xs text-white/50 mt-1">Hạn mức credit hiện tại: {credits.toLocaleString('vi-VN')} credit</p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => navigate('/credits')}
+                                            className="px-5 py-2.5 bg-[#F5C518] text-[#0A2463] text-sm font-bold rounded-xl hover:bg-[#D4A800] transition-colors self-start sm:self-auto"
+                                        >
+                                            + Nạp thêm credit
+                                        </button>
+                                    </div>
+
+                                    <div>
+                                        <h3 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2">
+                                            Lịch sử nạp credit
+                                        </h3>
+                                        {billingLoading ? (
+                                            <div className="text-center py-8">
+                                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-650 mx-auto"></div>
+                                                <p className="text-sm text-slate-500 mt-2">Đang tải lịch sử giao dịch...</p>
+                                            </div>
+                                        ) : billingHistory.length > 0 ? (
+                                            <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+                                                <table className="min-w-full divide-y divide-slate-200">
+                                                    <thead className="bg-slate-50">
+                                                        <tr>
+                                                            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Mã đơn hàng</th>
+                                                            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Ngày tạo</th>
+                                                            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Gói nạp</th>
+                                                            <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase">Số tiền</th>
+                                                            <th className="px-4 py-3 text-center text-xs font-semibold text-slate-500 uppercase">Credit cộng</th>
+                                                            <th className="px-4 py-3 text-center text-xs font-semibold text-slate-500 uppercase">Trạng thái</th>
+                                                            <th className="px-4 py-3 text-center text-xs font-semibold text-slate-500 uppercase">Thao tác</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="bg-white divide-y divide-slate-100">
+                                                        {billingHistory.map((order) => (
+                                                            <tr key={order._id} className="hover:bg-slate-50/50">
+                                                                <td className="px-4 py-3 text-sm font-semibold text-slate-700">#{order.payosOrderCode}</td>
+                                                                <td className="px-4 py-3 text-xs text-slate-500">
+                                                                    {new Date(order.createdAt).toLocaleDateString('vi-VN', {
+                                                                        day: '2-digit', month: '2-digit', year: 'numeric',
+                                                                        hour: '2-digit', minute: '2-digit'
+                                                                    })}
+                                                                </td>
+                                                                <td className="px-4 py-3 text-sm text-slate-800 font-medium">{order.packageName}</td>
+                                                                <td className="px-4 py-3 text-sm text-right text-slate-900 font-bold">{(order.amount || 0).toLocaleString('vi-VN')}₫</td>
+                                                                <td className="px-4 py-3 text-sm text-center text-emerald-600 font-bold">+{order.creditAmount?.toLocaleString('vi-VN')}</td>
+                                                                <td className="px-4 py-3 text-center">
+                                                                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
+                                                                        order.status === 'PAID'
+                                                                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                                            : order.status === 'PENDING'
+                                                                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                                                                            : 'bg-red-50 text-red-700 border border-red-200'
+                                                                    }`}>
+                                                                        {order.status === 'PAID' ? 'Thành công' : order.status === 'PENDING' ? 'Chờ quét mã' : 'Đã hủy'}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="px-4 py-3 text-center">
+                                                                    {order.status === 'PENDING' && order.checkoutUrl && (
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => navigate(`/credits?orderCode=${order.payosOrderCode}`)}
+                                                                            className="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg shadow-sm transition-colors cursor-pointer"
+                                                                        >
+                                                                            Quét mã ngay
+                                                                        </button>
+                                                                    )}
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        ) : (
+                                            <div className="text-center py-10 bg-slate-50 rounded-xl border border-dashed border-slate-350">
+                                                <p className="text-sm text-slate-500 font-medium">Bạn chưa thực hiện giao dịch nào.</p>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => navigate('/credits')}
+                                                    className="mt-3 text-xs bg-indigo-650 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg cursor-pointer"
+                                                >
+                                                    Nạp credit đầu tiên
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             )}
 
                         </div>

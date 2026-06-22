@@ -184,6 +184,7 @@ function ApplicationsList() {
             >
               <option value="all">Tất cả trạng thái</option>
               <option value="open">Đang mở</option>
+              <option value="pending">Chờ duyệt</option>
               <option value="closed">Đã đóng</option>
             </select>
 
@@ -234,10 +235,12 @@ function ApplicationsList() {
                       <span
                         className={`inline-block px-3 py-0.5 rounded-full text-xs font-bold border ${job.status === "open"
                           ? "bg-emerald-50 border-emerald-100/60 text-emerald-600"
+                          : job.status === "pending"
+                          ? "bg-amber-50 border-amber-100/60 text-amber-600"
                           : "bg-slate-150 border-slate-200 text-slate-500"
                           }`}
                       >
-                        {job.status === "open" ? "Đang mở" : "Đã đóng"}
+                        {job.status === "open" ? "Đang mở" : job.status === "pending" ? "Chờ duyệt" : "Đã đóng"}
                       </span>
                       {job.isPremium && (
                         <span className="inline-flex items-center gap-1 bg-amber-50 border border-amber-200/60 text-amber-700 text-xs px-2.5 py-0.5 rounded-full font-semibold shadow-sm">

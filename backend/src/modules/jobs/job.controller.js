@@ -3,6 +3,8 @@ import Job from "./job.model.js";
 import JobApplication from "../Application/jobApplication.model.js";
 import { deductCredits, CREDIT_COSTS } from "../../utils/credit.util.js";
 import { UserModel } from "../users/user.model.js";
+import geminiService from "../../config/gemini.service.js";
+import InterviewSession from "../interview/interview.model.js";
 
 /* ========================= */
 /* Tạo Job */
@@ -350,6 +352,161 @@ const deleteJob = async (req, res) => {
   }
 };
 
+const getJobRecommendationsBySession = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const userId = req.user.userId;
+
+    if (!mongoose.Types.ObjectId.isValid(sessionId)) {
+      return res.status(400).json({ message: "Mã phiên phỏng vấn không hợp lệ" });
+    }
+
+    const session = await InterviewSession.findById(sessionId);
+    if (!session) {
+      return res.status(404).json({ message: "Không tìm thấy phiên phỏng vấn" });
+    }
+
+    if (session.userId.toString() !== userId.toString()) {
+      return res.status(403).json({ message: "Bạn không có quyền xem gợi ý của phiên phỏng vấn này" });
+    }
+
+    // Kiểm tra đã hoàn thành phỏng vấn chưa
+    const isCompleted = session.status === 'completed' && session.answeredQuestions >= 10;
+    if (!isCompleted) {
+      return res.status(200).json({
+        success: false,
+        completed: false,
+        message: "Phiên phỏng vấn chưa hoàn thành hoặc chưa trả lời đủ 10 câu hỏi để nhận gợi ý việc làm từ AI."
+      });
+    }
+
+    // Đánh giá điểm đạt (AI dễ tính một chút: từ 50 điểm trở lên)
+    const passed = session.averageScore >= 50;
+
+    if (!passed) {
+      const prompt = `Bạn là cố vấn sự nghiệp AI tại hệ thống JobReady. Ứng viên vừa tham gia phỏng vấn vị trí "${session.jobTitle}" nhưng kết quả chưa đạt yêu cầu.
+      Thông tin kết quả:
+      - Điểm trung bình: ${session.averageScore}/100
+      - Các điểm mạnh: ${session.strengths?.join(", ") || "Chưa xác định"}
+      - Các điểm cần cải thiện: ${session.improvements?.join(", ") || "Chưa xác định"}
+      - Nhận xét chung: ${session.overallFeedback || ""}
+
+      Hãy viết một thông điệp nhận xét và khuyên nhủ cá nhân hóa bằng Tiếng Việt (khoảng 3-4 câu) gửi đến ứng viên.
+      Hãy chỉ ra một cách tinh tế rằng với kết quả và kỹ năng hiện tại họ chưa thực sự phù hợp với công việc này, khuyên họ nên ôn tập lại các điểm yếu đã nêu và khuyến khích họ rèn luyện thêm rồi thử sức phỏng vấn lại.
+      Tuyệt đối không sử dụng định dạng Markdown đặc biệt, chỉ viết văn bản thuần túy và thân thiện.`;
+      
+      let aiMessage = "";
+      try {
+        aiMessage = await geminiService.generateWithPrompt(prompt);
+      } catch (geminiErr) {
+        aiMessage = `Kết quả phỏng vấn của bạn đạt ${session.averageScore}/100. Hiện tại các kỹ năng của bạn chưa hoàn toàn phù hợp với vị trí này. Hãy xem lại các góp ý chi tiết từ AI và rèn luyện thêm để nâng cao trình độ nhé!`;
+      }
+
+      return res.status(200).json({
+        success: true,
+        completed: true,
+        passed: false,
+        message: aiMessage,
+        data: []
+      });
+    }
+
+    // Nếu đạt, tìm job tuyển dụng đang mở
+    const jobs = await Job.find({ status: "open" }).populate("recruiterId", "name companyName avatar avatarUrl").lean();
+    if (jobs.length === 0) {
+      return res.status(200).json({
+        success: true,
+        completed: true,
+        passed: true,
+        message: `Chúc mừng bạn đã đạt kết quả phỏng vấn rất khả quan (${session.averageScore}/100)! Hệ thống hiện chưa có tin tuyển dụng phù hợp với vị trí này, vui lòng tham khảo thêm các cơ hội từ bên ngoài qua TopCV nhé!`,
+        data: []
+      });
+    }
+
+    // Gọi Gemini để chọn và viết lý do phù hợp
+    const prompt = `Bạn là chuyên gia tuyển dụng và cố vấn sự nghiệp AI tại JobReady.
+    Ứng viên vừa hoàn thành buổi phỏng vấn thử vị trí "${session.jobTitle}".
+    Thông tin ứng viên:
+    - Điểm trung bình phỏng vấn: ${session.averageScore}/100
+    - Các điểm mạnh: ${session.strengths?.join(", ") || "Chưa xác định"}
+    - Các điểm cần cải thiện: ${session.improvements?.join(", ") || "Chưa xác định"}
+    - Nhận xét chung: ${session.overallFeedback || ""}
+
+    Dưới đây là danh sách các tin tuyển dụng đang tuyển trên hệ thống:
+    ${jobs.map((j, idx) => `STT: ${idx + 1}
+    ID: ${j._id}
+    Tiêu đề công việc: ${j.title}
+    Mô tả công việc: ${j.description}
+    Yêu cầu: ${j.requirements || "Không có"}
+    Địa điểm: ${j.location?.city || "Việt Nam"}
+    ---`).join("\n")}
+
+    Hãy thực hiện hai nhiệm vụ:
+    1. Hãy chọn ra tối đa 3 công việc phù hợp nhất với kỹ năng và thế mạnh của ứng viên.
+    2. Hãy viết một đoạn thông điệp nhận xét cá nhân hóa bằng Tiếng Việt (khoảng 3-4 câu) gửi đến ứng viên để giải thích lý do tại sao họ lại được đề xuất những công việc này dựa trên những điểm mạnh mà họ đã chứng minh được trong buổi phỏng vấn.
+
+    Hãy trả về duy nhất một định dạng JSON theo mẫu sau:
+    \`\`\`json
+    {
+      "message": "Đoạn thông điệp nhận xét cá nhân hóa gửi đến ứng viên...",
+      "recommendations": [
+        {
+          "jobId": "chuỗi ID của công việc phù hợp",
+          "matchScore": 92,
+          "matchReason": "Giải thích ngắn gọn tại sao công việc này phù hợp với họ..."
+        }
+      ]
+    }
+    \`\`\`
+    Tuyệt đối chỉ trả về khối JSON hợp lệ. Không viết thêm bất kỳ văn bản nào khác ngoài khối mã JSON.`;
+
+    let aiResult = null;
+    try {
+      const responseText = await geminiService.generateWithPrompt(prompt);
+      aiResult = geminiService.parseJsonResponse(responseText);
+    } catch (geminiErr) {
+      console.error("Gemini recommendation error:", geminiErr);
+    }
+
+    let recommendedJobs = [];
+    if (aiResult && Array.isArray(aiResult.recommendations)) {
+      recommendedJobs = aiResult.recommendations.map(rec => {
+        const job = jobs.find(j => j._id.toString() === rec.jobId.toString());
+        if (job) {
+          return {
+            ...job,
+            matchScore: rec.matchScore,
+            matchReason: rec.matchReason
+          };
+        }
+        return null;
+      }).filter(Boolean);
+    }
+
+    if (recommendedJobs.length === 0) {
+      recommendedJobs = jobs.slice(0, 3).map(j => ({
+        ...j,
+        matchScore: 80,
+        matchReason: `Vị trí công việc phù hợp với lĩnh vực ${session.jobCategory} của bạn.`
+      }));
+    }
+
+    const responseMessage = aiResult?.message || `Chúc mừng bạn đã hoàn thành xuất sắc buổi phỏng vấn vị trí ${session.jobTitle} với số điểm ${session.averageScore}/100! Dưới đây là các vị trí công việc mà AI gợi ý phù hợp nhất với năng lực của bạn.`;
+
+    return res.status(200).json({
+      success: true,
+      completed: true,
+      passed: true,
+      message: responseMessage,
+      data: recommendedJobs
+    });
+
+  } catch (error) {
+    console.error("Get job recommendations error:", error);
+    return res.status(555).json({ message: "Không thể lấy gợi ý việc làm." });
+  }
+};
+
 export default {
   createJob,
   applyJob,
@@ -359,5 +516,6 @@ export default {
   saveJob,
   getSavedJobs,
   updateJob,
-  deleteJob
+  deleteJob,
+  getJobRecommendationsBySession
 };

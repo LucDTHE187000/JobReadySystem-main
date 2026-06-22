@@ -140,6 +140,54 @@ router.post("/create-link", authMiddleware, async (req, res) => {
   }
 });
 
+router.get("/details/:orderCode", authMiddleware, async (req, res) => {
+  try {
+    const orderCode = Number(req.params.orderCode);
+    if (!orderCode) {
+      return res.status(400).json({ message: "Mã đơn hàng không hợp lệ" });
+    }
+
+    const creditPayment = await CreditPaymentModel.findOne({
+      payosOrderCode: orderCode,
+      user: req.user.userId,
+    });
+    if (!creditPayment) {
+      return res.status(404).json({ message: "Đơn hàng không tồn tại" });
+    }
+
+    // Refresh status from PayOS if it is pending
+    if (creditPayment.status === "PENDING") {
+      try {
+        const payosStatus = await payos.paymentRequests.get(orderCode);
+        if (payosStatus && payosStatus.status) {
+          creditPayment.status = payosStatus.status;
+          await creditPayment.save();
+          if (payosStatus.status === "PAID" && !creditPayment.credited) {
+            await settlePayment(creditPayment, payosStatus);
+          }
+        }
+      } catch (e) {
+        console.warn("Unable to refresh PayOS status on details fetch:", e?.message || e);
+      }
+    }
+
+    return res.status(200).json({
+      orderCode: creditPayment.payosOrderCode,
+      checkoutUrl: creditPayment.checkoutUrl,
+      qrCode: creditPayment.qrCode,
+      status: creditPayment.status,
+      amount: creditPayment.amount,
+      creditAmount: creditPayment.creditAmount,
+      packageName: creditPayment.packageName,
+      description: creditPayment.packageName ? `Gói ${creditPayment.packageName} ${creditPayment.creditAmount?.toLocaleString()} credit` : `Đơn hàng ${creditPayment.payosOrderCode}`,
+      buyerName: req.user?.name || "DUONG TRONG LUC",
+    });
+  } catch (error) {
+    console.error("Get PayOS order details error:", error);
+    return res.status(500).json({ message: error?.message || "Không thể lấy chi tiết đơn hàng" });
+  }
+});
+
 router.get("/verify/:orderCode", authMiddleware, async (req, res) => {
   try {
     const orderCode = Number(req.params.orderCode);
@@ -238,6 +286,7 @@ router.get("/payment-result", async (req, res) => {
       ? `Đơn hàng ${creditPayment.payosOrderCode} đã được thanh toán. Bạn nhận được ${creditPayment.creditAmount.toLocaleString()} credit.`
       : `Đơn hàng ${creditPayment.payosOrderCode} hiện có trạng thái ${creditPayment.status}. Vui lòng kiểm tra lại sau.`;
 
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     return res.send(`
       <html>
         <head><title>${title}</title></head>
@@ -245,7 +294,7 @@ router.get("/payment-result", async (req, res) => {
           <div style="max-width:640px;margin:auto;padding:24px;background:white;border-radius:20px;box-shadow:0 20px 45px rgba(15,23,42,.08);">
             <h1 style="margin-bottom:16px;">${title}</h1>
             <p style="font-size:16px; line-height:1.6;">${message}</p>
-            <p style="margin-top:24px;"><a href="/" style="display:inline-block;padding:12px 22px;background:#0a2463;color:white;border-radius:12px;text-decoration:none;">Quay về JobReady</a></p>
+            <p style="margin-top:24px;"><a href="${frontendUrl}/pricing" style="display:inline-block;padding:12px 22px;background:#0a2463;color:white;border-radius:12px;text-decoration:none;">Quay về bảng giá</a></p>
           </div>
         </body>
       </html>

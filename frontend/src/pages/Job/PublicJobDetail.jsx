@@ -636,9 +636,11 @@ export default function PublicJobDetail() {
                                 <span className={`inline-flex items-center text-xs font-bold px-2.5 py-1 rounded-full ${
                                     job.status === 'open'
                                         ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                                        : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                        : job.status === 'pending'
+                                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                                            : 'bg-red-500/20 text-red-400 border border-red-500/30'
                                 }`}>
-                                    {job.status === 'open' ? '🟢 Đang tuyển' : '🔴 Đã đóng'}
+                                    {job.status === 'open' ? '🟢 Đang tuyển' : job.status === 'pending' ? '🟡 Chờ duyệt' : '🔴 Đã đóng'}
                                 </span>
                             </div>
                         </div>

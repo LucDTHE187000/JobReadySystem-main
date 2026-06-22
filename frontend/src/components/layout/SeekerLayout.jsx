@@ -1,7 +1,11 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { API_URL } from '@/config';
 import {
     Home, FileText, BrainCircuit, History, BarChart3, User, LogOut,
-    Briefcase, ClipboardList, CreditCard, Plus, MessageSquare, BookOpen, PenTool
+    Briefcase, ClipboardList, CreditCard, Plus, MessageSquare, BookOpen, PenTool,
+    Menu, X
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -24,6 +28,31 @@ export default function SeekerLayout({ children, title, breadcrumb }) {
     const location = useLocation();
     const navigate = useNavigate();
     const credits = user?.credits ?? 6500;
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [userPackage, setUserPackage] = useState('');
+
+    useEffect(() => {
+        const fetchPackage = async () => {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token) return;
+            try {
+                const res = await axios.get(`${API_URL}/api/payment/history`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const paidOrders = (res.data.history || []).filter(o => o.status === 'PAID');
+                if (paidOrders.length > 0) {
+                    setUserPackage(paidOrders[0].packageName); // ví dụ: "Pro"
+                } else {
+                    setUserPackage('Cơ bản');
+                }
+            } catch (err) {
+                console.error("Failed to fetch billing package in layout:", err);
+            }
+        };
+        if (user) {
+            fetchPackage();
+        }
+    }, [user]);
 
     return (
         <div 
@@ -66,7 +95,14 @@ export default function SeekerLayout({ children, title, breadcrumb }) {
 
                 <div className="p-4 border-t border-white/10 space-y-3">
                     <div className="bg-white/10 rounded-xl p-4">
-                        <p className="text-[10px] uppercase tracking-wider text-white/50 mb-1">Credit</p>
+                        <div className="flex justify-between items-center mb-1">
+                            <p className="text-[10px] uppercase tracking-wider text-white/50">Credit</p>
+                            {userPackage && (
+                                <span className="text-[9px] bg-[#F5C518]/20 text-[#F5C518] px-1.5 py-0.5 rounded font-bold uppercase flex-shrink-0">
+                                    {userPackage}
+                                </span>
+                            )}
+                        </div>
                         <p className="text-2xl font-bold text-[#F5C518]">{credits.toLocaleString('vi-VN')}</p>
                         <button
                             type="button"
@@ -82,11 +118,18 @@ export default function SeekerLayout({ children, title, breadcrumb }) {
                         onClick={() => navigate('/profile')}
                         className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 text-white/80 text-sm"
                     >
-                        <div className="w-9 h-9 rounded-full bg-[#F5C518] text-[#0A2463] font-bold flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-full bg-[#F5C518] text-[#0A2463] font-bold flex items-center justify-center flex-shrink-0">
                             {user?.name?.charAt(0) || 'U'}
                         </div>
                         <div className="text-left flex-1 min-w-0">
-                            <p className="font-semibold text-white truncate">{user?.name}</p>
+                            <div className="flex items-center justify-between gap-1">
+                                <p className="font-semibold text-white truncate flex-1">{user?.name}</p>
+                                {userPackage && (
+                                    <span className="text-[8px] bg-[#F5C518]/25 text-[#F5C518] px-1 py-0.5 rounded font-bold uppercase flex-shrink-0">
+                                        {userPackage}
+                                    </span>
+                                )}
+                            </div>
                             <p className="text-xs text-white/50 truncate">{user?.email}</p>
                         </div>
                     </button>
@@ -103,14 +146,127 @@ export default function SeekerLayout({ children, title, breadcrumb }) {
 
             <div className="relative z-10 flex-1 flex flex-col min-w-0">
                 <header className="lg:hidden sticky top-0 z-40 bg-[#030A21]/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-white/10">
-                    <Link to="/" className="flex items-center gap-2 font-bold text-white">
-                        <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 overflow-hidden">
-                            <img src="/logo-jobready.png" alt="JobReady logo" className="w-full h-full object-cover" />
-                        </div>
-                        <span>JOB<span className="text-[#F5C518]">READY</span></span>
-                    </Link>
-                    <span className="text-[#F5C518] font-bold text-sm">{credits} credit</span>
+                    <div className="flex items-center gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setIsMobileMenuOpen(true)}
+                            className="p-1 text-white hover:text-[#F5C518] transition-colors"
+                        >
+                            <Menu size={24} />
+                        </button>
+                        <Link to="/" className="flex items-center gap-2 font-bold text-white">
+                            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                <img src="/logo-jobready.png" alt="JobReady logo" className="w-full h-full object-cover" />
+                            </div>
+                            <span>JOB<span className="text-[#F5C518]">READY</span></span>
+                        </Link>
+                    </div>
+                    <span className="text-[#F5C518] font-bold text-sm">{credits.toLocaleString('vi-VN')} credit</span>
                 </header>
+
+                {/* Mobile Menu Drawer */}
+                {isMobileMenuOpen && (
+                    <div className="fixed inset-0 z-50 lg:hidden flex">
+                        {/* Backdrop */}
+                        <div 
+                            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        />
+                        
+                        {/* Drawer Content */}
+                        <aside className="relative flex flex-col w-72 max-w-[80vw] h-full bg-[#030A21]/95 backdrop-blur-md border-r border-white/10 text-white z-10 animate-in slide-in-from-left duration-300">
+                            <div className="p-5 border-b border-white/10 flex items-center justify-between">
+                                <Link to="/" className="flex items-center gap-2.5" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                        <img src="/logo-jobready.png" alt="JobReady logo" className="w-full h-full object-cover" />
+                                    </div>
+                                    <span className="font-bold text-white text-lg tracking-tight">JOB<span className="text-[#F5C518]">READY</span></span>
+                                </Link>
+                                <button 
+                                    type="button" 
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="p-1 text-white/70 hover:text-white transition-colors"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
+                                {NAV.map(({ to, label, icon: Icon, external }) => {
+                                    const active = !external && location.pathname === to;
+                                    const cls = active
+                                        ? 'bg-[#F5C518]/20 text-[#F5C518] border-l-2 border-[#F5C518]'
+                                        : 'text-white/70 hover:bg-white/10 hover:text-white border-l-2 border-transparent';
+                                    if (external) {
+                                        return (
+                                            <Link 
+                                                key={to} 
+                                                to={to} 
+                                                onClick={() => setIsMobileMenuOpen(false)}
+                                                className={`flex items-center gap-3 px-4 py-2.5 rounded-r-lg text-sm font-medium ${cls}`}
+                                            >
+                                                <Icon size={18} /> {label}
+                                            </Link>
+                                        );
+                                    }
+                                    return (
+                                        <Link 
+                                            key={to} 
+                                            to={to} 
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className={`flex items-center gap-3 px-4 py-2.5 rounded-r-lg text-sm font-medium transition-colors ${cls}`}
+                                        >
+                                            <Icon size={18} className={active ? 'text-[#F5C518]' : ''} /> {label}
+                                        </Link>
+                                    );
+                                })}
+                            </nav>
+
+                            <div className="p-4 border-t border-white/10 space-y-3">
+                                <div className="bg-white/10 rounded-xl p-4">
+                                    <div className="flex justify-between items-center mb-1">
+                                        <p className="text-[10px] uppercase tracking-wider text-white/50">Credit</p>
+                                        {userPackage && (
+                                            <span className="text-[10px] bg-[#F5C518]/20 text-[#F5C518] px-1.5 py-0.5 rounded font-bold uppercase">
+                                                {userPackage}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-xl font-bold text-[#F5C518]">{credits.toLocaleString('vi-VN')}</p>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setIsMobileMenuOpen(false); navigate('/credits'); }}
+                                        className="mt-3 w-full flex items-center justify-center gap-2 py-2 bg-[#F5C518] text-[#0A2463] text-sm font-bold rounded-lg hover:bg-[#D4A800]"
+                                    >
+                                        <Plus size={16} /> Nạp credit
+                                    </button>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={() => { setIsMobileMenuOpen(false); navigate('/profile'); }}
+                                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 text-white/80 text-sm"
+                                >
+                                    <div className="w-9 h-9 rounded-full bg-[#F5C518] text-[#0A2463] font-bold flex items-center justify-center flex-shrink-0">
+                                        {user?.name?.charAt(0) || 'U'}
+                                    </div>
+                                    <div className="text-left flex-1 min-w-0">
+                                        <p className="font-semibold text-white truncate">{user?.name}</p>
+                                        <p className="text-xs text-white/50 truncate">{user?.email}</p>
+                                    </div>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => { setIsMobileMenuOpen(false); signOut(); navigate('/'); }}
+                                    className="w-full flex items-center gap-2 px-3 py-2 text-white/60 hover:text-white text-sm"
+                                >
+                                    <LogOut size={16} /> Đăng xuất
+                                </button>
+                            </div>
+                        </aside>
+                    </div>
+                )}
 
                 <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
                     {breadcrumb && (

@@ -109,7 +109,7 @@ export default function Testimonials() {
                                     <h3 className="font-heading text-lg font-bold text-white mb-3 leading-snug line-clamp-2">
                                         {item.title}
                                     </h3>
-                                    <p className="text-sm text-white/85 leading-relaxed mb-6 italic font-light">
+                                    <p className="text-sm text-white/85 leading-relaxed mb-6 italic font-light line-clamp-4" title={item.description}>
                                         "{item.description}"
                                     </p>
                                 </div>
