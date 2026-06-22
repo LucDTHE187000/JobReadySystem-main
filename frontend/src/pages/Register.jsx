@@ -30,9 +30,7 @@ export default function Register() {
     // Redirect already-authenticated users
     useEffect(() => {
         if (user) {
-            if (user.role === 'EMPLOYER' || user.role === 'employer') navigate('/employer/dashboard', { replace: true });
-            else if (user.role === 'ADMIN' || user.role === 'admin') navigate('/admin/dashboard', { replace: true });
-            else navigate('/dashboard', { replace: true });
+            navigate('/', { replace: true });
         }
     }, [user, navigate]);
 

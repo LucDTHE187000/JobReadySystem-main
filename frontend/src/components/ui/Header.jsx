@@ -32,6 +32,7 @@ export default function Header({ variant = 'dark' }) {
     const navigate = useNavigate();
     const location = useLocation();
     const isEmployer = user?.role === 'EMPLOYER' || user?.role === 'ADMIN';
+    const managerLink = user?.role === 'ADMIN' ? '/admin/dashboard' : '/dashboard';
 
     const [unreadCount, setUnreadCount] = useState(0);
 
@@ -132,7 +133,7 @@ export default function Header({ variant = 'dark' }) {
                                     </>
                                 )}
                                 {isEmployer && (
-                                    <Link to="/dashboard" className="px-3 py-2 text-sm text-white/80 hover:text-[#F5C518] font-medium whitespace-nowrap">Trang quản lý</Link>
+                                    <Link to={managerLink} className="px-3 py-2 text-sm text-white/80 hover:text-[#F5C518] font-medium whitespace-nowrap">Trang quản lý</Link>
                                 )}
                             </>
                         )}
@@ -211,7 +212,7 @@ export default function Header({ variant = 'dark' }) {
                                                     </Link>
                                                 </>
                                             ) : (
-                                                <Link to="/dashboard" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                                <Link to={managerLink} onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                     <User size={15} /> Trang quản lý
                                                 </Link>
                                             )}
@@ -276,7 +277,7 @@ export default function Header({ variant = 'dark' }) {
                         {user ? (
                             <>
                                 {isEmployer && (
-                                    <Link to="/dashboard" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-white/80 hover:bg-white/5 rounded-lg">Trang quản lý</Link>
+                                    <Link to={managerLink} onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-white/80 hover:bg-white/5 rounded-lg">Trang quản lý</Link>
                                 )}
                                 {!isEmployer && (
                                     <Link to="/jobs" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-white/80 hover:bg-white/5 rounded-lg">Tìm việc làm</Link>

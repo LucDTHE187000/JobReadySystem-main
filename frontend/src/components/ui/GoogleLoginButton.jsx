@@ -48,10 +48,7 @@ export default function GoogleLoginButton({ role, onSuccessCallback }) {
                                         callbackRef.current(result.user);
                                     } else {
                                         // Default navigation logic
-                                        const userRole = result.user?.role;
-                                        if (userRole === 'ADMIN') navigate('/admin/dashboard', { replace: true });
-                                        else if (userRole === 'EMPLOYER') navigate('/dashboard', { replace: true });
-                                        else navigate('/', { replace: true });
+                                        navigate('/', { replace: true });
                                     }
                                 }
                             } catch (err) {

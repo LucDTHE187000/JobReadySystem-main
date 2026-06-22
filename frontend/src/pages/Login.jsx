@@ -46,9 +46,7 @@ export default function Login() {
     // Redirect already-authenticated users
     useEffect(() => {
         if (user) {
-            if (user.role === 'ADMIN') navigate('/admin/dashboard', { replace: true });
-            else if (user.role === 'EMPLOYER') navigate('/dashboard', { replace: true });
-            else navigate('/', { replace: true });
+            navigate('/', { replace: true });
         }
     }, [user, navigate]);
 
@@ -230,11 +228,7 @@ export default function Login() {
                 setError(msg);
             }
             setLoading(false);
-        } else {
-            const role = result.user?.role;
-            if (role === 'ADMIN') navigate('/admin/dashboard', { replace: true });
-            else if (role === 'EMPLOYER') navigate('/dashboard', { replace: true });
-            else navigate('/', { replace: true });
+            navigate('/', { replace: true });
         }
     };
 
