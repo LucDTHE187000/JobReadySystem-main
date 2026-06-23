@@ -64,7 +64,10 @@ export class AuthService {
             if (!promo) {
                 throw new Error("Mã ưu đãi không hợp lệ");
             }
-            initialCredits += promo.credits;
+            // Không cộng dồn nếu đã nhận 150 credits từ Campaign Mode
+            if (!hasReceivedCampaignSignupBonus) {
+                initialCredits += promo.credits;
+            }
             redeemedCodes.push(cleanCode);
         }
 
@@ -501,7 +504,9 @@ export class AuthService {
                 const cleanCode = promoCode.toUpperCase().trim();
                 const promo = PROMO_CODES[cleanCode];
                 if (promo) {
-                    initialCredits += promo.credits;
+                    if (!hasReceivedCampaignSignupBonus) {
+                        initialCredits += promo.credits;
+                    }
                     redeemedCodes.push(cleanCode);
                 }
             }

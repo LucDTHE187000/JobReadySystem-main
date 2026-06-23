@@ -35,6 +35,17 @@ export default function Register() {
         }
     }, [user, navigate]);
 
+    // Tự động điền mã giới thiệu (ref) hoặc mã khuyến mãi (promo) từ URL link chia sẻ
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const refCode = params.get('ref');
+        const promoVal = params.get('promo');
+        const codeVal = refCode || promoVal;
+        if (codeVal) {
+            setPromoCode(codeVal.toUpperCase().trim());
+        }
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
