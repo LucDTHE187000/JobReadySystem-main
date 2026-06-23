@@ -45,9 +45,14 @@ export default function RedeemPromoPage() {
         { code: promoCode },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setPromoSuccess(response.data.message || 'Tự động nhận thành công mã sự kiện!');
-      setPromoCodeInput('');
-      if (refreshUser) await refreshUser();
+      if (response.data?.requiresPin) {
+        setActivePromoCode(promoCode);
+        setShowPinModal(true);
+      } else {
+        setPromoSuccess(response.data.message || 'Tự động nhận thành công mã sự kiện!');
+        setPromoCodeInput('');
+        if (refreshUser) await refreshUser();
+      }
     } catch (error) {
       console.error("Auto redeem error:", error);
       if (error.response?.data?.requiresPin) {
@@ -81,9 +86,14 @@ export default function RedeemPromoPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setPromoSuccess(response.data.message || 'Áp dụng mã sự kiện thành công!');
-      setPromoCodeInput('');
-      if (refreshUser) await refreshUser();
+      if (response.data?.requiresPin) {
+        setActivePromoCode(targetCode);
+        setShowPinModal(true);
+      } else {
+        setPromoSuccess(response.data.message || 'Áp dụng mã sự kiện thành công!');
+        setPromoCodeInput('');
+        if (refreshUser) await refreshUser();
+      }
     } catch (error) {
       console.error("Redeem promo code error:", error);
       if (error.response?.data?.requiresPin) {
