@@ -20,6 +20,7 @@ export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [userType, setUserType] = useState('candidate');
+    const [promoCode, setPromoCode] = useState('');
     const [error, setError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
@@ -71,7 +72,7 @@ export default function Register() {
         }
 
         setLoading(true);
-        const result = await signUp(email, password, fullName, userType);
+        const result = await signUp(email, password, fullName, userType, promoCode);
 
         if (result.error) {
             setError(result.error.message);
@@ -236,6 +237,18 @@ export default function Register() {
                             </div>
                         )}
 
+                        <div>
+                            <label htmlFor="promoCode" className="block text-sm font-semibold text-[#0A2463] mb-2">Mã sự kiện / Mã khuyến mãi (Tùy chọn)</label>
+                            <input
+                                id="promoCode"
+                                type="text"
+                                value={promoCode}
+                                onChange={(e) => setPromoCode(e.target.value)}
+                                placeholder="Ví dụ: JOBREADY_ONLINE"
+                                className="w-full px-4 py-3 bg-[#F4F6FB] border border-[#DDE3F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A2463] uppercase placeholder:normal-case font-medium"
+                            />
+                        </div>
+
                         <div className="flex items-start gap-2">
                             <input type="checkbox" className="mt-1 accent-[#0A2463]" required />
                             <p className="text-xs text-[#5A6482]">
@@ -257,7 +270,7 @@ export default function Register() {
                         <p className="text-center text-sm text-[#5A6482] my-2">— hoặc đăng ký nhanh với —</p>
 
                         <div className="flex justify-center my-2">
-                            <GoogleLoginButton role={userType === 'candidate' ? 'JOB_SEEKER' : 'EMPLOYER'} />
+                            <GoogleLoginButton role={userType === 'candidate' ? 'JOB_SEEKER' : 'EMPLOYER'} code={promoCode} />
                         </div>
 
                         <p className="text-center text-sm text-[#5A6482]">

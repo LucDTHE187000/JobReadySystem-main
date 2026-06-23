@@ -31,6 +31,7 @@ const ADMIN_NAV = [
     { id: "jobs", label: "Tin tuyển dụng", icon: Briefcase },
     { id: "payments", label: "Quản lý thanh toán", icon: CreditCard },
     { id: "feedback", label: "Phản hồi & Đánh giá", icon: MessageSquare },
+    { id: "system", label: "Cấu hình Hệ thống", icon: Shield },
 ];
 
 function AdminSidebar({ active, setActive, user, onLogout, pendingCount }) {
@@ -1340,6 +1341,179 @@ function FeedbackTab() {
 }
 
 // ============================================================
+// SYSTEM SETTINGS TAB
+// ============================================================
+function SystemSettingsTab() {
+    const [campaignMode, setCampaignMode] = useState(false);
+    const [promoRedemptionEnabled, setPromoRedemptionEnabled] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [message, setMessage] = useState("");
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        axios.get(`${API_URL}/api/payment/system-settings`, { headers: authHeader() })
+            .then(r => {
+                setCampaignMode(r.data.campaignMode);
+                setPromoRedemptionEnabled(r.data.promoRedemptionEnabled);
+            })
+            .catch(err => {
+                console.error(err);
+                setError("Không thể tải cấu hình hệ thống");
+            })
+            .finally(() => setLoading(false));
+    }, []);
+
+    const handleToggleSetting = async (key, newValue) => {
+        setSaving(true);
+        setMessage("");
+        setError("");
+        try {
+            const payload = {
+                campaignMode: key === 'campaignMode' ? newValue : campaignMode,
+                promoRedemptionEnabled: key === 'promoRedemptionEnabled' ? newValue : promoRedemptionEnabled
+            };
+            const response = await axios.post(
+                `${API_URL}/api/payment/system-settings`,
+                payload,
+                { headers: authHeader() }
+            );
+            setCampaignMode(response.data.campaignMode);
+            setPromoRedemptionEnabled(response.data.promoRedemptionEnabled);
+            setMessage(response.data.message || "Cập nhật cấu hình thành công!");
+        } catch (err) {
+            console.error(err);
+            setError(err.response?.data?.message || "Cập nhật cấu hình thất bại.");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600" /></div>;
+
+    return (
+        <div className="space-y-6">
+            <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-white/60 shadow-xl shadow-slate-900/5">
+                <h2 className="text-2xl font-bold tracking-tight text-slate-800 mb-1">Cấu hình Hệ thống</h2>
+                <p className="text-sm text-slate-500 font-medium font-sans">Quản lý các cài đặt toàn cục của nền tảng JOBREADY</p>
+            </div>
+
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-white/60 shadow-xl shadow-slate-900/5 space-y-6">
+                {/* Switch 1: Campaign Mode */}
+                <div className="flex items-start justify-between border-b border-slate-100 pb-5">
+                    <div className="space-y-1">
+                        <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
+                            <span>Chế độ sự kiện truyền thông (Campaign Mode)</span>
+                            {campaignMode ? (
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 uppercase tracking-wider animate-pulse">
+                                    Đang bật
+                                </span>
+                            ) : (
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 uppercase tracking-wider">
+                                    Mặc định
+                                </span>
+                            )}
+                        </h3>
+                        <p className="text-slate-500 text-sm max-w-2xl font-medium">
+                            Khi chế độ này **BẬT**, tất cả tài khoản ứng viên mới đăng ký (qua email thông thường hoặc đăng nhập Google) sẽ được tặng **150 credits** (60 mặc định + 90 ưu đãi) thay vì mặc định 60 credits.
+                            Thích hợp kích hoạt trong các buổi offline/online workshop để thu hút người dùng đăng ký trải nghiệm.
+                        </p>
+                    </div>
+
+                    <div className="flex items-center">
+                        <button
+                            type="button"
+                            disabled={saving}
+                            onClick={() => handleToggleSetting('campaignMode', !campaignMode)}
+                            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                                campaignMode ? "bg-indigo-600" : "bg-slate-200"
+                            } ${saving ? "opacity-50 pointer-events-none" : ""}`}
+                        >
+                            <span className="sr-only">Toggle Campaign Mode</span>
+                            <span
+                                aria-hidden="true"
+                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                    campaignMode ? "translate-x-5" : "translate-x-0"
+                                }`}
+                            />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Switch 2: Promo Redemption Toggle */}
+                <div className="flex items-start justify-between border-b border-slate-100 pb-5">
+                    <div className="space-y-1">
+                        <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
+                            <span>Cho phép đổi mã sự kiện (Promo Redemption)</span>
+                            {promoRedemptionEnabled ? (
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 uppercase tracking-wider animate-pulse">
+                                    Đang mở
+                                </span>
+                            ) : (
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-100 uppercase tracking-wider">
+                                    Đang đóng
+                                </span>
+                            )}
+                        </h3>
+                        <p className="text-slate-500 text-sm max-w-2xl font-medium">
+                            Khi bật, người dùng có thể nhập mã sự kiện truyền thông (và xác thực qua Email OTP của họ) để nhận thêm 90 credits. 
+                            Khi tắt, hệ thống sẽ chặn tất cả yêu cầu đổi mã sự kiện để tránh rò rỉ mã giữa các ngày truyền thông.
+                        </p>
+                    </div>
+
+                    <div className="flex items-center">
+                        <button
+                            type="button"
+                            disabled={saving}
+                            onClick={() => handleToggleSetting('promoRedemptionEnabled', !promoRedemptionEnabled)}
+                            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                                promoRedemptionEnabled ? "bg-indigo-600" : "bg-slate-200"
+                            } ${saving ? "opacity-50 pointer-events-none" : ""}`}
+                        >
+                            <span className="sr-only">Toggle Promo Redemption</span>
+                            <span
+                                aria-hidden="true"
+                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                    promoRedemptionEnabled ? "translate-x-5" : "translate-x-0"
+                                }`}
+                            />
+                        </button>
+                    </div>
+                </div>
+
+                {message && (
+                    <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 text-sm text-emerald-700 font-semibold shadow-sm flex items-center gap-2 animate-fade-in">
+                        <CheckCircle2 size={18} /> {message}
+                    </div>
+                )}
+
+                {error && (
+                    <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-750 font-semibold shadow-sm flex items-center gap-2 animate-fade-in">
+                        <Ban size={18} /> {error}
+                    </div>
+                )}
+
+                <div className="pt-2">
+                    <h4 className="font-bold text-slate-800 text-sm mb-3">Tóm tắt cấu hình hoạt động:</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 shadow-sm">
+                            <p className="text-xs text-slate-450 uppercase font-black tracking-wider mb-1">Số dư đăng ký tài khoản</p>
+                            <p className="text-2xl font-black text-[#0A2463]">{campaignMode ? "150 Credits" : "60 Credits"}</p>
+                            <p className="text-xs text-slate-500 mt-1">Gồm 60 mặc định & {campaignMode ? "thêm 90 credits ưu đãi sự kiện" : "không có ưu đãi"}</p>
+                        </div>
+                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-105 shadow-sm">
+                            <p className="text-xs text-slate-450 uppercase font-black tracking-wider mb-1">Trạng thái đổi mã ưu đãi</p>
+                            <p className="text-2xl font-black text-[#0A2463]">{promoRedemptionEnabled ? "Đang hoạt động" : "Đã tạm khóa"}</p>
+                            <p className="text-xs text-slate-500 mt-1">Yêu cầu xác thực dynamic OTP gửi trực tiếp qua Email của User</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ============================================================
 // MAIN ADMIN PAGE
 // ============================================================
 export default function AdminDashboard() {
@@ -1392,6 +1566,7 @@ export default function AdminDashboard() {
         jobs: <JobsTab />,
         payments: <PaymentsTab />,
         feedback: <FeedbackTab />,
+        system: <SystemSettingsTab />,
     };
 
     return (

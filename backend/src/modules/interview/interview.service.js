@@ -346,8 +346,15 @@ LƯU Ý: Tất cả các trường score, feedback, keyPoints, missedPoints, sug
                 const previousQs = session.questions;
                 const payload = {
                     position: session.jobTitle,
+                    level: session.jobCategory || 'Junior',
                     averageScore: session.averageScore,
-                    questions: previousQs.map(q => q.questionText),
+                    questions: previousQs.map(q => ({
+                        questionText: q.questionText,
+                        userAnswer: q.userAnswer || "",
+                        aiScore: q.aiScore || 0,
+                        topic: q.topic || "General"
+                    })),
+                    // Keep these for compatibility if needed elsewhere
                     answers: previousQs.map(q => q.userAnswer || ""),
                     scores: previousQs.map(q => q.aiScore || 0),
                     topics: previousQs.map(q => q.topic || "")
@@ -367,8 +374,7 @@ LƯU Ý: Tất cả các trường score, feedback, keyPoints, missedPoints, sug
                 console.error("N8N Overall Feedback Error, falling back to local Groq if available:", err.message);
                 if (groqClient) {
                     try {
-                        const previousQs = session.questions;
-                        const feedbackPrompt = `Bạn là nhà tuyển dụng nhân sự chuyên nghiệp cấp cao.
+                    const feedbackPrompt = `Bạn là nhà tuyển dụng nhân sự chuyên nghiệp cấp cao.
 Hãy tổng hợp và đánh giá kết quả buổi phỏng vấn của ứng viên cho vị trí ${session.jobTitle}.
 
 CHI TIẾT PHỎNG VẤN:
@@ -377,20 +383,20 @@ Q: ${q.questionText}
 A: ${q.userAnswer}
 Score: ${q.aiScore}/100, Feedback: ${q.aiFeedback || 'N/A'}`).join('\n---\n')}
 
-YÊUEU CAU:
+YÊU CẦU:
 1. Phân tích chi tiết từng câu hỏi - thấy được điểm mạnh/yếu
-2. Feedback phải dài 5-6 câu, chi tiết, có cụ thể ví dụ
-3. Strengths: 4-5 điểm mạnh nổi bật (3-4 từ mỗi điểm)
-4. Improvements: 4-5 điểm cần cải thiện (3-4 từ mỗi điểm)
-5. NextSteps: 4-5 hành động cụ thể (3-4 từ mỗi bước)
+2. Feedback phải dài 5-8 câu, chi tiết, phân tích cụ thể thái độ, ưu điểm và nhược điểm
+3. Strengths: 3-5 điểm mạnh chi tiết, cụ thể (có giải thích ngắn gọn lý do vì sao là điểm mạnh)
+4. Improvements: 3-5 điểm cần cải thiện chi tiết, cụ thể (chỉ ra câu nào chưa tốt hoặc thiếu ý gì)
+5. NextSteps: 3-5 hành động cụ thể, chi tiết giúp ứng viên cải thiện kỹ năng
 6. Recommendation: Strong Hire / Hire / Consider / No Hire
 
 Trả về JSON thuần túy (không markdown):
 {
-  "feedback": "<5-6 câu phân tích chi tiết về năng lực, thái độ, kỹ năng, điểm mạnh/yếu cụ thể>",
-  "strengths": ["<điểm mạnh 1 - 3-4 từ>", "<điểm mạnh 2 - 3-4 từ>", "<điểm mạnh 3 - 3-4 từ>", "<điểm mạnh 4 - 3-4 từ>", "<điểm mạnh 5 - 3-4 từ>"],
-  "improvements": ["<cần cải 1 - 3-4 từ>", "<cần cải 2 - 3-4 từ>", "<cần cải 3 - 3-4 từ>", "<cần cải 4 - 3-4 từ>", "<cần cải 5 - 3-4 từ>"],
-  "nextSteps": ["<hành động 1 - cụ thể>", "<hành động 2 - cụ thể>", "<hành động 3 - cụ thể>", "<hành động 4 - cụ thể>", "<hành động 5 - cụ thể>"],
+  "feedback": "<5-8 câu phân tích chi tiết về năng lực, thái độ, kỹ năng, điểm mạnh/yếu cụ thể>",
+  "strengths": ["<điểm mạnh chi tiết 1>", "<điểm mạnh chi tiết 2>", "<điểm mạnh chi tiết 3>"],
+  "improvements": ["<cần cải thiện chi tiết 1>", "<cần cải thiện chi tiết 2>", "<cần cải thiện chi tiết 3>"],
+  "nextSteps": ["<hành động chi tiết 1>", "<hành động chi tiết 2>", "<hành động chi tiết 3>"],
   "recommendation": "Hire / Strong Hire / Consider / No Hire"
 }`;
                         const rawFeedback = await groqClient.generateWithPrompt(feedbackPrompt);

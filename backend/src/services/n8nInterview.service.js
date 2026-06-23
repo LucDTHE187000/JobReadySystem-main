@@ -195,22 +195,36 @@ Trả về JSON:
         ).join('\n\n');
 
         const prompt = `Bạn là HR Director đang tổng kết buổi phỏng vấn cho vị trí ${position} (${level}).
-
-TOÀN BỘ BUỔI PHỎNG VẤN:
-${qaList}
-
-Điểm trung bình: ${averageScore}/100
-
-Hãy viết đánh giá tổng thể CHUYÊN NGHIỆP và CỤ THỂ bằng tiếng Việt.
-
-Trả về JSON:
-{
-  "overallFeedback": "đánh giá tổng thể 3-5 câu, nêu rõ ứng viên phù hợp vị trí không và lý do",
-  "strengths": ["điểm mạnh nổi bật 1", "điểm mạnh nổi bật 2", "điểm mạnh nổi bật 3"],
-  "improvements": ["điểm cần cải thiện 1", "điểm cần cải thiện 2"],
-  "nextSteps": ["bước tiếp theo 1", "bước tiếp theo 2"],
-  "hiringRecommendation": "Strong Yes / Yes / Maybe / No"
-}`;
+ 
+ TOÀN BỘ BUỔI PHỎNG VẤN:
+ ${qaList}
+ 
+ Điểm trung bình: ${averageScore}/100
+ 
+ Hãy viết đánh giá tổng thể CHUYÊN NGHIỆP, CHI TIẾT và CỰ THỂ dựa trên các câu hỏi/trả lời thực tế bằng tiếng Việt.
+ 
+ Trả về JSON:
+ {
+   "overallFeedback": "Đánh giá tổng thể chi tiết (5-8 câu), phân tích cụ thể thái độ, ưu điểm và nhược điểm nổi bật của ứng viên dựa trên câu trả lời thực tế, nêu rõ ứng viên có phù hợp với vị trí này không và lý do tại sao.",
+   "strengths": [
+     "Điểm mạnh cụ thể 1 (Ví dụ: Thể hiện tư duy logic tốt khi giải quyết bài toán tối ưu SQL ở câu 3)",
+     "Điểm mạnh cụ thể 2 (Ví dụ: Nắm chắc kiến thức nền tảng về cơ chế Indexing trong MongoDB)",
+     "Điểm mạnh cụ thể 3",
+     "Điểm mạnh cụ thể 4 (tối thiểu 3-5 điểm mạnh chi tiết)"
+   ],
+   "improvements": [
+     "Điểm cần cải thiện cụ thể 1 (Ví dụ: Cần phân biệt rõ kiểu dữ liệu nguyên thủy và phức tạp ở câu 8)",
+     "Điểm cần cải thiện cụ thể 2 (Ví dụ: Câu trả lời ở câu 5 còn chung chung, cần bổ sung ví dụ thực tế)",
+     "Điểm cần cải thiện cụ thể 3",
+     "Điểm cần cải thiện cụ thể 4 (tối thiểu 3-5 điểm cải thiện chi tiết)"
+   ],
+   "nextSteps": [
+     "Hành động cụ thể chi tiết 1",
+     "Hành động cụ thể chi tiết 2",
+     "Hành động cụ thể chi tiết 3"
+   ],
+   "hiringRecommendation": "Strong Yes / Yes / Maybe / No"
+ }`;
 
         return await callAI(prompt);
     }
@@ -219,21 +233,43 @@ Trả về JSON:
     async analyzeCV(data) {
         const { cvText, position } = data;
 
-        const prompt = `Bạn là chuyên gia HR phân tích CV cho vị trí ${position || 'Software Engineer'}.
+        const prompt = `Bạn là chuyên gia HR và ATS (Applicant Tracking System) phân tích CV cho vị trí ${position || 'Software Engineer'}.
+Hãy phân tích cực kỳ chi tiết, khách quan và cụ thể dựa trên nội dung CV được cung cấp bên dưới. Hãy chỉ rõ từng điểm mạnh, điểm yếu cụ thể đọc được từ CV (không chung chung) và đưa ra các đề xuất cải thiện thực tế.
 
 CV CỦA ỨNG VIÊN:
 ${cvText}
 
-Phân tích chi tiết và trả về JSON:
+Yêu cầu phân tích chi tiết và trả về định dạng JSON thuần túy (không kèm markdown \`\`\`json) với cấu trúc sau:
 {
-  "skills": ["kỹ năng 1", "kỹ năng 2"],
-  "technologies": ["công nghệ 1", "công nghệ 2"],
+  "totalScore": <điểm số ATS tổng quát từ 40-100, phản ánh độ hoàn thiện và mức độ phù hợp của CV>,
+  "structureScore": <điểm cấu trúc, bố cục trình bày từ 0-100>,
+  "contentScore": <điểm chất lượng nội dung, kinh nghiệm làm việc từ 0-100>,
+  "languageScore": <điểm ngôn ngữ, chính tả, văn phong từ 0-100>,
+  "relevanceScore": <điểm độ tương thích kỹ năng với vị trí ${position || 'Software Engineer'} từ 0-100>,
+  "skills": ["kỹ năng chuyên môn 1", "kỹ năng chuyên môn 2"],
+  "technologies": ["công nghệ/công cụ sử dụng 1", "công nghệ/công cụ sử dụng 2"],
   "experienceLevel": "Intern / Fresher / Junior / Mid / Senior",
-  "experienceYears": <số năm kinh nghiệm ước tính>,
-  "strengths": ["điểm mạnh 1", "điểm mạnh 2"],
-  "weaknesses": ["điểm yếu 1", "điểm yếu 2"],
-  "recommendedInterviewTopics": ["chủ đề nên hỏi 1", "chủ đề nên hỏi 2", "chủ đề nên hỏi 3"],
-  "summary": "tóm tắt ngắn gọn về ứng viên bằng tiếng Việt"
+  "experienceYears": <số năm kinh nghiệm ước tính, ví dụ: 2>,
+  "strengths": [
+    "Điểm mạnh cụ thể 1 (Ví dụ: Có 2 năm kinh nghiệm thực tế về Java & Python)",
+    "Điểm mạnh cụ thể 2 (Ví dụ: Có kinh nghiệm xây dựng hệ thống quy mô nhỏ)",
+    "Điểm mạnh cụ thể 3",
+    "Điểm mạnh cụ thể 4"
+  ],
+  "weaknesses": [
+    "Điểm yếu cụ thể 1 (Ví dụ: Thiếu kinh nghiệm làm việc với cơ sở dữ liệu lớn/phân tán)",
+    "Điểm yếu cụ thể 2 (Ví dụ: Thiếu các số liệu đo lường hiệu quả công việc - KPIs)",
+    "Điểm yếu cụ thể 3",
+    "Điểm yếu cụ thể 4"
+  ],
+  "suggestions": [
+    "Đề xuất cải thiện cụ thể 1 (Ví dụ: Bổ sung thêm các dự án thực tế về SQL/NoSQL)",
+    "Đề xuất cải thiện cụ thể 2 (Ví dụ: Sử dụng mô hình STAR để viết phần kinh nghiệm và đưa số liệu % tăng trưởng vào)",
+    "Đề xuất cải thiện cụ thể 3",
+    "Đề xuất cải thiện cụ thể 4"
+  ],
+  "recommendedInterviewTopics": ["chủ đề phỏng vấn khuyên dùng 1", "chủ đề phỏng vấn khuyên dùng 2", "chủ đề phỏng vấn khuyên dùng 3"],
+  "summary": "tóm tắt nhận xét tổng quát ngắn gọn về ứng viên bằng tiếng Việt (2-3 câu)"
 }`;
 
         return await callAI(prompt);

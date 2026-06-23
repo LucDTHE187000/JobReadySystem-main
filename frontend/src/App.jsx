@@ -20,6 +20,9 @@ import CreateJob from './pages/Job/CreateApplication';
 import JobDetail from './pages/Job/JobDetail';
 import PaymentPage from './pages/Job/PaymentPage';
 import CreditShopPage from './pages/CreditShopPage';
+import CheckInPage from './pages/CheckInPage';
+import ReferralsPage from './pages/ReferralsPage';
+import RedeemPromoPage from './pages/RedeemPromoPage';
 import ManageCandidates from './pages/Job/ManageCandidates';
 import JobSearch from './pages/JobSearch';
 import PublicJobDetail from './pages/Job/PublicJobDetail';
@@ -127,6 +130,15 @@ function App() {
             } />
             <Route path="/credits" element={
               <JobSeekerRoute><CreditShopPage /></JobSeekerRoute>
+            } />
+            <Route path="/checkin" element={
+              <JobSeekerRoute><CheckInPage /></JobSeekerRoute>
+            } />
+            <Route path="/referrals" element={
+              <JobSeekerRoute><ReferralsPage /></JobSeekerRoute>
+            } />
+            <Route path="/redeem" element={
+              <JobSeekerRoute><RedeemPromoPage /></JobSeekerRoute>
             } />
             <Route path="/payment/:id" element={
               <JobSeekerRoute><PaymentPage /></JobSeekerRoute>

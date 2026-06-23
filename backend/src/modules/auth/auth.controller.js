@@ -4,14 +4,18 @@ import { z } from "zod";
 // Validation schemas
 export const googleLoginSchema = z.object({
     token: z.string().min(1, "Google token is required"),
-    role: z.enum(["ADMIN", "EMPLOYER", "JOB_SEEKER"]).optional()
+    role: z.enum(["ADMIN", "EMPLOYER", "JOB_SEEKER"]).optional(),
+    promoCode: z.string().optional(),
+    referralCode: z.string().optional()
 });
 
 export const registerSchema = z.object({
     email: z.string().email("Email không hợp lệ").min(1, "Email không được để trống"),
     password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự").max(100, "Mật khẩu không được vượt quá 100 ký tự"),
     name: z.string().min(2, "Họ và tên phải có ít nhất 2 ký tự").max(100, "Họ và tên không được vượt quá 100 ký tự"),
-    role: z.enum(["ADMIN", "EMPLOYER", "JOB_SEEKER"]).optional()
+    role: z.enum(["ADMIN", "EMPLOYER", "JOB_SEEKER"]).optional(),
+    promoCode: z.string().optional(),
+    referralCode: z.string().optional()
 });
 
 export const loginSchema = z.object({

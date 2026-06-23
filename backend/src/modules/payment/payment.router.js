@@ -3,8 +3,9 @@ import { PayOS } from "@payos/node";
 import { authMiddleware } from "../../middleware/auth.middleware.js";
 import { UserModel } from "../users/user.model.js";
 import { CreditPaymentModel } from "./creditPayment.model.js";
-import { addCredits } from "../../utils/credit.util.js";
+import { addCredits, PROMO_CODES } from "../../utils/credit.util.js";
 import { sendPaymentSuccessEmail } from "../../utils/email.util.js";
+import { SystemSettingModel } from "../system/systemSetting.model.js";
 
 const router = Router();
 
@@ -20,23 +21,23 @@ const CREDIT_PACKAGES = [
   {
     id: "starter",
     packageName: "Starter",
-    creditAmount: 3000,
+    creditAmount: 30,
     amount: 29000,
-    description: "Gói Starter 3.000 credit",
+    description: "Gói Starter 30 credit",
   },
   {
     id: "pro",
     packageName: "Pro",
-    creditAmount: 9000,
+    creditAmount: 90,
     amount: 79000,
-    description: "Gói Pro 9.000 credit",
+    description: "Gói Pro 90 credit",
   },
   {
     id: "max",
     packageName: "Max",
-    creditAmount: 21000,
+    creditAmount: 170,
     amount: 149000,
-    description: "Gói Max 21.000 credit",
+    description: "Gói Max 170 credit",
   },
 ];
 
@@ -302,6 +303,236 @@ router.get("/payment-result", async (req, res) => {
   } catch (error) {
     console.error("Payment result page error:", error);
     return res.status(500).send(`<h1>Lỗi server</h1><p>Vui lòng thử lại sau.</p>`);
+  }
+});
+
+router.post("/redeem-promo", authMiddleware, async (req, res) => {
+  try {
+    const { code, pin } = req.body;
+    if (!code) {
+      return res.status(400).json({ message: "Vui lòng nhập mã ưu đãi" });
+    }
+
+    const cleanCode = code.toUpperCase().trim();
+    const promo = PROMO_CODES[cleanCode];
+    if (!promo) {
+      return res.status(400).json({ message: "Mã ưu đãi không hợp lệ hoặc đã hết hạn" });
+    }
+
+    // 1. Kiểm tra cấu hình Đóng/Mở tính năng đổi mã sự kiện toàn hệ thống
+    const promoSetting = await SystemSettingModel.findOne({ key: "promo_redemption_enabled" });
+    const promoRedemptionEnabled = promoSetting ? promoSetting.value === true : true;
+    if (!promoRedemptionEnabled) {
+      return res.status(400).json({ message: "Hệ thống đổi mã sự kiện hiện đang đóng. Vui lòng quay lại sau!" });
+    }
+
+    // 2. Lấy thông tin user và kiểm tra các giới hạn ưu đãi
+    const user = await UserModel.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: "Không tìm thấy người dùng" });
+    }
+
+    // Chặn nhận đúp nếu đăng ký trong ngày sự kiện đã được nhận 150 credits
+    if (user.hasReceivedCampaignSignupBonus) {
+      return res.status(400).json({ message: "Bạn đã nhận ưu đãi 150 credits khi đăng ký tài khoản trong sự kiện, không thể áp dụng thêm mã quà tặng." });
+    }
+
+    if (!user.redeemedCodes) {
+      user.redeemedCodes = [];
+    }
+
+    // Chỉ được nhận duy nhất một mã ưu đãi sự kiện
+    if (user.redeemedCodes.length > 0 || user.redeemedCodes.includes(cleanCode)) {
+      return res.status(400).json({ message: "Mỗi tài khoản chỉ được nhận duy nhất một lần ưu đãi sự kiện hoặc mã khuyến mãi." });
+    }
+
+    // 3. Xử lý xác thực OTP qua Email (Nếu chưa gửi PIN)
+    if (!pin) {
+      const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const { OtpModel } = await import("../otp/otp.model.js");
+
+      // Xóa các OTP đổi quà cũ để tránh trùng lặp
+      await OtpModel.deleteMany({ email: user.email, purpose: "redeem_promo" });
+
+      // Lưu OTP mới
+      await OtpModel.create({
+        userId: user._id,
+        email: user.email,
+        code: otpCode,
+        purpose: "redeem_promo",
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000), // hiệu lực 10 phút
+      });
+
+      // Gửi mail mã xác thực (chạy ngầm)
+      const { sendPromoVerificationEmail } = await import("../../utils/email.util.js");
+      sendPromoVerificationEmail(user.email, otpCode, user.name, cleanCode)
+        .then(() => console.log(`📧 Đã gửi mã xác thực ưu đãi ${cleanCode} (${otpCode}) tới ${user.email}`))
+        .catch(err => console.error("Lỗi gửi mail mã xác thực ưu đãi:", err));
+
+      return res.status(200).json({
+        requiresPin: true,
+        message: "Mã xác thực đã được gửi về email của bạn. Vui lòng kiểm tra và nhập mã PIN để hoàn tất."
+      });
+    }
+
+    // 4. Xác thực mã OTP do người dùng gửi lên
+    const { OtpModel } = await import("../otp/otp.model.js");
+    const otpRecord = await OtpModel.findOne({ email: user.email, purpose: "redeem_promo" }).sort({ createdAt: -1 });
+
+    if (!otpRecord) {
+      return res.status(400).json({
+        message: "Mã xác thực không tồn tại hoặc yêu cầu đã quá hạn. Vui lòng gửi lại.",
+        requiresPin: true
+      });
+    }
+
+    if (new Date() > otpRecord.expiresAt) {
+      return res.status(400).json({
+        message: "Mã xác thực đã hết hạn. Vui lòng gửi lại yêu cầu để nhận mã mới.",
+        requiresPin: true
+      });
+    }
+
+    if (otpRecord.code !== pin.trim()) {
+      return res.status(400).json({
+        message: "Mã xác thực không chính xác. Vui lòng kiểm tra lại hộp thư email.",
+        requiresPin: true
+      });
+    }
+
+    // Xác thực thành công: Xóa OTP, nạp credit và lưu mã đã dùng
+    await OtpModel.deleteMany({ email: user.email, purpose: "redeem_promo" });
+
+    user.credits = (user.credits ?? 60) + promo.credits;
+    user.redeemedCodes.push(cleanCode);
+    await user.save();
+
+    // Tạo thông báo thành công
+    try {
+      const { NotificationService } = await import("../notification/notification.service.js");
+      await NotificationService.createNotification(
+        user._id,
+        "Nhận ưu đãi sự kiện thành công",
+        `Chúc mừng! Bạn đã nhận thành công +${promo.credits} credits từ mã ưu đãi "${promo.name}".`,
+        "system"
+      );
+    } catch (notiErr) {
+      console.error("Promo notification error:", notiErr);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Áp dụng mã thành công! Bạn được cộng +${promo.credits} credits.`,
+      credits: user.credits
+    });
+  } catch (error) {
+    console.error("Redeem promo code error:", error);
+    return res.status(500).json({ message: "Lỗi server. Không thể áp dụng mã ưu đãi sự kiện." });
+  }
+});
+
+router.post("/checkin", authMiddleware, async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: "Không tìm thấy người dùng" });
+    }
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+    if (user.lastCheckIn) {
+      const lastCheckInDate = new Date(user.lastCheckIn);
+      const lastCheckInMidnight = new Date(lastCheckInDate.getFullYear(), lastCheckInDate.getMonth(), lastCheckInDate.getDate()).getTime();
+
+      if (today === lastCheckInMidnight) {
+        return res.status(400).json({ message: "Bạn đã điểm danh hôm nay rồi. Hãy quay lại vào ngày mai!" });
+      }
+    }
+
+    // Cộng 3 credits và cập nhật ngày điểm danh
+    user.credits = (user.credits ?? 60) + 3;
+    user.lastCheckIn = now;
+    await user.save();
+
+    // Tạo thông báo
+    try {
+      const { NotificationService } = await import("../notification/notification.service.js");
+      await NotificationService.createNotification(
+        user._id,
+        "Điểm danh hàng ngày",
+        "Chúc mừng! Bạn nhận được +3 credits cho lượt điểm danh hôm nay.",
+        "system"
+      );
+    } catch (notiErr) {
+      console.error("Checkin notification error:", notiErr);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Điểm danh thành công! Bạn được cộng +3 credits.",
+      credits: user.credits
+    });
+  } catch (error) {
+    console.error("Check-in error:", error);
+    return res.status(500).json({ message: "Lỗi server. Không thể thực hiện điểm danh." });
+  }
+});
+
+router.get("/system-settings", async (req, res) => {
+  try {
+    const campaignSetting = await SystemSettingModel.findOne({ key: "campaign_mode" });
+    const campaignMode = campaignSetting ? campaignSetting.value === true : false;
+
+    const promoSetting = await SystemSettingModel.findOne({ key: "promo_redemption_enabled" });
+    const promoRedemptionEnabled = promoSetting ? promoSetting.value === true : true;
+
+    return res.status(200).json({ campaignMode, promoRedemptionEnabled });
+  } catch (error) {
+    console.error("Get system settings error:", error);
+    return res.status(500).json({ message: "Không thể lấy cấu hình hệ thống" });
+  }
+});
+
+router.post("/system-settings", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Bạn không có quyền thay đổi cấu hình này" });
+    }
+
+    const { campaignMode, promoRedemptionEnabled } = req.body;
+
+    if (campaignMode !== undefined) {
+      await SystemSettingModel.findOneAndUpdate(
+        { key: "campaign_mode" },
+        { value: !!campaignMode },
+        { upsert: true }
+      );
+    }
+
+    if (promoRedemptionEnabled !== undefined) {
+      await SystemSettingModel.findOneAndUpdate(
+        { key: "promo_redemption_enabled" },
+        { value: !!promoRedemptionEnabled },
+        { upsert: true }
+      );
+    }
+
+    const campaignSetting = await SystemSettingModel.findOne({ key: "campaign_mode" });
+    const finalCampaignMode = campaignSetting ? campaignSetting.value === true : false;
+
+    const promoSetting = await SystemSettingModel.findOne({ key: "promo_redemption_enabled" });
+    const finalPromoRedemptionEnabled = promoSetting ? promoSetting.value === true : true;
+
+    return res.status(200).json({
+      success: true,
+      message: "Cập nhật cấu hình hệ thống thành công!",
+      campaignMode: finalCampaignMode,
+      promoRedemptionEnabled: finalPromoRedemptionEnabled
+    });
+  } catch (error) {
+    console.error("Update system settings error:", error);
+    return res.status(500).json({ message: "Không thể cập nhật cấu hình hệ thống" });
   }
 });
 

@@ -99,39 +99,6 @@ export default function CVReportPanel({ analysis, fileName, onClose }) {
         Math.round((breakdown.structure + breakdown.content) / 2) || 94,
     ];
 
-    // Expand arrays to a target count by splitting sentences and using fallback text
-    const expandToCount = (list, fallbacks = [], count = 10) => {
-        const out = [];
-        const pushIfUnique = (s) => {
-            if (!s) return;
-            const t = s.trim();
-            if (!t) return;
-            if (!out.includes(t)) out.push(t);
-        };
-
-        // add original items first
-        (list || []).forEach(item => pushIfUnique(item));
-
-        // split original items into sentences to generate more entries
-        if (out.length < count) {
-            (list || []).forEach(item => {
-                if (!item) return;
-                item.toString().split(/(?<=[.?!])\s+/).forEach(sent => pushIfUnique(sent.replace(/^[-•\s]+/, '').trim()));
-            });
-        }
-
-        // use fallback text sources (overallFeedback, rawPreview, etc.)
-        if (out.length < count) {
-            (fallbacks || []).forEach(src => {
-                if (!src) return;
-                src.toString().split(/(?<=[.?!])\s+/).forEach(sent => pushIfUnique(sent.replace(/^[-•\s]+/, '').trim()));
-            });
-        }
-
-        // pad with empty strings if still short (keeps UI consistent)
-        return out.slice(0, count);
-    };
-
     // Prefer skillDetails from analysis if available, else fall back to top-level arrays
     const strengthsSource = (analysis.skillDetails && Array.isArray(analysis.skillDetails.strengths) && analysis.skillDetails.strengths.length > 0)
         ? analysis.skillDetails.strengths
@@ -143,9 +110,15 @@ export default function CVReportPanel({ analysis, fileName, onClose }) {
         ? analysis.skillDetails.suggestions
         : (analysis.suggestions || []);
 
-    const strengthsList = expandToCount(strengthsSource, [analysis.overallFeedback, analysis.rawPreview], 10);
-    const weaknessesList = expandToCount(weaknessesSource, [analysis.overallFeedback, analysis.rawPreview], 10);
-    const suggestionsList = expandToCount(suggestionsSource, [analysis.overallFeedback, analysis.rawPreview], 10);
+    const strengthsList = (strengthsSource && strengthsSource.length > 0) 
+        ? strengthsSource.filter(Boolean) 
+        : ['Cấu trúc CV rõ ràng, dễ đọc', 'Liệt kê các thông tin học vấn và kinh nghiệm một cách có tổ chức'];
+    const weaknessesList = (weaknessesSource && weaknessesSource.length > 0) 
+        ? weaknessesSource.filter(Boolean) 
+        : ['Cần bổ sung thêm các số liệu định lượng (KPIs, thành tích dạng số)', 'Một số phần mô tả kinh nghiệm còn ngắn gọn'];
+    const suggestionsList = (suggestionsSource && suggestionsSource.length > 0) 
+        ? suggestionsSource.filter(Boolean) 
+        : ['Đưa thêm số liệu và kết quả cụ thể (ví dụ: % tăng trưởng, số lượng khách hàng)', 'Chi tiết hóa danh sách công nghệ và kỹ năng chuyên môn đã sử dụng'];
 
     return (
         <div className="space-y-6">

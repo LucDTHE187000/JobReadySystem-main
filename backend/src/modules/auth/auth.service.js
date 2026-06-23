@@ -4,11 +4,12 @@ import { generateTokenFromUser } from "../../utils/jwt.util.js";
 import { generateOTP, generateOTPExpiry } from "../../utils/otp.util.js";
 import { sendOTPEmail, sendResetPasswordEmail } from "../../utils/email.util.js";
 import { OAuth2Client } from "google-auth-library";
+import { DEFAULT_CREDITS, PROMO_CODES } from "../../utils/credit.util.js";
 
 export class AuthService {
     // Đăng ký tài khoản mới
     static async register(userData) {
-        const { email, password, name, role } = userData;
+        const { email, password, name, role, promoCode, referralCode } = userData;
 
         // Normalize email (lowercase, trim)
         const normalizedEmail = email.toLowerCase().trim();
@@ -31,6 +32,42 @@ export class AuthService {
             throw new Error("Email already registered");
         }
 
+        // Đọc Campaign Mode để gán credit mặc định
+        let defaultSignupCredits = DEFAULT_CREDITS;
+        let hasReceivedCampaignSignupBonus = false;
+        try {
+            const { SystemSettingModel } = await import("../system/systemSetting.model.js");
+            const campaignSetting = await SystemSettingModel.findOne({ key: "campaign_mode" });
+            if (campaignSetting && campaignSetting.value === true) {
+                defaultSignupCredits = 150; // 60 + 90
+                hasReceivedCampaignSignupBonus = true;
+            }
+        } catch (err) {
+            console.error("Failed to read campaign setting in registration:", err);
+        }
+
+        // Kiểm tra và áp dụng mã giới thiệu bạn bè
+        let referredByUser = null;
+        if (referralCode) {
+            referredByUser = await UserModel.findOne({ referralCode: referralCode.toUpperCase().trim() });
+            if (!referredByUser) {
+                throw new Error("Mã giới thiệu không tồn tại hoặc không hợp lệ");
+            }
+        }
+
+        // Kiểm tra và áp dụng mã khuyến mãi sự kiện nếu có
+        let initialCredits = defaultSignupCredits;
+        const redeemedCodes = [];
+        if (promoCode) {
+            const cleanCode = promoCode.toUpperCase().trim();
+            const promo = PROMO_CODES[cleanCode];
+            if (!promo) {
+                throw new Error("Mã ưu đãi không hợp lệ");
+            }
+            initialCredits += promo.credits;
+            redeemedCodes.push(cleanCode);
+        }
+
         // Tạo tài khoản mới - Cần xác thực email qua OTP
         let user;
         try {
@@ -40,6 +77,10 @@ export class AuthService {
                 name: normalizedName,
                 role: role || "JOB_SEEKER",
                 isVerified: false,
+                credits: initialCredits,
+                hasReceivedCampaignSignupBonus,
+                redeemedCodes: redeemedCodes,
+                referredBy: referredByUser ? referredByUser._id : undefined
             });
         } catch (error) {
             if (error.code === 11000 || error.message.includes("duplicate")) {
@@ -113,7 +154,34 @@ export class AuthService {
         }
 
         // Cập nhật user và xóa OTP
-        user.isVerified = true;
+        if (!user.isVerified) {
+            user.isVerified = true;
+
+            // Xử lý thưởng giới thiệu (Referral bonus)
+            if (user.referredBy && !user.referralBonusProcessed) {
+                user.credits = (user.credits ?? 60) + 10; // Người được giới thiệu nhận +10
+                user.referralBonusProcessed = true;
+
+                try {
+                    const referrer = await UserModel.findById(user.referredBy);
+                    if (referrer) {
+                        referrer.credits = (referrer.credits ?? 60) + 15; // Người giới thiệu nhận +15
+                        await referrer.save();
+
+                        // Gửi thông báo cho người giới thiệu
+                        const { NotificationService } = await import("../notification/notification.service.js");
+                        await NotificationService.createNotification(
+                            referrer._id,
+                            "Nhận credit từ giới thiệu bạn bè",
+                            `Chúc mừng! Bạn đã nhận được +15 credits vì giới thiệu thành công ứng viên ${user.name}.`,
+                            "system"
+                        );
+                    }
+                } catch (refErr) {
+                    console.error("Failed to reward referrer on OTP verify:", refErr);
+                }
+            }
+        }
         await user.save();
 
         await OtpModel.deleteMany({ email });
@@ -217,7 +285,7 @@ export class AuthService {
                 name: user.name,
                 role: user.role,
                 language: user.language,
-                credits: user.credits ?? 6500,
+                credits: user.credits ?? DEFAULT_CREDITS,
                 phone: user.phone || '',
                 address: user.address || '',
                 avatar: user.avatar || '',
@@ -357,7 +425,8 @@ export class AuthService {
     }
 
     // Đăng nhập bằng Google
-    static async googleLogin({ token, role }) {
+    static async googleLogin(googleLoginData) {
+        const { token, role, referralCode, promoCode } = googleLoginData;
         if (!token) {
             throw new Error("Google ID Token is required");
         }
@@ -409,7 +478,64 @@ export class AuthService {
             // 2. Tạo user mới
             // Map role được truyền từ client (JOB_SEEKER hoặc EMPLOYER)
             const userRole = (role === "EMPLOYER" || role === "ADMIN") ? role : "JOB_SEEKER";
+
+            // Đọc Campaign Mode để gán credit mặc định
+            let defaultSignupCredits = DEFAULT_CREDITS;
+            let hasReceivedCampaignSignupBonus = false;
+            try {
+                const { SystemSettingModel } = await import("../system/systemSetting.model.js");
+                const campaignSetting = await SystemSettingModel.findOne({ key: "campaign_mode" });
+                if (campaignSetting && campaignSetting.value === true) {
+                    defaultSignupCredits = 150; // 60 + 90
+                    hasReceivedCampaignSignupBonus = true;
+                }
+            } catch (err) {
+                console.error("Failed to read campaign setting in googleLogin:", err);
+            }
+
+            let initialCredits = userRole === "JOB_SEEKER" ? defaultSignupCredits : 0;
+            const redeemedCodes = [];
             
+            // Áp dụng promoCode sự kiện nếu có
+            if (promoCode && userRole === "JOB_SEEKER") {
+                const cleanCode = promoCode.toUpperCase().trim();
+                const promo = PROMO_CODES[cleanCode];
+                if (promo) {
+                    initialCredits += promo.credits;
+                    redeemedCodes.push(cleanCode);
+                }
+            }
+
+            // Áp dụng referralCode giới thiệu nếu có
+            let referredBy = undefined;
+            let referralBonusProcessed = false;
+            if (referralCode && userRole === "JOB_SEEKER") {
+                const referrer = await UserModel.findOne({ referralCode: referralCode.toUpperCase().trim() });
+                if (referrer) {
+                    referredBy = referrer._id;
+                    referralBonusProcessed = true;
+                    // Cộng thưởng giới thiệu ngay lập tức vì Google login tự động verified
+                    initialCredits += 10; // Người được giới thiệu nhận +10
+                    
+                    // Người giới thiệu nhận +15
+                    referrer.credits = (referrer.credits ?? 60) + 15;
+                    await referrer.save();
+
+                    // Gửi thông báo cho người giới thiệu
+                    try {
+                        const { NotificationService } = await import("../notification/notification.service.js");
+                        await NotificationService.createNotification(
+                            referrer._id,
+                            "Nhận credit từ giới thiệu bạn bè",
+                            `Chúc mừng! Bạn đã nhận được +15 credits vì giới thiệu thành công ứng viên qua Google.`,
+                            "system"
+                        );
+                    } catch (notiErr) {
+                        console.error("Referral notification failed in googleLogin:", notiErr);
+                    }
+                }
+            }
+
             user = await UserModel.create({
                 email: normalizedEmail,
                 name: name || "Google User",
@@ -418,7 +544,11 @@ export class AuthService {
                 isVerified: true,
                 role: userRole,
                 avatarUrl: avatarUrl || "",
-                credits: userRole === "JOB_SEEKER" ? 6500 : 0 // Matching local signup credits logic
+                credits: initialCredits,
+                hasReceivedCampaignSignupBonus,
+                redeemedCodes: redeemedCodes,
+                referredBy: referredBy,
+                referralBonusProcessed: referralBonusProcessed
             });
 
             // Tạo thông báo chào mừng
@@ -449,7 +579,7 @@ export class AuthService {
                 name: user.name,
                 role: user.role,
                 language: user.language,
-                credits: user.credits ?? 6500,
+                credits: user.credits ?? DEFAULT_CREDITS,
                 phone: user.phone || '',
                 address: user.address || '',
                 avatar: user.avatar || '',

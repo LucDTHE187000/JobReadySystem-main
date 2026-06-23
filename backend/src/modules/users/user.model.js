@@ -30,7 +30,14 @@ const userSchema = new mongoose.Schema(
     isApproved: { type: Boolean, default: false }, // Dùng cho Employer: Admin duyệt mới được đăng tin
     language: { type: String, enum: ["EN", "VI"], default: "VI" },
 
-    credits: { type: Number, default: 6500, min: 0 },
+    credits: { type: Number, default: 60, min: 0 },
+    hasReceivedCampaignSignupBonus: { type: Boolean, default: false },
+    redeemedCodes: { type: [String], default: [] },
+    referralCode: { type: String, unique: true, sparse: true },
+    referredBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    referralBonusProcessed: { type: Boolean, default: false },
+    lastCheckIn: { type: Date },
+    freeInterviews: { type: Number, default: 0 },
 
     // Thông tin cho Job Seeker
     resume: { type: String }, // Deprecated: dùng cvs array thay thế
@@ -68,6 +75,14 @@ const userSchema = new mongoose.Schema(
     toObject: { virtuals: true }
   }
 );
+
+// Sinh mã giới thiệu ngẫu nhiên duy nhất cho user khi tạo mới
+userSchema.pre("validate", function(next) {
+  if (!this.referralCode && this.role === "JOB_SEEKER") {
+    this.referralCode = "JR-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+  }
+  next();
+});
 
 // Hash password trước khi lưu
 userSchema.pre("save", async function (next) {

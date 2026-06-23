@@ -16,6 +16,9 @@ cvRouter.post('/analyze', authMiddleware, CVController.analyzeCV);
 // Phân tích CV hiện tại của user (POST /api/cv/analyze-current)
 cvRouter.post('/analyze-current', authMiddleware, CVController.analyzeCurrentCV);
 
+// Phân tích CV theo Combo (POST /api/cv/analyze-combo)
+cvRouter.post('/analyze-combo', authMiddleware, CVController.analyzeComboCV);
+
 // Quản lý mẫu thiết kế CV tự tạo
 cvRouter.get('/designs', authMiddleware, CVController.getCVDesigns);
 cvRouter.post('/designs', authMiddleware, CVController.saveCVDesign);

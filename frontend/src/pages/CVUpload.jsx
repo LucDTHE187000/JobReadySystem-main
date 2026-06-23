@@ -621,6 +621,36 @@ export default function CVUpload() {
         }
     };
 
+    const handleAnalyzeCombo = async (cvId) => {
+        try {
+            setAnalyzing(true);
+            setAnalyzingCvId(cvId);
+            console.log('[CVUpload] Starting CV analysis combo for:', cvId);
+
+            const res = await axios.post(`${API_URL}/api/cv/analyze-combo`, { cvId }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            console.log('[CVUpload] Combo Analysis response:', res.data);
+
+            if (res.data?.data) {
+                setAnalysisResult(res.data.data);
+                setShowAnalysis(true);
+                await fetchCVs();
+                if (refreshUser) await refreshUser();
+            }
+        } catch (error) {
+            console.error('[CVUpload] Combo Analysis error:', error);
+            setMessage({
+                type: 'error',
+                text: error.response?.data?.error || 'Lỗi khi phân tích CV Combo.'
+            });
+        } finally {
+            setAnalyzing(false);
+            setAnalyzingCvId(null);
+        }
+    };
+
     const formatDate = (date) => {
         return new Date(date).toLocaleDateString('vi-VN', {
             day: '2-digit',
@@ -781,11 +811,20 @@ export default function CVUpload() {
                             {/* Features & Cost - 1 column */}
                             <div className="space-y-6">
                                 <div className="bg-white/80 border border-slate-200/60 backdrop-blur-md rounded-3xl p-6 text-slate-800 shadow-md">
-                                    <p className="text-xs uppercase text-slate-500 mb-1 font-semibold">Chi phí phân tích</p>
-                                    <p className="text-3xl font-bold text-[#0A2463]">500 credit / lần</p>
-                                    <p className="text-sm text-slate-500 mt-2">Số dư: <span className="text-[#0A2463] font-bold">{(user?.credits ?? 0).toLocaleString('vi-VN')}</span></p>
-                                    {(user?.credits ?? 0) < 500 && (
-                                        <p className="text-red-650 text-xs mt-2 font-bold">Không đủ credit — hãy nạp thêm tại Pricing.</p>
+                                    <p className="text-xs uppercase text-slate-500 mb-1 font-semibold font-sans">Chi phí phân tích</p>
+                                    <p className="text-lg font-bold text-[#0A2463]">Phân tích đơn lẻ: 10 credits / lượt</p>
+                                    <p className="text-lg font-bold text-amber-600 mt-1">Gói Combo AI: 28 credits / lượt</p>
+                                    <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                                        (Combo gồm Chấm CV & Tặng 1 lượt phỏng vấn miễn phí tiếp theo)
+                                    </p>
+                                    <p className="text-sm text-slate-500 mt-3 border-t border-slate-100 pt-3">
+                                        Số dư ví: <span className="text-[#0A2463] font-bold">{(user?.credits ?? 0).toLocaleString('vi-VN')} credits</span>
+                                    </p>
+                                    <p className="text-sm text-slate-500 mt-1">
+                                        Lượt phỏng vấn free: <span className="text-emerald-600 font-bold">{user?.freeInterviews || 0} lượt</span>
+                                    </p>
+                                    {(user?.credits ?? 0) < 10 && (
+                                        <p className="text-red-650 text-xs mt-2 font-bold animate-pulse">Không đủ credit — hãy nạp thêm tại trang Pricing.</p>
                                     )}
                                 </div>
 
@@ -872,11 +911,12 @@ export default function CVUpload() {
                                                     </div>
                                                 )}
                                             </div>
-                                            <div className="flex gap-2">
+                                            <div className="flex flex-wrap gap-2 w-full mt-4 border-t border-slate-100 pt-4">
                                                 <button
                                                     onClick={() => handleAnalyze(cv._id)}
-                                                    disabled={analyzingCvId === cv._id}
-                                                    className="flex-1 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 disabled:opacity-50 font-semibold rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                                                    disabled={analyzingCvId === cv._id || (user?.credits ?? 0) < 10}
+                                                    className="flex-1 min-w-[150px] px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 font-bold rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer text-sm shadow-sm"
+                                                    title="Chấm điểm CV & phân tích lỗi (Trừ 10 credits)"
                                                 >
                                                     {analyzingCvId === cv._id ? (
                                                         <>
@@ -886,23 +926,44 @@ export default function CVUpload() {
                                                     ) : (
                                                         <>
                                                             <Sparkles className="w-4 h-4" />
-                                                            Phân Tích
+                                                            Phân tích lẻ (10 Cr)
                                                         </>
                                                     )}
                                                 </button>
+
+                                                <button
+                                                    onClick={() => handleAnalyzeCombo(cv._id)}
+                                                    disabled={analyzingCvId === cv._id || (user?.credits ?? 0) < 28}
+                                                    className="flex-1 min-w-[180px] px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:from-amber-600 hover:to-orange-700 disabled:opacity-50 font-bold rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer text-sm shadow-sm"
+                                                    title="Combo Chấm CV & Tặng 1 lượt phỏng vấn (Trừ 28 credits)"
+                                                >
+                                                    {analyzingCvId === cv._id ? (
+                                                        <>
+                                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                                            Đang phân tích...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Zap className="w-4 h-4 text-yellow-300 animate-pulse" />
+                                                            Combo AI (28 Cr)
+                                                        </>
+                                                    )}
+                                                </button>
+
                                                 {cv.filePath && (
                                                     <a
                                                         href={`${API_URL}${cv.filePath}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg border border-slate-300 transition-all flex items-center gap-2 cursor-pointer text-sm"
+                                                        className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg border border-slate-350 transition-all flex items-center justify-center gap-1.5 cursor-pointer text-sm"
                                                     >
                                                         Xem CV
                                                     </a>
                                                 )}
+                                                
                                                 <button
                                                     onClick={() => handleDeleteCV(cv._id)}
-                                                    className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold rounded-lg border border-red-500/20 transition-all flex items-center gap-2 cursor-pointer"
+                                                    className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-semibold rounded-lg border border-red-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer text-sm"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                     Xóa

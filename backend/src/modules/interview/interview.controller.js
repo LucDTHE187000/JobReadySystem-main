@@ -50,7 +50,18 @@ class InterviewController {
             const { deductCredits, CREDIT_COSTS } = await import('../../utils/credit.util.js');
             const { UserModel } = await import('../users/user.model.js');
             try {
-                await deductCredits(userId, CREDIT_COSTS.INTERVIEW_SESSION, UserModel);
+                const user = await UserModel.findById(userId);
+                if (!user) {
+                    return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+                }
+
+                if (user.freeInterviews && user.freeInterviews > 0) {
+                    user.freeInterviews = user.freeInterviews - 1;
+                    await user.save();
+                    console.log(`[Interview Cost] User ${userId} uses 1 free combo interview. Remaining free: ${user.freeInterviews}`);
+                } else {
+                    await deductCredits(userId, CREDIT_COSTS.INTERVIEW_SESSION, UserModel);
+                }
             } catch (creditErr) {
                 return res.status(creditErr.status || 402).json({
                     error: creditErr.message || 'Không đủ credit để bắt đầu phỏng vấn',
@@ -141,19 +152,13 @@ class InterviewController {
             const questionsArray = sessionForCheck?.questions || [];
             const answeredCount = questionsArray.filter(q => q.userAnswer && q.userAnswer.trim()).length || 0;
             
-            // Use actual question count as the target, not stored totalQuestions (which may be outdated)
-            const actualQuestionCount = questionsArray.length;
-            const targetCount = Math.max(totalQuestionsInSession, actualQuestionCount);
-            
-            const isLastQuestion = answeredCount >= targetCount;
+            // Stop session when user has answered the total requested number of questions
+            const isLastQuestion = answeredCount >= totalQuestionsInSession;
 
             console.log(`[SUBMIT ANSWER] sessionId=${evaluatedQuestion.sessionId}`);
-            console.log(`  Session.totalQuestions = ${sessionForCheck?.totalQuestions}`);
-            console.log(`  Actual questions created = ${actualQuestionCount}`);
-            console.log(`  Target count (max of both) = ${targetCount}`);
-            console.log(`  Already answered: ${answeredCount}, Total so far: ${answeredCount}`);
+            console.log(`  Session.totalQuestions = ${totalQuestionsInSession}`);
+            console.log(`  Already answered: ${answeredCount}`);
             console.log(`  isLastQuestion = ${isLastQuestion}`);
-            console.log(`  Calculation: ${answeredCount} >= ${targetCount} = ${isLastQuestion}`);
 
             res.status(200).json({
                 success: true,
@@ -384,21 +389,16 @@ class InterviewController {
                 return res.status(404).json({ error: 'Session không tồn tại' });
             }
 
-            // Nếu đã đủ số lượng câu hỏi và câu hỏi cuối cùng đã được trả lời, báo lỗi/hoàn thành
+            // Check based on the number of actual answered questions in the session
             const totalQLimit = session.totalQuestions || 10;
-            console.log(`[GEN QUESTION] Questions in session: ${session.questions.length}/${totalQLimit}`);
+            const answeredCount = session.questions.filter(q => q.userAnswer && q.userAnswer.trim() !== '').length || 0;
+            console.log(`[GEN QUESTION] sessionId=${sessionId}, answeredCount=${answeredCount}/${totalQLimit}, totalGenerated=${session.questions.length}`);
             
-            if (session.questions.length >= totalQLimit) {
-                const lastQ = session.questions[session.questions.length - 1];
-                const lastQHasAnswer = lastQ && lastQ.userAnswer && lastQ.userAnswer.trim() !== '';
-                console.log(`[GEN QUESTION] At limit! Last question answered: ${lastQHasAnswer}`);
-                
-                if (lastQHasAnswer) {
-                    console.log(`[GEN QUESTION] ERROR: Session completed with ${session.questions.length} questions`);
-                    return res.status(400).json({
-                        error: 'Phiên phỏng vấn đã hoàn tất, không thể tạo thêm câu hỏi'
-                    });
-                }
+            if (answeredCount >= totalQLimit) {
+                console.log(`[GEN QUESTION] ERROR: Session completed with ${answeredCount} answered questions`);
+                return res.status(400).json({
+                    error: 'Phiên phỏng vấn đã hoàn tất, không thể tạo thêm câu hỏi'
+                });
             }
 
             // ==========================================
@@ -412,51 +412,19 @@ class InterviewController {
             //     const lastQ = session.questions[session.questions.length - 1];
             //     const secondLastQ = session.questions.length > 1 ? session.questions[session.questions.length - 2] : null;
             //     const isLastQFollowUp = secondLastQ && secondLastQ.followUpAsked === true;
-
-            //     if (lastQ.followUpQuestion && !lastQ.followUpAsked && !isLastQFollowUp) {
-            //         console.log(`[FOLLOW-UP] Kích hoạt câu hỏi follow-up từ Q${lastQ.questionNumber}: ${lastQ.followUpQuestion}`);
-            //         
-            //         lastQ.followUpAsked = true;
-            //         await lastQ.save();
-
-            //         const newQuestion = new InterviewQuestion({
-            //             sessionId,
-            //             questionNumber: session.questions.length + 1,
-            //             questionText: lastQ.followUpQuestion,
-            //             questionType: lastQ.questionType || 'Technical',
-            //             topic: lastQ.topic || 'General',
-            //             aiFeedback: ''
-            //         });
-
-            //         await newQuestion.save();
-            //         session.questions.push(newQuestion._id);
-            //         await session.save();
-
-            //         return res.status(200).json({
-            //             success: true,
-            //             data: {
-            //                 _id: newQuestion._id,
-            //                 questionText: newQuestion.questionText,
-            //                 question: newQuestion.questionText,
-            //                 questionType: newQuestion.questionType,
-            //                 topic: newQuestion.topic,
-            //                 questionNumber: newQuestion.questionNumber
-            //             }
-            //         });
-            //     }
+            //     if (lastQ.followUpQuestion && !lastQ.followUpAsked && !isLastQFollowUp) { ... }
             // }
 
             // ==========================================
             // CHỐNG TRÙNG LẶP CÂU HỎI KHI REFRESH (F5) HOẶC BẤM NHANH
-            // Nếu câu hỏi cuối cùng chưa được trả lời và không có follow-up, trả về luôn câu hỏi đó
+            // Nếu câu hỏi cuối cùng trong DB chưa được trả lời, trả về luôn câu hỏi đó thay vì tạo mới
             // ==========================================
             if (session.questions.length > 0) {
                 const lastQ = session.questions[session.questions.length - 1];
-                const questionAge = Date.now() - new Date(lastQ.createdAt || 0).getTime();
-                const isFreshUnanswered = !lastQ.userAnswer && questionAge < 30000; // 30 giây
+                const isUnanswered = !lastQ.userAnswer || lastQ.userAnswer.trim() === '';
                 
-                if (isFreshUnanswered) {
-                    console.log(`[REFRESH SAFE] Câu hỏi cuối cùng Q${lastQ.questionNumber} vẫn chưa được trả lời (age=${questionAge}ms). Return luôn thay vì gen mới.`);
+                if (isUnanswered) {
+                    console.log(`[REFRESH SAFE] Trả về câu hỏi cuối cùng Q${lastQ.questionNumber} chưa trả lời.`);
                     return res.status(200).json({
                         success: true,
                         data: {

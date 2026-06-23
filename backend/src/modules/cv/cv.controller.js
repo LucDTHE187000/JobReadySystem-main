@@ -373,6 +373,102 @@ export class CVController {
     }
 
     /**
+     * Phân tích CV theo Combo (Chấm CV & Phỏng vấn)
+     * POST /api/cv/analyze-combo
+     * Body: { cvId? }
+     */
+    static async analyzeComboCV(req, res) {
+        try {
+            const userId = req.user.userId;
+            const { cvId } = req.body;
+
+            console.log(`[Analyze CV Combo] User: ${userId}, CV ID: ${cvId || 'latest'}`);
+
+            const user = await UserModel.findById(userId).select('cvs freeInterviews credits').lean();
+            if (!user || !user.cvs || user.cvs.length === 0) {
+                return res.status(404).json({ error: 'Không tìm thấy CV để phân tích' });
+            }
+
+            let cv;
+            if (cvId) {
+                cv = user.cvs.find(c => c._id.toString() === cvId);
+                if (!cv) {
+                    return res.status(404).json({ error: 'CV không tồn tại' });
+                }
+            } else {
+                cv = user.cvs[user.cvs.length - 1];
+            }
+
+            const filePath = path.join(__dirname, '../../../', cv.filePath);
+            if (!fs.existsSync(filePath)) {
+                return res.status(404).json({ error: 'File CV không tồn tại' });
+            }
+
+            let cvText = '';
+            try {
+                const pdfModule = await import('pdf-parse');
+                const pdfParse = pdfModule.default || pdfModule;
+                const pdfBuffer = fs.readFileSync(filePath);
+                const pdfData = await pdfParse(pdfBuffer);
+                cvText = pdfData.text || '';
+            } catch (pdfError) {
+                cvText = `CV Name: ${cv.fileName}\nFile Size: ${cv.fileSize} bytes`;
+            }
+
+            if (!cvText || cvText.trim().length === 0) {
+                return res.status(400).json({ error: 'Không thể trích xuất text từ CV' });
+            }
+
+            // Trừ 28 credits cho Combo
+            try {
+                await deductCredits(userId, CREDIT_COSTS.COMBO, UserModel);
+            } catch (creditErr) {
+                return res.status(creditErr.status || 402).json({
+                    error: creditErr.message || 'Không đủ credit để thực hiện gói Combo',
+                });
+            }
+
+            // Gọi CV Service để phân tích
+            const analysis = await CVService.analyzeCV(cvText, '');
+
+            // Lưu analysis vào DB và tăng freeInterviews + 1
+            await UserModel.findByIdAndUpdate(
+                userId,
+                {
+                    $set: { 'cvs.$[elem].analysis': analysis },
+                    $inc: { freeInterviews: 1 }
+                },
+                {
+                    arrayFilters: [{ 'elem._id': cv._id }],
+                    new: true
+                }
+            );
+
+            // Tạo thông báo
+            try {
+                const { NotificationService } = await import("../notification/notification.service.js");
+                await NotificationService.createNotification(
+                    userId,
+                    "Kích hoạt Combo AI thành công",
+                    "Bạn đã đăng ký thành công Combo (Chấm CV & Phỏng vấn). Bạn có +1 lượt phỏng vấn miễn phí tiếp theo.",
+                    "system"
+                );
+            } catch (notiErr) {
+                console.error("Combo notification error:", notiErr);
+            }
+
+            return res.status(200).json({
+                success: true,
+                message: 'Phân tích CV thành công (Combo kích hoạt)',
+                data: analysis,
+            });
+        } catch (error) {
+            console.error('Analyze Combo CV error:', error);
+            return res.status(500).json({ error: error.message || 'Lỗi khi phân tích CV' });
+        }
+    }
+
+    /**
      * Lấy danh sách thiết kế mẫu CV của user hiện tại
      * GET /api/cv/designs
      */

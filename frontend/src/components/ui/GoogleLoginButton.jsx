@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
-export default function GoogleLoginButton({ role, onSuccessCallback }) {
+export default function GoogleLoginButton({ role, onSuccessCallback, code }) {
     const { signInWithGoogle } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
@@ -12,6 +12,7 @@ export default function GoogleLoginButton({ role, onSuccessCallback }) {
     // Dùng ref để lưu trữ giá trị role và callback mới nhất nhằm tránh re-run useEffect khi chúng thay đổi
     const roleRef = useRef(role);
     const callbackRef = useRef(onSuccessCallback);
+    const codeRef = useRef(code);
 
     useEffect(() => {
         roleRef.current = role;
@@ -20,6 +21,10 @@ export default function GoogleLoginButton({ role, onSuccessCallback }) {
     useEffect(() => {
         callbackRef.current = onSuccessCallback;
     }, [onSuccessCallback]);
+
+    useEffect(() => {
+        codeRef.current = code;
+    }, [code]);
 
     useEffect(() => {
         let script = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
@@ -40,7 +45,7 @@ export default function GoogleLoginButton({ role, onSuccessCallback }) {
                             setLoading(true);
                             setError('');
                             try {
-                                const result = await signInWithGoogle(response.credential, roleRef.current);
+                                const result = await signInWithGoogle(response.credential, roleRef.current, codeRef.current);
                                 if (result.error) {
                                     setError(result.error.message || 'Đăng nhập Google thất bại');
                                 } else {

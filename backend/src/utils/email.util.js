@@ -119,6 +119,113 @@ export const sendOTPEmail = async (to, otp, name = "User") => {
 };
 
 /**
+ * Send promo verification OTP email
+ * @param {string} to - Recipient email
+ * @param {string} otp - OTP code
+ * @param {string} name - Recipient name
+ * @param {string} promoName - Promo code name
+ * @returns {Promise<Object>} Send result
+ */
+export const sendPromoVerificationEmail = async (to, otp, name = "User", promoName = "GIFT_79") => {
+    const hasResendConfig = !!process.env.RESEND_API_KEY;
+    const isDevModeOnly = process.env.EMAIL_DEV_MODE === "true" || !hasResendConfig;
+
+    if (isDevModeOnly) {
+        console.log("\n" + "=".repeat(60));
+        console.log("📧 [DEV MODE] Promo Verification OTP Email (Not sent - Development mode)");
+        console.log("=".repeat(60));
+        console.log(`To: ${to}`);
+        console.log(`Name: ${name}`);
+        console.log(`Promo Name: ${promoName}`);
+        console.log(`OTP Code: ${otp}`);
+        console.log(`Expires in: 10 minutes`);
+        console.log("=".repeat(60) + "\n");
+        return { success: true, messageId: "dev-mode", devMode: true };
+    }
+
+    try {
+        const resendInstance = getResendInstance();
+        const sender = getSender();
+
+        const mailOptions = {
+            from: `JobReady <${sender}>`,
+            to: to,
+            subject: `[JobReady] Mã xác thực nhận ưu đãi ${promoName}`,
+            html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background: linear-gradient(135deg, #0A2463 0%, #1e40af 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+                        .otp-box { background: white; border: 2px dashed #0A2463; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px; }
+                        .otp-code { font-size: 32px; font-weight: bold; color: #0A2463; letter-spacing: 5px; }
+                        .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>JobReady System</h1>
+                        </div>
+                        <div class="content">
+                            <h2>Xin chào ${name}!</h2>
+                            <p>Bạn đã yêu cầu đổi mã ưu đãi sự kiện <strong>${promoName}</strong> để nhận thêm 90 credits miễn phí.</p>
+                            <p>Vui lòng nhập mã xác thực OTP dưới đây vào trang sự kiện để hoàn tất:</p>
+                            
+                            <div class="otp-box">
+                                <div class="otp-code">${otp}</div>
+                            </div>
+                            
+                            <p>Mã xác thực này có hiệu lực trong vòng <strong>10 phút</strong>.</p>
+                            <p>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email.</p>
+                        </div>
+                        <div class="footer">
+                            <p>&copy; ${new Date().getFullYear()} JobReady System. Tất cả các quyền được bảo lưu.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `,
+            text: `
+                Xin chào ${name}!
+                
+                Bạn đã yêu cầu đổi mã ưu đãi sự kiện ${promoName} để nhận thêm 90 credits miễn phí.
+                Vui lòng nhập mã xác thực OTP dưới đây vào trang sự kiện để hoàn tất:
+                
+                ${otp}
+                
+                Mã xác thực này có hiệu lực trong vòng 10 phút.
+                
+                Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email.
+                
+                © ${new Date().getFullYear()} JobReady System. Tất cả các quyền được bảo lưu.
+            `
+        };
+
+        const { data, error } = await resendInstance.emails.send(mailOptions);
+        
+        if (error) {
+            throw new Error(error.message || JSON.stringify(error));
+        }
+
+        return { success: true, messageId: data.id };
+    } catch (error) {
+        console.error("❌ Error sending promo verification email:", error.message);
+        console.log("\n" + "=".repeat(60));
+        console.log("⚠️  Email không gửi được qua Resend, nhưng OTP đã được tạo:");
+        console.log(`📧 Email: ${to}`);
+        console.log(`🔑 OTP Code: ${otp}`);
+        console.log("=".repeat(60) + "\n");
+
+        return { success: false, messageId: null, error: error.message };
+    }
+};
+
+/**
  * Send reset password OTP email
  * @param {string} to - Recipient email
  * @param {string} otp - OTP code

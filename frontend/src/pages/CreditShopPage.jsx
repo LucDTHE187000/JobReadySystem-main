@@ -10,26 +10,26 @@ const PACKAGES = [
   {
     id: 'starter',
     title: 'Starter',
-    credits: 3000,
+    credits: 30,
     price: 29000,
     label: 'Tiết kiệm',
-    description: 'Nạp 3.000 credit cho các tính năng cơ bản',
+    description: 'Nạp 30 credit cho các tính năng cơ bản',
   },
   {
     id: 'pro',
     title: 'Pro',
-    credits: 9000,
+    credits: 90,
     price: 79000,
     label: 'Tiêu chuẩn',
-    description: 'Nạp 9.000 credit, phù hợp cho ứng viên thường xuyên',
+    description: 'Nạp 90 credit, phù hợp cho ứng viên thường xuyên',
   },
   {
     id: 'max',
     title: 'Max',
-    credits: 21000,
+    credits: 170,
     price: 149000,
     label: 'Cao cấp',
-    description: 'Nạp 21.000 credit cho nhu cầu sử dụng nâng cao',
+    description: 'Nạp 170 credit cho nhu cầu sử dụng nâng cao',
   },
 ];
 
@@ -75,7 +75,7 @@ function QRCodeImage({ value, size = 280 }) {
 // ──────────────────────────────────────────────────────────────────────────
 
 export default function CreditShopPage() {
-  const { refreshUser } = useAuth();
+  const { user, refreshUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -97,6 +97,14 @@ export default function CreditShopPage() {
   const pollingRef = useRef(null);
 
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+  // Redirect promo query parameter to /redeem?promo=CODE
+  useEffect(() => {
+    const promo = queryParams.get('promo');
+    if (promo) {
+      navigate(`/redeem?promo=${promo}`, { replace: true });
+    }
+  }, [location.search, navigate]);
 
   const clearTimers = () => {
     if (timerRef.current) {
@@ -369,22 +377,24 @@ export default function CreditShopPage() {
             </div>
           </div>
 
-          <div className="rounded-[32px] bg-white/80 border border-slate-200/60 backdrop-blur-md p-8 text-slate-800 shadow-md">
-            <div className="mb-6 bg-slate-50 border border-slate-200 p-6">
-              <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Hướng dẫn thanh toán</p>
-              <h3 className="mt-3 text-2xl font-bold">4 bước thanh toán</h3>
-              <ol className="mt-5 space-y-3 text-sm leading-6 text-slate-600">
-                <li>1. Chọn gói credit phù hợp.</li>
-                <li>2. Nhấn "Tạo mã QR" — mã hiện ngay trong trang.</li>
-                <li>3. Mở app ngân hàng, quét QR và xác nhận.</li>
-                <li>4. Nhấn "Tôi đã thanh toán" để nhận credit.</li>
-              </ol>
-            </div>
+          <div className="space-y-6">
+            <div className="rounded-[32px] bg-white/80 border border-slate-200/60 backdrop-blur-md p-8 text-slate-800 shadow-md">
+              <div className="mb-6 bg-slate-50 border border-slate-200 p-6">
+                <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Hướng dẫn thanh toán</p>
+                <h3 className="mt-3 text-2xl font-bold">4 bước thanh toán</h3>
+                <ol className="mt-5 space-y-3 text-sm leading-6 text-slate-600">
+                  <li>1. Chọn gói credit phù hợp.</li>
+                  <li>2. Nhấn "Tạo mã QR" — mã hiện ngay trong trang.</li>
+                  <li>3. Mở app ngân hàng, quét QR và xác nhận.</li>
+                  <li>4. Nhấn "Tôi đã thanh toán" để nhận credit.</li>
+                </ol>
+              </div>
 
-            <div className="space-y-4 text-sm text-slate-600">
-              <p><span className="font-bold text-slate-700">Gói đang chọn:</span> {selectedPackage.title}</p>
-              <p><span className="font-bold text-slate-700">Credit nhận:</span> {selectedPackage.credits.toLocaleString()}</p>
-              <p><span className="font-bold text-slate-700">Giá:</span> {formatCurrency(selectedPackage.price)}</p>
+              <div className="space-y-4 text-sm text-slate-600">
+                <p><span className="font-bold text-slate-700">Gói đang chọn:</span> {selectedPackage.title}</p>
+                <p><span className="font-bold text-slate-700">Credit nhận:</span> {selectedPackage.credits.toLocaleString()}</p>
+                <p><span className="font-bold text-slate-700">Giá:</span> {formatCurrency(selectedPackage.price)}</p>
+              </div>
             </div>
           </div>
         </section>

@@ -114,6 +114,11 @@ export default function ChatbotWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   
+  // Dragging states to allow moving chatbot anywhere on the screen
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStart = useRef({ mouseX: 0, mouseY: 0, posX: 0, posY: 0, moved: false });
+
   // Dynamic User Scoped Storage Key to keep history strictly isolated per account
   const userId = user?._id || user?.id || 'guest';
   const storageKey = `jobready_chat_history_${userId}`;
@@ -124,6 +129,97 @@ export default function ChatbotWidget() {
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Mouse & Touch drag event handlers
+  const handleMouseDown = (e) => {
+    if (e.button !== 0) return; // Only allow left click
+    setIsDragging(true);
+    dragStart.current = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      posX: position.x,
+      posY: position.y,
+      moved: false
+    };
+    e.preventDefault();
+  };
+
+  const handleTouchStart = (e) => {
+    if (e.touches.length !== 1) return;
+    setIsDragging(true);
+    dragStart.current = {
+      mouseX: e.touches[0].clientX,
+      mouseY: e.touches[0].clientY,
+      posX: position.x,
+      posY: position.y,
+      moved: false
+    };
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - dragStart.current.mouseX;
+      const dy = e.clientY - dragStart.current.mouseY;
+
+      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+        dragStart.current.moved = true;
+      }
+
+      // Restrict position to viewport boundary so it doesn't get lost
+      const newX = Math.max(-20, Math.min(window.innerWidth - 80, dragStart.current.posX - dx));
+      const newY = Math.max(-20, Math.min(window.innerHeight - 80, dragStart.current.posY - dy));
+      
+      setPosition({ x: newX, y: newY });
+    };
+
+    const handleMouseUp = () => {
+      if (!isDragging) return;
+      setIsDragging(false);
+    };
+
+    const handleTouchMove = (e) => {
+      if (!isDragging || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - dragStart.current.mouseX;
+      const dy = e.touches[0].clientY - dragStart.current.mouseY;
+
+      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+        dragStart.current.moved = true;
+      }
+
+      const newX = Math.max(-20, Math.min(window.innerWidth - 80, dragStart.current.posX - dx));
+      const newY = Math.max(-20, Math.min(window.innerHeight - 80, dragStart.current.posY - dy));
+
+      setPosition({ x: newX, y: newY });
+    };
+
+    const handleTouchEnd = () => {
+      if (!isDragging) return;
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('touchmove', handleTouchMove, { passive: true });
+      window.addEventListener('touchend', handleTouchEnd);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isDragging]);
+
+  const handleButtonClick = (e) => {
+    if (dragStart.current.moved) {
+      // It was dragged, do not toggle the chat window!
+      return;
+    }
+    handleOpenToggle();
+  };
 
   // Load chat history whenever the logged-in user changes (prevents bleed-over between accounts)
   useEffect(() => {
@@ -225,7 +321,13 @@ export default function ChatbotWidget() {
   ];
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 font-sans flex flex-col items-end">
+    <div 
+      className="fixed z-50 font-sans flex flex-col items-end"
+      style={{
+        right: `${24 + position.x}px`,
+        bottom: `${24 + position.y}px`
+      }}
+    >
       {/* Custom pulse animation style block */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes pulse-scale-zoom {
@@ -283,9 +385,14 @@ export default function ChatbotWidget() {
       {/* Chat Window Container */}
       {isOpen && (
         <div className="w-[310px] sm:w-[340px] h-[500px] max-h-[85vh] bg-slate-950/90 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-2xl flex flex-col overflow-hidden mb-4 transition-all duration-300 transform scale-100 origin-bottom-right">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-slate-900 to-slate-950 px-3 py-2.5 border-b border-slate-800/60 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
+          {/* Header - Draggable */}
+          <div 
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+            className="bg-gradient-to-r from-slate-900 to-slate-950 px-3 py-2.5 border-b border-slate-800/60 flex items-center justify-between select-none cursor-grab active:cursor-grabbing shrink-0"
+            style={{ touchAction: 'none' }}
+          >
+            <div className="flex items-center gap-2.5 pointer-events-none">
               <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center overflow-hidden shadow-md relative shrink-0">
                 <img src="/robot-logo.png" alt="Robot Logo" className="w-[90%] h-[90%] object-contain rounded-full" />
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border border-white rounded-full"></span>
@@ -295,12 +402,14 @@ export default function ChatbotWidget() {
                   JobReady AI 
                   <Sparkles size={11} className="text-yellow-400" />
                 </h3>
-                <span className="text-[10px] text-emerald-400 font-medium block leading-none">Đang trực tuyến</span>
+                <span className="text-[10px] text-emerald-400 font-medium block leading-none">Đang trực tuyến (Kéo để di chuyển)</span>
               </div>
             </div>
             <div className="flex items-center gap-1">
               {history.length > 0 && (
                 <button
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
                   onClick={handleClearHistory}
                   className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800/40 rounded-lg transition-all"
                   title="Xóa cuộc trò chuyện"
@@ -309,6 +418,8 @@ export default function ChatbotWidget() {
                 </button>
               )}
               <button
+                onMouseDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
                 onClick={handleOpenToggle}
                 className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800/40 rounded-lg transition-all"
               >
@@ -423,14 +534,17 @@ export default function ChatbotWidget() {
         </div>
       )}
 
-      {/* Floating Toggle Button */}
+      {/* Floating Toggle Button - Draggable */}
       <button
-        onClick={handleOpenToggle}
-        className={`w-16 h-16 rounded-full bg-white border border-slate-200 hover:border-slate-300 shadow-2xl flex items-center justify-center transition-all duration-300 transform hover:scale-110 active:scale-95 relative group focus:outline-none ${
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
+        onClick={handleButtonClick}
+        className={`w-16 h-16 rounded-full bg-white border border-slate-200 hover:border-slate-300 shadow-2xl flex items-center justify-center transition-all duration-300 transform hover:scale-110 active:scale-95 relative group focus:outline-none cursor-grab active:cursor-grabbing ${
           isOpen ? 'rotate-90' : ''
         }`}
         style={{
           boxShadow: '0 8px 32px rgba(16, 185, 129, 0.2)',
+          touchAction: 'none'
         }}
       >
         {isOpen ? (
@@ -441,7 +555,7 @@ export default function ChatbotWidget() {
             <img 
               src="/robot-logo.png" 
               alt="Robot Logo" 
-              className="w-[90%] h-[90%] object-contain rounded-full animate-pulse-scale-zoom group-hover:scale-105 transition-transform duration-300" 
+              className="w-[90%] h-[90%] object-contain rounded-full animate-pulse-scale-zoom group-hover:scale-105 transition-transform duration-300 pointer-events-none" 
             />
             {/* Ping animation indicator - floating outside at -top-1 -right-1 */}
             <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full animate-custom-ping"></span>

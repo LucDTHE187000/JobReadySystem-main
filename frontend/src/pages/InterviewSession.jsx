@@ -185,16 +185,39 @@ export default function InterviewSession() {
             if (!s) throw new Error('Session data empty');
             setSession(s);
             sessionRef.current = s;
-            setTotalQuestions(s?.totalQuestions || 5);
-            setMessages([{ role: 'ai', text: `Xin chào! Tôi là AI phỏng vấn JobReady. Hôm nay chúng ta sẽ luyện tập vị trí **${s?.jobTitle || ''}**. Hãy trả lời tự tin và rõ ràng nhé!` }]);
+            
+            const limit = s?.totalQuestions || 10;
+            setTotalQuestions(limit);
+            
+            // Reconstruct chat history if there are already questions in the session
+            const dbQuestions = s?.questions || [];
+            const chatHistory = [{ 
+                role: 'ai', 
+                text: `Xin chào! Tôi là AI phỏng vấn JobReady. Hôm nay chúng ta sẽ luyện tập vị trí **${s?.jobTitle || ''}**. Hãy trả lời tự tin và rõ ràng nhé!` 
+            }];
+            
+            let answeredCount = 0;
+            dbQuestions.forEach((q) => {
+                if (q.questionText) {
+                    chatHistory.push({ id: q._id?.toString(), role: 'ai', text: q.questionText, meta: q.questionType || 'Mixed' });
+                    if (q.userAnswer && q.userAnswer.trim()) {
+                        chatHistory.push({ role: 'user', text: q.userAnswer });
+                        answeredCount++;
+                    }
+                }
+            });
+            
+            setMessages(chatHistory);
+            setQuestionIndex(answeredCount);
             setLoading(false);
             
-            // Schedule first question fetch with delay
-            console.log('[INIT SESSION] Session loaded, scheduling first question fetch in 500ms...');
-            setTimeout(() => {
-                console.log('[FETCH QUESTION] Starting first question fetch (from init)...');
-                fetchQuestion(s, true).catch(err => console.error('[FETCH QUESTION ERROR]', err));
-            }, 500); // 500ms delay to prevent race conditions
+            // Schedule next question fetch with delay only if not already completed
+            if (answeredCount < limit) {
+                console.log(`[INIT SESSION] Session loaded. Answered count: ${answeredCount}. Fetching current/next question...`);
+                setTimeout(() => {
+                    fetchQuestion(s, answeredCount === 0).catch(err => console.error('[FETCH QUESTION ERROR]', err));
+                }, 500);
+            }
             
             return;
         } catch (e) {
@@ -239,10 +262,11 @@ export default function InterviewSession() {
                 text = text.replace(/\d+\.\s*$/, '').trim();
             }
 
-            // Check if this question is already displayed (by comparing with last AI message)
-            const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
-            if (lastMessage?.role === 'ai' && lastMessage?.text?.includes(text.substring(0, 50))) {
-                console.log('[FETCH QUESTION] Question already displayed, skipping duplicate');
+            // Check if this question is already displayed (by comparing unique question ID)
+            const isAlreadyDisplayed = messages.some(msg => msg.id === qId);
+            if (isAlreadyDisplayed) {
+                console.log('[FETCH QUESTION] Question already displayed by ID, setting current ID and skipping duplicate message');
+                setCurrentQuestionId(qId);
                 return;
             }
 
@@ -251,7 +275,7 @@ export default function InterviewSession() {
             setCurrentQuestionId(qId);
             setMessages((m) => [
                 ...m,
-                { role: 'ai', text, meta: q.questionType || 'Mixed' },
+                { id: qId, role: 'ai', text, meta: q.questionType || 'Mixed' },
             ]);
 
         } catch (e) {
@@ -280,8 +304,12 @@ export default function InterviewSession() {
             );
 
             const { isLastQuestion } = submitRes.data?.data || {};
+            
+            // Fail-safe: finish session if backend says it's the last question, 
+            // OR if frontend question index has reached/exceeded totalQuestions.
+            const isLast = isLastQuestion || (questionIndex + 1 >= totalQuestions);
 
-            if (isLastQuestion) {
+            if (isLast) {
                 // Last question - complete interview and redirect to result
                 console.log('[LAST QUESTION] Completing interview session...');
                 setMessages(prev => [...prev, { role: 'ai', text: '🎉 Bạn đã hoàn thành buổi phỏng vấn! Đang tạo báo cáo...' }]);

@@ -4,6 +4,7 @@ import Hero from '../components/ui/Hero';
 import JobListings from '../components/ui/JobListings';
 import Partners from '../components/ui/Partners';
 import Testimonials from '../components/ui/Testimonials';
+import CountdownTimer from '../components/ui/CountdownTimer';
 import CallToAction from '../components/ui/CallToAction';
 import Footer from '../components/ui/Footer';
 import { siteImages } from '../config/siteImages';
@@ -23,6 +24,7 @@ export default function LandingPage() {
                 <JobListings />
                 <Partners />
                 <Testimonials />
+                <CountdownTimer />
                 <CallToAction />
                 <Footer theme="dark" />
             </div>

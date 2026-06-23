@@ -5,7 +5,7 @@ import { API_URL } from '@/config';
 import {
     Home, FileText, BrainCircuit, History, BarChart3, User, LogOut,
     Briefcase, ClipboardList, CreditCard, Plus, MessageSquare, BookOpen, PenTool,
-    Menu, X
+    Menu, X, CalendarDays, Gift, Award
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -18,6 +18,9 @@ const NAV = [
     { to: '/interview-history', label: 'Lịch sử PV', icon: History },
     { to: '/interview-analytics', label: 'Phân tích', icon: BarChart3 },
     { to: '/my-applications', label: 'Ứng tuyển', icon: ClipboardList },
+    { to: '/checkin', label: 'Điểm danh', icon: CalendarDays },
+    { to: '/referrals', label: 'Giới thiệu bạn', icon: Gift },
+    { to: '/redeem', label: 'Ưu đãi sự kiện', icon: Award },
     { to: '/profile', label: 'Hồ sơ', icon: User },
     { to: '/write-blog', label: 'Viết Blog', icon: PenTool },
     { to: '/feedback', label: 'Feedback', icon: MessageSquare },
@@ -27,7 +30,7 @@ export default function SeekerLayout({ children, title, breadcrumb }) {
     const { user, signOut } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
-    const credits = user?.credits ?? 6500;
+    const credits = user?.credits ?? 65;
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [userPackage, setUserPackage] = useState('');
 

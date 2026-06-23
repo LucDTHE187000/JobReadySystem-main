@@ -84,11 +84,17 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const signInWithGoogle = async (googleToken, role = undefined) => {
+  const signInWithGoogle = async (googleToken, role = undefined, code = undefined) => {
     try {
+      const isReferral = code && code.toUpperCase().trim().startsWith('JR-');
+      const promoCode = isReferral ? undefined : code;
+      const referralCode = isReferral ? code : undefined;
+
       const response = await axios.post(`${API_URL}/api/auth/google`, {
         token: googleToken,
-        role
+        role,
+        promoCode,
+        referralCode
       });
 
       const { token, user } = response.data;
@@ -107,18 +113,23 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const signUp = async (email, password, fullName, userType) => {
+  const signUp = async (email, password, fullName, userType, code) => {
     try {
       // Map frontend role to backend role
       // candidate -> JOB_SEEKER
       // employer -> EMPLOYER
       const role = userType === 'candidate' ? 'JOB_SEEKER' : 'EMPLOYER';
+      const isReferral = code && code.toUpperCase().trim().startsWith('JR-');
+      const promoCode = isReferral ? undefined : code;
+      const referralCode = isReferral ? code : undefined;
 
       const response = await axios.post(`${API_URL}/api/auth/register`, {
         email,
         password,
         name: fullName,
-        role
+        role,
+        promoCode,
+        referralCode
       });
 
       // Backend returns { message, userId, email } but NO token immediately (needs OTP)

@@ -1,11 +1,16 @@
 /** Chi phí credit theo hành động */
 export const CREDIT_COSTS = {
-    CV_ANALYZE: 500,
-    INTERVIEW_SESSION: 1500,
+    CV_ANALYZE: 10,
+    INTERVIEW_SESSION: 20,
+    COMBO: 28,
     JOB_APPLY: 0,
 };
 
-export const DEFAULT_CREDITS = 6500;
+export const DEFAULT_CREDITS = 60;
+
+export const PROMO_CODES = {
+    "GIFT_79": { credits: 90, name: "Voucher Sự Kiện GIFT_79 (Trị giá 79.000₫)" }
+};
 
 export async function deductCredits(userId, amount, UserModel) {
     const user = await UserModel.findById(userId);
