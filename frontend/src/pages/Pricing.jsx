@@ -16,12 +16,14 @@ const plans = [
         period: '',
         credits: '30 credits',
         features: [
-            'Nạp 30 credit cho các tính năng cơ bản',
-            'Tìm kiếm việc làm free',
-            'Phân tích CV (10 credit/lượt)',
-            'Phỏng vấn AI (20 credit/lượt)',
+            '30 Credits sử dụng mọi tính năng',
+            'Phân tích CV & Phỏng vấn cơ bản',
+            'Lưu lịch sử trong 30 ngày',
         ],
-        missing: [],
+        missing: [
+            'Xuất báo cáo PDF ôn tập',
+            'Ưu tiên xử lý AI (Tốc độ cao)',
+        ],
         cta: 'Tạo mã QR thanh toán',
         highlight: false,
     },
@@ -33,12 +35,14 @@ const plans = [
         period: '',
         credits: '90 credits',
         features: [
-            'Nạp 90 credit cho các tính năng cơ bản',
-            'Tìm kiếm việc làm free',
-            'Phân tích CV (10 credit/lượt)',
-            'Phỏng vấn AI (20 credit/lượt)',
+            '90 Credits sử dụng mọi tính năng',
+            'Tặng thêm 10 Credits (Tổng cộng 100)',
+            'Lưu lịch sử trong 90 ngày',
+            'Xuất báo cáo PDF ôn tập',
         ],
-        missing: [],
+        missing: [
+            'Ưu tiên xử lý AI (Tốc độ cao)',
+        ],
         cta: 'Tạo mã QR thanh toán',
         highlight: true,
     },
@@ -50,10 +54,11 @@ const plans = [
         period: '',
         credits: '170 credits',
         features: [
-            'Nạp 170 credit cho các tính năng cơ bản',
-            'Tìm kiếm việc làm free',
-            'Phân tích CV (10 credit/lượt)',
-            'Phỏng vấn AI (20 credit/lượt)',
+            '170 Credits sử dụng mọi tính năng',
+            'Tặng thêm 30 Credits (Tổng cộng 200)',
+            'Lưu lịch sử không giới hạn',
+            'Xuất báo cáo PDF nâng cao',
+            'Ưu tiên xử lý AI (Tốc độ cao)',
         ],
         missing: [],
         cta: 'Tạo mã QR thanh toán',
@@ -62,9 +67,9 @@ const plans = [
 ];
 
 const creditUsage = [
-    { action: 'Phân tích CV nâng cao 📋✓', credits: 10 },
-    { action: '1 phiên phỏng vấn AI (10 câu) 🎤🤖', credits: 20 },
-    { action: 'Gói Combo (Chấm CV & Phỏng vấn) 🎁', credits: 28 },
+    { action: 'Phân tích CV nâng cao 📋✓', credits: -10 },
+    { action: '1 phiên phỏng vấn AI (10 câu) 🎤🤖', credits: -20 },
+    { action: 'Gói Combo (Chấm CV & Phỏng vấn) 🎁', credits: -28 },
     { action: 'Đăng tin tuyển dụng 📈', credits: 0 },
     { action: 'Tìm kiếm việc làm 🔍', credits: 0 },
 ];

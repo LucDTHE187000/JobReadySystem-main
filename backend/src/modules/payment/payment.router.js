@@ -52,7 +52,35 @@ async function settlePayment(order, paymentData) {
 
   const status = paymentData?.status ?? order.status;
   if (status === "PAID") {
-    await addCredits(order.user, order.creditAmount, UserModel);
+    // Đảm bảo số credit luôn được cộng đúng theo chính sách tặng thưởng (kể cả với link thanh toán cũ)
+    let finalCredits = order.creditAmount;
+    if (order.packageId === "pro" && finalCredits < 100) {
+      finalCredits = 100;
+    } else if (order.packageId === "max" && finalCredits < 200) {
+      finalCredits = 200;
+    }
+    order.creditAmount = finalCredits;
+
+    await addCredits(order.user, finalCredits, UserModel);
+    
+    // Nâng cấp activePlan dựa trên gói nạp
+    try {
+      const user = await UserModel.findById(order.user);
+      if (user) {
+        const planHierarchy = { free: 0, starter: 1, pro: 2, max: 3 };
+        const purchasedPlan = order.packageId; // "starter" | "pro" | "max"
+        const currentLevel = planHierarchy[user.activePlan || "free"] || 0;
+        const newLevel = planHierarchy[purchasedPlan] || 0;
+        if (newLevel > currentLevel) {
+          user.activePlan = purchasedPlan;
+          await user.save();
+          console.log(`[Plan Upgrade] User ${user.email} upgraded from ${user.activePlan || "free"} to ${purchasedPlan}`);
+        }
+      }
+    } catch (planErr) {
+      console.error("Failed to upgrade activePlan on payment settlement:", planErr);
+    }
+
     order.status = "PAID";
     order.credited = true;
     order.paidAt = new Date();
@@ -283,8 +311,16 @@ router.get("/payment-result", async (req, res) => {
 
     const success = creditPayment.status === "PAID";
     const title = success ? "Thanh toán thành công" : "Thanh toán đang xử lý";
+    
+    let receivedText = `${creditPayment.creditAmount.toLocaleString()} credit`;
+    if (creditPayment.creditAmount === 100) {
+      receivedText = `90 credit + tặng 10 credit (Tổng cộng 100 credit)`;
+    } else if (creditPayment.creditAmount === 200) {
+      receivedText = `170 credit + tặng 30 credit (Tổng cộng 200 credit)`;
+    }
+
     const message = success
-      ? `Đơn hàng ${creditPayment.payosOrderCode} đã được thanh toán. Bạn nhận được ${creditPayment.creditAmount.toLocaleString()} credit.`
+      ? `Đơn hàng ${creditPayment.payosOrderCode} đã được thanh toán. Bạn nhận được ${receivedText}.`
       : `Đơn hàng ${creditPayment.payosOrderCode} hiện có trạng thái ${creditPayment.status}. Vui lòng kiểm tra lại sau.`;
 
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";

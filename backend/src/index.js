@@ -22,6 +22,7 @@ import feedbackRouter from "./modules/feedback/feedback.router.js";
 import { courseRouter } from "./modules/courses/course.router.js";
 import { seedCourses } from "./modules/courses/course.seeder.js";
 import { adminRouter } from "./modules/admin/admin.router.js";
+import { startHistoryCleanupScheduler } from "./services/historyCleanup.service.js";
 import notificationRouter from "./modules/notification/notification.router.js";
 import campaignRouter from "./modules/campaign/campaign.router.js";
 import blogRouter from "./modules/blog/blog.router.js";
@@ -131,6 +132,7 @@ async function start() {
     await connectDatabase();
     console.log("✅ Database connected successfully");
     await seedCourses();
+    startHistoryCleanupScheduler();
 
     const server = app.listen(PORT, HOST, () => {
       const displayHost = HOST === "0.0.0.0" ? "localhost" : HOST;

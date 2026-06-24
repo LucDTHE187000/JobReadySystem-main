@@ -13,7 +13,7 @@ const PACKAGES = [
     credits: 30,
     price: 29000,
     label: 'Tiết kiệm',
-    description: 'Nạp 30 credit cho các tính năng cơ bản',
+    description: 'Phân tích CV & Phỏng vấn cơ bản, lưu lịch sử 30 ngày.',
   },
   {
     id: 'pro',
@@ -21,7 +21,7 @@ const PACKAGES = [
     credits: 90,
     price: 79000,
     label: 'Tiêu chuẩn',
-    description: 'Nạp 90 credit, phù hợp cho ứng viên thường xuyên',
+    description: 'Tặng thêm 10 Credits, lưu lịch sử 90 ngày & xuất báo cáo PDF.',
   },
   {
     id: 'max',
@@ -29,7 +29,7 @@ const PACKAGES = [
     credits: 170,
     price: 149000,
     label: 'Cao cấp',
-    description: 'Nạp 170 credit cho nhu cầu sử dụng nâng cao',
+    description: 'Tặng thêm 30 Credits, lưu lịch sử không giới hạn, xuất PDF nâng cao, câu hỏi theo ngành & ưu tiên xử lý AI.',
   },
 ];
 
@@ -162,8 +162,17 @@ export default function CreditShopPage() {
           if (response.data.success) {
             clearTimers();
             setVerifyState('success');
-            setVerifyMessage(`Thanh toán thành công! Bạn đã nhận ${response.data.creditAmount.toLocaleString()} credit.`);
+            let receivedText = `${response.data.creditAmount.toLocaleString()} credit`;
+            if (response.data.creditAmount === 100) {
+              receivedText = `90 credit + tặng 10 credit (Tổng cộng 100 credit)`;
+            } else if (response.data.creditAmount === 200) {
+              receivedText = `170 credit + tặng 30 credit (Tổng cộng 200 credit)`;
+            }
+            setVerifyMessage(`Thanh toán thành công! Bạn đã nhận ${receivedText}. Tự động chuyển hướng về trang Bảng giá...`);
             if (refreshUser) await refreshUser();
+            setTimeout(() => {
+              navigate('/pricing');
+            }, 10000);
           }
         } catch (error) {
           console.error("Auto polling verification error:", error);
@@ -284,8 +293,17 @@ export default function CreditShopPage() {
 
       if (response.data.success) {
         setVerifyState('success');
-        setVerifyMessage(`Thanh toán thành công! Bạn đã nhận ${response.data.creditAmount.toLocaleString()} credit.`);
+        let receivedText = `${response.data.creditAmount.toLocaleString()} credit`;
+        if (response.data.creditAmount === 100) {
+          receivedText = `90 credit + tặng 10 credit (Tổng cộng 100 credit)`;
+        } else if (response.data.creditAmount === 200) {
+          receivedText = `170 credit + tặng 30 credit (Tổng cộng 200 credit)`;
+        }
+        setVerifyMessage(`Thanh toán thành công! Bạn đã nhận ${receivedText}. Tự động chuyển hướng về trang Bảng giá...`);
         if (refreshUser) await refreshUser();
+        setTimeout(() => {
+          navigate('/pricing');
+        }, 10000);
         return;
       }
 

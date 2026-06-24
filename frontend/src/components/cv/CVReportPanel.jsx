@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { BrainCircuit, FileText, Download, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 function MetricBar({ label, value, color }) {
     return (
@@ -86,6 +87,7 @@ function RadarVisual({ scores }) {
 }
 
 export default function CVReportPanel({ analysis, fileName, onClose }) {
+    const { user } = useAuth();
     if (!analysis) return null;
     const score = analysis.score ?? 0;
     const breakdown = analysis.scoreBreakdown || {
@@ -138,7 +140,17 @@ export default function CVReportPanel({ analysis, fileName, onClose }) {
                 <Link to="/interview" className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#F5C518] text-slate-800 rounded-xl text-sm font-bold hover:bg-[#D4A800] transition">
                     <BrainCircuit size={18} /> Luyện phỏng vấn AI
                 </Link>
-                <button type="button" className="px-4 py-2.5 border border-[#DDE3F0] rounded-xl text-sm text-slate-800 font-medium hover:bg-white">
+                <button
+                    type="button"
+                    onClick={() => {
+                        if (!user || (user.activePlan !== 'pro' && user.activePlan !== 'max')) {
+                            alert("Tính năng xuất báo cáo PDF yêu cầu nâng cấp gói Tiêu chuẩn (Pro) hoặc Cao cấp (Max).");
+                            return;
+                        }
+                        window.print();
+                    }}
+                    className="px-4 py-2.5 border border-[#DDE3F0] rounded-xl text-sm text-slate-800 font-medium hover:bg-white"
+                >
                     Xuất kết quả
                 </button>
                 {onClose && (

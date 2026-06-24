@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema(
     language: { type: String, enum: ["EN", "VI"], default: "VI" },
 
     credits: { type: Number, default: 60, min: 0 },
+    activePlan: { type: String, enum: ["free", "starter", "pro", "max"], default: "free" },
     hasReceivedCampaignSignupBonus: { type: Boolean, default: false },
     redeemedCodes: { type: [String], default: [] },
     referralCode: { type: String, unique: true, sparse: true },

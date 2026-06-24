@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Download, RotateCcw, ArrowRight, TrendingUp, ChevronDown, ChevronUp, CheckCircle, XCircle, Target, Brain, MessageSquare, Award, Briefcase } from 'lucide-react';
 import SeekerLayout from '../components/layout/SeekerLayout';
+import { useAuth } from '../contexts/AuthContext';
 
 function formatSalary(salary) {
     if (!salary) return 'Thỏa thuận';
@@ -22,6 +23,7 @@ function formatSalary(salary) {
 }
 
 export default function InterviewResult() {
+    const { user } = useAuth();
     const { sessionId } = useParams();
     const navigate = useNavigate();
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -499,7 +501,13 @@ export default function InterviewResult() {
                         Luyện tập lại
                     </button>
                     <button
-                        onClick={() => {/* Download logic */}}
+                        onClick={() => {
+                            if (!user || (user.activePlan !== 'pro' && user.activePlan !== 'max')) {
+                                alert("Tính năng tải báo cáo PDF yêu cầu nâng cấp gói Tiêu chuẩn (Pro) hoặc Cao cấp (Max).");
+                                return;
+                            }
+                            window.print();
+                        }}
                         className="py-4 px-6 bg-white border-2 border-[#0A2463] text-[#0A2463] font-bold rounded-2xl hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
                     >
                         <Download className="w-5 h-5" />
