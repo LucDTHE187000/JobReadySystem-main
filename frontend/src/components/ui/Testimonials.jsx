@@ -45,6 +45,7 @@ const DEFAULT_TESTIMONIALS = [
 
 export default function Testimonials() {
     const [blogs, setBlogs] = useState([]);
+    const [selectedTestimonial, setSelectedTestimonial] = useState(null);
 
     useEffect(() => {
         const fetchBlogs = async () => {
@@ -81,7 +82,8 @@ export default function Testimonials() {
                     {displayList.map((item, i) => (
                         <ScrollReveal key={item._id} delay={150 * (i + 1)} type="all" direction="up">
                             <div 
-                                className="bg-white/5 hover:bg-white/15 backdrop-blur-md rounded-2xl p-7 border border-white/10 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col justify-between relative group h-full glow-border-gold"
+                                onClick={() => setSelectedTestimonial(item)}
+                                className="bg-white/5 hover:bg-white/15 backdrop-blur-md rounded-2xl p-7 border border-white/10 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col justify-between relative group h-full glow-border-gold cursor-pointer"
                             >
                                 {/* Decorative quotes */}
                                 <span className="absolute top-6 right-6 text-white/5 group-hover:text-[#F5C518]/15 transition-colors duration-500 scale-105 group-hover:scale-110 pointer-events-none">
@@ -131,6 +133,69 @@ export default function Testimonials() {
                     ))}
                 </div>
             </div>
+
+            {/* Testimonial Detail Modal */}
+            {selectedTestimonial && (
+                <div 
+                    className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all duration-300"
+                    onClick={() => setSelectedTestimonial(null)}
+                >
+                    <div 
+                        className="bg-zinc-950 border border-white/10 rounded-3xl p-8 max-w-lg w-full relative shadow-2xl glow-border-gold text-left"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Close button */}
+                        <button 
+                            onClick={() => setSelectedTestimonial(null)}
+                            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 text-white hover:bg-[#F5C518] hover:text-[#0A2463] flex items-center justify-center font-bold transition-all"
+                        >
+                            ✕
+                        </button>
+                        
+                        {/* Outcome & Stars */}
+                        <div className="flex items-center justify-between mb-6">
+                            <span className="px-3 py-1 bg-[#F5C518]/15 text-[#D4A800] border border-[#F5C518]/25 font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1">
+                                <Award size={14} className="text-[#D4A800]" />
+                                {selectedTestimonial.outcome}
+                            </span>
+                            <div className="flex items-center gap-0.5">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star 
+                                        key={star} 
+                                        size={16} 
+                                        className={star <= selectedTestimonial.rating ? 'fill-[#F5C518] text-[#F5C518]' : 'text-white/20'}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Title */}
+                        <h3 className="font-heading text-2xl font-black text-white mb-4 leading-snug">
+                            {selectedTestimonial.title}
+                        </h3>
+
+                        {/* Description */}
+                        <div className="max-h-[300px] overflow-y-auto pr-2 custom-scrollbar mb-6">
+                            <p className="text-base text-white/90 leading-relaxed italic font-light whitespace-pre-wrap">
+                                "{selectedTestimonial.description}"
+                            </p>
+                        </div>
+
+                        {/* Author info */}
+                        <div className="flex items-center gap-3 pt-5 border-t border-white/10">
+                            <div className="w-12 h-12 rounded-full bg-white/10 border border-white/10 text-[#F5C518] font-black text-lg flex items-center justify-center">
+                                {selectedTestimonial.userId?.name?.charAt(0) || 'Ứ'}
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-base text-white">{selectedTestimonial.userId?.name || 'Ứng viên giấu tên'}</h4>
+                                <p className="text-xs text-white/50">
+                                    {new Date(selectedTestimonial.createdAt).toLocaleDateString('vi-VN')}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </section>
     );
 }
