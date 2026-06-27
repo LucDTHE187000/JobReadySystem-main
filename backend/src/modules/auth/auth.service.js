@@ -156,48 +156,10 @@ export class AuthService {
             throw new Error("Invalid OTP");
         }
 
-        // Cập nhật user và xóa OTP
-        if (!user.isVerified) {
-            user.isVerified = true;
-
-            // Xử lý thưởng giới thiệu (Referral bonus)
-            if (user.referredBy && !user.referralBonusProcessed) {
-                user.credits = (user.credits ?? 60) + 10; // Người được giới thiệu nhận +10
-                user.referralBonusProcessed = true;
-
-                try {
-                    const referrer = await UserModel.findById(user.referredBy);
-                    if (referrer) {
-                        referrer.credits = (referrer.credits ?? 60) + 15; // Người giới thiệu nhận +15
-                        await referrer.save();
-
-                        // Gửi thông báo cho người giới thiệu
-                        const { NotificationService } = await import("../notification/notification.service.js");
-                        await NotificationService.createNotification(
-                            referrer._id,
-                            "Nhận credit từ giới thiệu bạn bè",
-                            `Chúc mừng! Bạn đã nhận được +15 credits vì giới thiệu thành công ứng viên ${user.name}.`,
-                            "system"
-                        );
-                    }
-                } catch (refErr) {
-                    console.error("Failed to reward referrer on OTP verify:", refErr);
-                }
-            }
-        }
-        await user.save();
+        // Cập nhật user, xử lý giới thiệu và gửi email chào mừng
+        await AuthService.finalizeVerification(user);
 
         await OtpModel.deleteMany({ email });
-
-        // Gửi email chào mừng thành viên mới
-        const isReferred = !!user.referredBy;
-        sendWelcomeEmail(email, user.name, isReferred)
-            .then(res => {
-                if (res.success) console.log(`[WELCOME EMAIL] Gửi mail chào mừng thành công tới ${email}`);
-            })
-            .catch(err => {
-                console.error(`[WELCOME EMAIL ERROR] Không thể gửi mail chào mừng tới ${email}:`, err.message);
-            });
 
         const token = generateTokenFromUser(user);
         return {
@@ -278,9 +240,8 @@ export class AuthService {
                 throw new Error("Invalid OTP");
             }
 
-            // Cập nhật user và xóa OTP
-            user.isVerified = true;
-            await user.save();
+            // Cập nhật user, xử lý giới thiệu, gửi email chào mừng và xóa OTP
+            await AuthService.finalizeVerification(user);
             await OtpModel.deleteMany({ email });
         }
 
@@ -619,6 +580,50 @@ export class AuthService {
                 companyWebsite: user.companyWebsite || '',
             },
         };
+    }
+
+    // Hoàn tất xác thực tài khoản (OTP) - Xử lý referral bonus & Welcome Email
+    static async finalizeVerification(user) {
+        if (!user.isVerified) {
+            user.isVerified = true;
+        }
+
+        // 1. Xử lý thưởng giới thiệu (Referral bonus)
+        if (user.referredBy && !user.referralBonusProcessed) {
+            user.credits = (user.credits ?? 60) + 10; // Người được giới thiệu nhận +10
+            user.referralBonusProcessed = true;
+
+            try {
+                const referrer = await UserModel.findById(user.referredBy);
+                if (referrer) {
+                    referrer.credits = (referrer.credits ?? 60) + 15; // Người giới thiệu nhận +15
+                    await referrer.save();
+
+                    // Gửi thông báo cho người giới thiệu
+                    const { NotificationService } = await import("../notification/notification.service.js");
+                    await NotificationService.createNotification(
+                        referrer._id,
+                        "Nhận credit từ giới thiệu bạn bè",
+                        `Chúc mừng! Bạn đã nhận được +15 credits vì giới thiệu thành công ứng viên ${user.name}.`,
+                        "system"
+                    );
+                }
+            } catch (refErr) {
+                console.error("Failed to reward referrer on verification finalize:", refErr);
+            }
+        }
+
+        await user.save();
+
+        // 2. Gửi email chào mừng thành viên mới
+        const isReferred = !!user.referredBy;
+        sendWelcomeEmail(user.email, user.name, isReferred)
+            .then(res => {
+                if (res.success) console.log(`[WELCOME EMAIL] Gửi mail chào mừng thành công tới ${user.email}`);
+            })
+            .catch(err => {
+                console.error(`[WELCOME EMAIL ERROR] Không thể gửi mail chào mừng tới ${user.email}:`, err.message);
+            });
     }
 }
 
