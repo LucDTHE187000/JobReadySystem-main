@@ -19,24 +19,14 @@ import {
 export default function OnboardingWizard({ role = 'seeker', isOpen, onClose }) {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
-  const [dontShowAgain, setDontShowAgain] = useState(false);
   const [visible, setVisible] = useState(false);
 
-  // Check initial visibility if controlled internally via localStorage
   useEffect(() => {
-    if (isOpen !== undefined) {
-      setVisible(isOpen);
-      if (isOpen) {
-        setCurrentStep(0);
-      }
-    } else {
-      const isCompleted = localStorage.getItem(`jobready_onboarding_${role}_completed`) === 'true';
-      setVisible(!isCompleted);
-      if (!isCompleted) {
-        setCurrentStep(0);
-      }
+    setVisible(!!isOpen);
+    if (isOpen) {
+      setCurrentStep(0);
     }
-  }, [isOpen, role]);
+  }, [isOpen]);
 
   if (!visible) return null;
 
@@ -153,10 +143,7 @@ export default function OnboardingWizard({ role = 'seeker', isOpen, onClose }) {
   const steps = role === 'seeker' ? seekerSteps : recruiterSteps;
   const step = steps[currentStep];
 
-  const handleClose = (forceComplete = false) => {
-    if (dontShowAgain || forceComplete) {
-      localStorage.setItem(`jobready_onboarding_${role}_completed`, 'true');
-    }
+  const handleClose = () => {
     setVisible(false);
     if (onClose) onClose();
   };
@@ -257,20 +244,6 @@ export default function OnboardingWizard({ role = 'seeker', isOpen, onClose }) {
               <span>{currentStep === steps.length - 1 ? 'Hoàn thành' : 'Tiếp tục'}</span>
               <ChevronRight size={16} />
             </button>
-          </div>
-
-          {/* Checkbox: Don't show again */}
-          <div className="flex items-center justify-center gap-2">
-            <input
-              type="checkbox"
-              id="dontShowOnboarding"
-              checked={dontShowAgain}
-              onChange={(e) => setDontShowAgain(e.target.checked)}
-              className="w-4 h-4 rounded border-white/10 bg-zinc-800 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-zinc-950 cursor-pointer"
-            />
-            <label htmlFor="dontShowOnboarding" className="text-xs text-zinc-500 select-none cursor-pointer hover:text-zinc-400">
-              Không hiển thị lại hướng dẫn này
-            </label>
           </div>
         </div>
 
