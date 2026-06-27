@@ -137,23 +137,36 @@ export default function About() {
                     <ScrollReveal className="text-center mb-16" delay={100} type="slide" direction="up">
                         <h2 className="font-heading text-4xl sm:text-5xl text-white font-black tracking-tight">HÀNH TRÌNH <span className="text-gradient-gold">PHÁT TRIỂN</span></h2>
                     </ScrollReveal>
-                    <div className="max-w-2xl mx-auto space-y-10">
-                        {milestones.map(({ year, event }, i) => (
-                            <ScrollReveal key={year} delay={100 * (i + 1)} type="all" direction="up">
-                                <div className="flex gap-6 items-start group">
-                                    <div className="flex flex-col items-center">
-                                        <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-[#F5C518] to-[#FFD700] flex items-center justify-center font-heading text-[#0A2463] text-lg font-black flex-shrink-0 shadow-lg shadow-[#F5C518]/25 group-hover:scale-110 transition-transform duration-300">
-                                            {year.slice(2)}
+                    <div className="relative max-w-5xl mx-auto">
+                        {/* Central line */}
+                        <div className="absolute left-4 md:left-1/2 top-2 bottom-2 w-0.5 bg-gradient-to-b from-[#F5C518] via-[#FFD700]/50 to-transparent -translate-x-1/2 z-10" />
+
+                        <div className="space-y-12 relative z-20">
+                            {milestones.map(({ year, event }, i) => {
+                                const isEven = i % 2 === 0;
+                                return (
+                                    <div key={year} className={`relative flex items-center justify-between ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'} flex-row gap-8 w-full group`}>
+                                        {/* Center dot */}
+                                        <div className="absolute left-4 md:left-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-gradient-to-tr from-[#F5C518] to-[#FFD700] border-4 border-zinc-950 shadow-[0_0_10px_rgba(245,197,24,0.5)] z-30 transition-transform duration-300 group-hover:scale-125" />
+
+                                        {/* Content Card */}
+                                        <div className="w-full md:w-[calc(50%-2rem)] pl-10 md:pl-0">
+                                            <ScrollReveal delay={100 * (i + 1)} type="slide" direction={isEven ? 'left' : 'right'}>
+                                                <div className="bg-white/5 hover:bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg hover:shadow-2xl transition-all duration-300 glow-border-gold hover:-translate-y-1">
+                                                    <span className="inline-block px-3.5 py-1 bg-[#F5C518]/15 text-[#F5C518] border border-[#F5C518]/25 font-bold text-xs uppercase tracking-widest rounded-full mb-3">
+                                                        {year}
+                                                    </span>
+                                                    <p className="text-white/80 leading-relaxed font-light text-sm sm:text-base">{event}</p>
+                                                </div>
+                                            </ScrollReveal>
                                         </div>
-                                        {i < milestones.length - 1 && <div className="w-0.5 h-full bg-[#F5C518]/30 mt-3 min-h-[50px]" />}
+
+                                        {/* Spacer for desktop */}
+                                        <div className="hidden md:block w-[calc(50%-2rem)]" />
                                     </div>
-                                    <div className="pt-2">
-                                        <p className="font-heading text-2xl text-white mb-1.5 font-bold group-hover:text-[#F5C518] transition-colors duration-300">{year}</p>
-                                        <p className="text-white/60 leading-relaxed font-light">{event}</p>
-                                    </div>
-                                </div>
-                            </ScrollReveal>
-                        ))}
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
             </section>

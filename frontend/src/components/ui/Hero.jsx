@@ -5,7 +5,7 @@ import { ScrollReveal, AnimatedCounter } from './ScrollAnimations';
 import Magnetic from './Magnetic';
 import { useState, useEffect } from 'react';
 
-const HERO_IMAGES = ['/abc.jpg', '/bcd.jpg', '/cde.jpg', '/efg.jpg', '/ghi.jpg', '/ijk.jpg', '/jkl.jpg'];
+const HERO_IMAGES = ['/ijk.jpg', '/jkl.jpg', '/bcd.jpg', '/ghi.jpg','/abc.jpg', '/cde.jpg', '/efg.jpg'];
 
 const stats = [
     { value: '250+', label: 'người dùng' },
