@@ -249,7 +249,7 @@ export default function Register() {
                         )}
 
                         <div>
-                            <label htmlFor="promoCode" className="block text-sm font-semibold text-[#0A2463] mb-2">Mã sự kiện / Mã khuyến mãi (Tùy chọn)</label>
+                            <label htmlFor="promoCode" className="block text-sm font-semibold text-[#0A2463] mb-2">Mã Giới Thiệu (Tùy chọn)</label>
                             <input
                                 id="promoCode"
                                 type="text"

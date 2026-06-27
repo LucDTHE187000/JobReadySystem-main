@@ -55,7 +55,7 @@ export default function About() {
                         </ScrollReveal>
 
                         {/* Right column: image from images/About_hero.png */}
-                        <ScrollReveal className="hidden lg:block" delay={300} type="scale">
+                        <ScrollReveal className="block mt-8 lg:mt-0" delay={300} type="scale">
                             <div className="relative group">
                                 <div className="absolute -inset-2 bg-gradient-to-tr from-[#F5C518]/20 to-[#1A3A7C]/30 rounded-[32px] blur-xl opacity-60 group-hover:opacity-85 transition-opacity duration-500" />
                                 <img 

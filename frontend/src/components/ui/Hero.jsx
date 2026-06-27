@@ -158,13 +158,13 @@ export default function Hero() {
                     </ScrollReveal>
 
                     {/* Right column — floating card */}
-                    <ScrollReveal className="hidden lg:block" delay={300} type="scale">
+                    <ScrollReveal className="block mt-12 lg:mt-0" delay={300} type="scale">
                         <div className="relative group">
                             {/* Decorative ambient background halo behind image */}
                             <div className="absolute inset-0 bg-[#F5C518]/10 rounded-[32px] filter blur-xl scale-95 opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10" />
 
                              <div className="rounded-3xl overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 p-3 shadow-2xl transition-all duration-500 group-hover:border-white/20 group-hover:bg-white/10">
-                                <div className="relative w-full h-[430px] overflow-hidden rounded-2xl bg-slate-950">
+                                <div className="relative w-full h-[280px] sm:h-[350px] lg:h-[430px] overflow-hidden rounded-2xl bg-slate-950">
                                     {HERO_IMAGES.map((img, idx) => {
                                         const isCurrent = idx === currentImageIndex;
                                         const isPrevious = idx === ((currentImageIndex - 1 + HERO_IMAGES.length) % HERO_IMAGES.length);
