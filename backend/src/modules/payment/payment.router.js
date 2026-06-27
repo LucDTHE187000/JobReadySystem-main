@@ -475,13 +475,18 @@ router.post("/checkin", authMiddleware, async (req, res) => {
     }
 
     const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    
+    // Định nghĩa helper chuyển đổi Date sang key ngày YYYY-MM-DD theo múi giờ Việt Nam (UTC+7)
+    const getVietnamDateKey = (date) => {
+      const vnTime = new Date(date.getTime() + 7 * 3600 * 1000);
+      return `${vnTime.getUTCFullYear()}-${vnTime.getUTCMonth()}-${vnTime.getUTCDate()}`;
+    };
 
     if (user.lastCheckIn) {
-      const lastCheckInDate = new Date(user.lastCheckIn);
-      const lastCheckInMidnight = new Date(lastCheckInDate.getFullYear(), lastCheckInDate.getMonth(), lastCheckInDate.getDate()).getTime();
+      const todayKey = getVietnamDateKey(now);
+      const lastCheckInKey = getVietnamDateKey(new Date(user.lastCheckIn));
 
-      if (today === lastCheckInMidnight) {
+      if (todayKey === lastCheckInKey) {
         return res.status(400).json({ message: "Bạn đã điểm danh hôm nay rồi. Hãy quay lại vào ngày mai!" });
       }
     }
