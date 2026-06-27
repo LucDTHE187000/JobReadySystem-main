@@ -890,8 +890,26 @@ Trả về JSON THUẦN TUY (không markdown, không text ngoài):
             // Nếu sau mọi cố gắng vẫn không có câu hỏi, dùng static fallback
             if (!questionText) {
                 console.warn("[STATIC FALLBACK] Cả N8N và Groq đều không khả dụng. Sử dụng câu hỏi dự phòng tĩnh.");
+                let fallbackCategory = 'General';
+                const sessionCategory = session.jobCategory || '';
+                if (['IT', 'Sales', 'Marketing', 'HR', 'Finance'].includes(sessionCategory)) {
+                    fallbackCategory = sessionCategory;
+                } else {
+                    const title = (session.jobTitle || position || '').toLowerCase();
+                    if (/(developer|software|engineer|tech|it|programmer|backend|frontend|fullstack|data|lập trình|phần mềm|hệ thống|cntt|công nghệ|web|lập trình viên)/i.test(title)) {
+                        fallbackCategory = 'IT';
+                    } else if (/(sales|bán hàng|kinh doanh|tư vấn|chăm sóc|hỗ trợ|giao dịch|telesales)/i.test(title)) {
+                        fallbackCategory = 'Sales';
+                    } else if (/(marketing|seo|sem|content|quảng cáo|truyền thông)/i.test(title)) {
+                        fallbackCategory = 'Marketing';
+                    } else if (/(hr|nhân sự|tuyển dụng|onboarding|đào tạo|c&b)/i.test(title)) {
+                        fallbackCategory = 'HR';
+                    } else if (/(finance|tài chính|kế toán|audit|ngân sách|báo cáo tài chính)/i.test(title)) {
+                        fallbackCategory = 'Finance';
+                    }
+                }
                 const fallbackQ = InterviewService.getFallbackQuestion(
-                    isSales ? 'Sales' : (isIT ? 'IT' : 'General'),
+                    fallbackCategory,
                     session.interviewType || 'Mixed',
                     session.questions.length
                 );
@@ -913,7 +931,7 @@ Trả về JSON THUẦN TUY (không markdown, không text ngoài):
                 else if (normalized.includes('technical')) questionType = 'Technical';
             }
 
-            // KIỂM TRA LẦN CUỐI SỰ RÒ RỈ TỪ KHÓA IT
+            // KIỂM TRA LẦN CUỐI SỰ RÒ RỈ TỪ KHÓA IT SANG SALES
             const questionLower = questionText.toLowerCase();
             const containsITKeywords = /(monolithic|microservices|rest api|graphql|sql|left join|inner join|database query|dependency injection|code review|software development|system design)/i.test(questionLower);
             
@@ -925,14 +943,46 @@ Trả về JSON THUẦN TUY (không markdown, không text ngoài):
                 aiResponse.questionText = questionText;
                 aiResponse.question = questionText;
                 aiResponse.questionType = questionType;
-            } else if (isIT && !containsITKeywords && !hasITContent) {
-                console.log(`[SAFE FALLBACK] Phát hiện câu hỏi không chuyên môn IT. Sử dụng câu hỏi từ Ngân hàng câu hỏi IT.`);
-                const fallbackQ = InterviewService.getFallbackQuestion("IT", session.interviewType || 'Behavioral', session.questions.length);
-                questionText = fallbackQ.question;
-                questionType = fallbackQ.type;
-                aiResponse.questionText = questionText;
-                aiResponse.question = questionText;
-                aiResponse.questionType = questionType;
+            }
+
+            // ĐẢM BẢO KHÔNG BỊ TRÙNG LẶP CÂU HỎI KHI DÙNG FALLBACK TĨNH
+            if (isDuplicateQuestion(questionText, previousQuestions)) {
+                console.warn(`[DUPLICATE DETECTED IN FINAL QUESTION] Tìm câu hỏi không bị trùng trong ngân hàng tĩnh.`);
+                let fallbackCategory = 'General';
+                const sessionCategory = session.jobCategory || '';
+                if (['IT', 'Sales', 'Marketing', 'HR', 'Finance'].includes(sessionCategory)) {
+                    fallbackCategory = sessionCategory;
+                } else {
+                    const title = (session.jobTitle || position || '').toLowerCase();
+                    if (/(developer|software|engineer|tech|it|programmer|backend|frontend|fullstack|data|lập trình|phần mềm|hệ thống|cntt|công nghệ|web|lập trình viên)/i.test(title)) {
+                        fallbackCategory = 'IT';
+                    } else if (/(sales|bán hàng|kinh doanh|tư vấn|chăm sóc|hỗ trợ|giao dịch|telesales)/i.test(title)) {
+                        fallbackCategory = 'Sales';
+                    } else if (/(marketing|seo|sem|content|quảng cáo|truyền thông)/i.test(title)) {
+                        fallbackCategory = 'Marketing';
+                    } else if (/(hr|nhân sự|tuyển dụng|onboarding|đào tạo|c&b)/i.test(title)) {
+                        fallbackCategory = 'HR';
+                    } else if (/(finance|tài chính|kế toán|audit|ngân sách|báo cáo tài chính)/i.test(title)) {
+                        fallbackCategory = 'Finance';
+                    }
+                }
+                
+                for (let offset = 1; offset <= 10; offset++) {
+                    const nextFallbackQ = InterviewService.getFallbackQuestion(
+                        fallbackCategory,
+                        session.interviewType || 'Mixed',
+                        session.questions.length + offset
+                    );
+                    if (!isDuplicateQuestion(nextFallbackQ.question, previousQuestions)) {
+                        console.log(`[RESOLVED DUPLICATE] Tìm thấy câu hỏi tĩnh không trùng ở offset ${offset}`);
+                        questionText = nextFallbackQ.question;
+                        questionType = nextFallbackQ.type;
+                        aiResponse.questionText = questionText;
+                        aiResponse.question = questionText;
+                        aiResponse.questionType = questionType;
+                        break;
+                    }
+                }
             }
 
             if (session) {

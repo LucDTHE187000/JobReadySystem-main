@@ -5,9 +5,10 @@ import { API_URL } from '@/config';
 import {
     Home, FileText, BrainCircuit, History, BarChart3, User, LogOut,
     Briefcase, ClipboardList, CreditCard, Plus, MessageSquare, BookOpen, PenTool,
-    Menu, X, CalendarDays, Gift, Award
+    Menu, X, CalendarDays, Gift, Award, HelpCircle
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import OnboardingWizard from '../ui/OnboardingWizard';
 
 const NAV = [
     { to: '/', label: 'Trang chủ', icon: Home, external: true },
@@ -33,6 +34,7 @@ export default function SeekerLayout({ children, title, breadcrumb }) {
     const credits = user?.credits ?? 65;
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [userPackage, setUserPackage] = useState('');
+    const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
 
     useEffect(() => {
         const fetchPackage = async () => {
@@ -135,6 +137,15 @@ export default function SeekerLayout({ children, title, breadcrumb }) {
                             </div>
                             <p className="text-xs text-white/50 truncate">{user?.email}</p>
                         </div>
+                    </button>
+
+                     <button
+                        type="button"
+                        onClick={() => setIsOnboardingOpen(true)}
+                        className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 text-white/80 hover:text-white text-sm cursor-pointer"
+                    >
+                        <HelpCircle size={16} className="text-[#F5C518]" />
+                        <span>Hướng dẫn sử dụng</span>
                     </button>
 
                     <button
@@ -261,6 +272,14 @@ export default function SeekerLayout({ children, title, breadcrumb }) {
 
                                 <button
                                     type="button"
+                                    onClick={() => { setIsMobileMenuOpen(false); setIsOnboardingOpen(true); }}
+                                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 text-white/80 text-sm cursor-pointer"
+                                >
+                                    <HelpCircle size={16} className="text-[#F5C518]" /> Hướng dẫn sử dụng
+                                </button>
+
+                                <button
+                                    type="button"
                                     onClick={() => { setIsMobileMenuOpen(false); signOut(); navigate('/'); }}
                                     className="w-full flex items-center gap-2 px-3 py-2 text-white/60 hover:text-white text-sm"
                                 >
@@ -281,6 +300,8 @@ export default function SeekerLayout({ children, title, breadcrumb }) {
                     {children}
                 </main>
             </div>
+            
+            <OnboardingWizard role="seeker" isOpen={isOnboardingOpen ? true : undefined} onClose={() => setIsOnboardingOpen(false)} />
         </div>
     );
 }

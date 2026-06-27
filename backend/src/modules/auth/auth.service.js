@@ -2,7 +2,7 @@ import { UserModel } from "../users/user.model.js";
 import { OtpModel } from "../otp/otp.model.js";
 import { generateTokenFromUser } from "../../utils/jwt.util.js";
 import { generateOTP, generateOTPExpiry } from "../../utils/otp.util.js";
-import { sendOTPEmail, sendResetPasswordEmail } from "../../utils/email.util.js";
+import { sendOTPEmail, sendResetPasswordEmail, sendWelcomeEmail } from "../../utils/email.util.js";
 import { OAuth2Client } from "google-auth-library";
 import { DEFAULT_CREDITS, PROMO_CODES } from "../../utils/credit.util.js";
 
@@ -188,6 +188,16 @@ export class AuthService {
         await user.save();
 
         await OtpModel.deleteMany({ email });
+
+        // Gửi email chào mừng thành viên mới
+        const isReferred = !!user.referredBy;
+        sendWelcomeEmail(email, user.name, isReferred)
+            .then(res => {
+                if (res.success) console.log(`[WELCOME EMAIL] Gửi mail chào mừng thành công tới ${email}`);
+            })
+            .catch(err => {
+                console.error(`[WELCOME EMAIL ERROR] Không thể gửi mail chào mừng tới ${email}:`, err.message);
+            });
 
         const token = generateTokenFromUser(user);
         return {
@@ -569,6 +579,16 @@ export class AuthService {
             } catch (notiErr) {
                 console.error("Welcome notification creation failed:", notiErr);
             }
+
+            // Gửi email chào mừng thành viên mới
+            const isReferred = !!user.referredBy;
+            sendWelcomeEmail(normalizedEmail, user.name, isReferred)
+                .then(res => {
+                    if (res.success) console.log(`[WELCOME EMAIL GOOGLE] Gửi mail chào mừng thành công tới ${normalizedEmail}`);
+                })
+                .catch(err => {
+                    console.error(`[WELCOME EMAIL GOOGLE ERROR] Không thể gửi mail chào mừng tới ${normalizedEmail}:`, err.message);
+                });
         }
 
         if (user.isActive === false) {

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Home,
   Users,
@@ -6,9 +7,11 @@ import {
   MessageSquare,
   Search,
   LogOut,
+  HelpCircle,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import OnboardingWizard from "./ui/OnboardingWizard";
 
 const Sidebar = ({
   sidebarOpen,
@@ -22,6 +25,7 @@ const Sidebar = ({
   const currentPath = location.pathname;
   const { user, signOut } = useAuth();
   const displayProfile = profile || user;
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
 
   const getActiveMenu = () => {
     if (activeMenu) return activeMenu;
@@ -129,6 +133,14 @@ const Sidebar = ({
         </div>
 
         <button
+          onClick={() => setIsOnboardingOpen(true)}
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all border border-transparent text-white/60 hover:bg-white/5 hover:text-white text-sm font-medium mx-0 cursor-pointer text-left"
+        >
+          <HelpCircle size={20} className="text-indigo-400" />
+          <span>Hướng dẫn sử dụng</span>
+        </button>
+
+        <button
           onClick={() => signOut()}
           className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all border border-transparent text-red-400 hover:bg-red-500/10 hover:text-red-300 text-sm font-medium mx-0 cursor-pointer text-left"
         >
@@ -136,6 +148,8 @@ const Sidebar = ({
           <span>Đăng xuất</span>
         </button>
       </div>
+
+      <OnboardingWizard role="recruiter" isOpen={isOnboardingOpen ? true : undefined} onClose={() => setIsOnboardingOpen(false)} />
     </aside>
   );
 };

@@ -833,3 +833,113 @@ export const sendAdminFeedbackNotificationEmail = async (userEmail, userName, fe
         return { success: false, error: error.message };
     }
 };
+
+/**
+ * Send welcome email to a new user
+ * @param {string} to - Recipient email
+ * @param {string} name - Recipient name
+ * @param {boolean} isReferred - Whether the user registered via referral code
+ * @returns {Promise<Object>} Send result
+ */
+export const sendWelcomeEmail = async (to, name = "User", isReferred = false) => {
+    const hasResendConfig = !!process.env.RESEND_API_KEY;
+    const isDevModeOnly = process.env.EMAIL_DEV_MODE === "true" || !hasResendConfig;
+
+    if (isDevModeOnly) {
+        console.log("\n" + "=".repeat(60));
+        console.log("📧 [DEV MODE] Welcome Email (Not sent - Development mode)");
+        console.log("=".repeat(60));
+        console.log(`To: ${to}`);
+        console.log(`Name: ${name}`);
+        console.log(`Is Referred: ${isReferred}`);
+        console.log("=".repeat(60) + "\n");
+        return { success: true, messageId: "dev-mode", devMode: true };
+    }
+
+    try {
+        const resendInstance = getResendInstance();
+        const sender = getSender();
+
+        const referralHtml = isReferred
+            ? `<div style="background: #ecfdf5; border-left: 4px solid #10b981; padding: 16px; margin: 25px 0; border-radius: 8px;">
+                <p style="margin: 0; font-size: 15px; color: #065f46; font-weight: bold;">🎉 Chúc mừng! Áp dụng mã giới thiệu thành công</p>
+                <p style="margin: 5px 0 0 0; font-size: 14px; color: #047857;">Tài khoản của bạn đã được cộng thêm <strong>10 credits</strong> miễn phí.</p>
+               </div>`
+            : '';
+
+        const html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f6fb; margin: 0; padding: 0; }
+                    .container { max-width: 600px; margin: 30px auto; padding: 0; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; }
+                    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 20px; text-align: center; }
+                    .header h1 { margin: 0; font-size: 28px; font-weight: bold; }
+                    .header p { margin: 10px 0 0 0; opacity: 0.9; font-size: 16px; }
+                    .content { padding: 40px; }
+                    .greeting { font-size: 18px; font-weight: bold; color: #111827; margin-bottom: 20px; }
+                    .highlight-text { font-size: 15px; line-height: 1.8; color: #374151; }
+                    .btn-container { text-align: center; margin-top: 30px; }
+                    .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white !important; font-weight: 600; text-decoration: none; padding: 12px 30px; border-radius: 8px; font-size: 15px; box-shadow: 0 4px 12px rgba(102,126,234,0.3); }
+                    .footer { text-align: center; padding: 25px; background-color: #f9fafb; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 12px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>Chào mừng bạn đến với JobReady! 🎉</h1>
+                        <p>Hành trình bứt phá sự nghiệp bắt đầu từ đây</p>
+                    </div>
+                    <div class="content">
+                        <div class="greeting">Xin chào ${name},</div>
+                        <div class="highlight-text">
+                            <p>Cảm ơn bạn đã quan tâm và lựa chọn JobReady để luyện tập phỏng vấn giữa hàng ngàn lựa chọn ngoài kia. Chúng tôi rất vinh hạnh được đồng hành cùng bạn trên con đường chinh phục nhà tuyển dụng!</p>
+                            
+                            ${referralHtml}
+                            
+                            <p>Với JobReady, bạn có thể dễ dàng:</p>
+                            <ul style="padding-left: 20px; color: #4b5563;">
+                                <li style="margin-bottom: 8px;"><strong>Chấm điểm CV bằng AI:</strong> Xem ngay điểm ATS và nhận đề xuất sửa đổi tối ưu.</li>
+                                <li style="margin-bottom: 8px;"><strong>Luyện phỏng vấn thử:</strong> Phòng phỏng vấn giả lập AI sinh câu hỏi bám sát chuyên ngành và chấm điểm, sửa câu trả lời chi tiết.</li>
+                                <li style="margin-bottom: 8px;"><strong>Học tập & Tìm việc:</strong> Nâng cấp kiến thức và kết nối trực tiếp với các tin đăng tuyển chính thức.</li>
+                            </ul>
+                            
+                            <p>Chúc bạn có trải nghiệm tuyệt vời nhất cùng JobReady!</p>
+                            <p style="margin-top: 25px; color: #4b5563; line-height: 1.5;">Trân trọng,<br/><strong>Đội ngũ JobReady</strong></p>
+                        </div>
+                        
+                        <div class="btn-container">
+                            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}" class="btn">Bắt đầu Trải nghiệm</a>
+                        </div>
+                    </div>
+                    <div class="footer">
+                        <p>© ${new Date().getFullYear()} JobReady System. Tất cả các quyền được bảo lưu.</p>
+                        <p>Đây là email tự động, vui lòng không phản hồi thư này.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+
+        const mailOptions = {
+            from: `JobReady <${sender}>`,
+            to: to,
+            subject: "Chào mừng bạn đến với JobReady! 🎉",
+            html,
+            text: `Xin chào ${name},\n\nChào mừng bạn đến với JobReady!\nCảm ơn bạn đã quan tâm và lựa chọn JobReady để luyện tập phỏng vấn giữa hàng ngàn lựa chọn ngoài kia. Chúc bạn có trải nghiệm tốt nhất trên hành trình sự nghiệp.\n\n${isReferred ? 'Chúc mừng bạn đã áp dụng mã giới thiệu thành công và nhận thêm 10 credits miễn phí.' : ''}\n\nTrân trọng,\nĐội ngũ JobReady`
+        };
+
+        const { data, error } = await resendInstance.emails.send(mailOptions);
+        if (error) {
+            throw new Error(error.message || JSON.stringify(error));
+        }
+
+        console.log(`📬 Welcome email sent to ${to}. ID: ${data.id}`);
+        return { success: true, messageId: data.id };
+    } catch (error) {
+        console.error("❌ Error sending welcome email:", error.message);
+        return { success: false, error: error.message };
+    }
+};

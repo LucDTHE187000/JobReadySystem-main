@@ -113,6 +113,11 @@ class InterviewService {
                 { question: 'Hãy trình bày về cấu trúc dữ liệu mà bạn thường sử dụng và lý do vì sao chọn chúng.', type: 'Technical', topic: 'Data Structures' },
                 { question: 'Bạn đã từng làm việc trong môi trường Agile/Scrum chưa? Trải nghiệm của bạn như thế nào?', type: 'Behavioral', topic: 'Teamwork' },
                 { question: 'Kể về một lần bạn phải debug một lỗi phức tạp. Quy trình và kết quả như thế nào?', type: 'Technical', topic: 'Problem Solving' },
+                { question: 'Hãy giải thích sự khác biệt giữa Relational Database (SQL) và Non-Relational Database (NoSQL). Khi nào bạn sử dụng loại nào?', type: 'Technical', topic: 'Database & Storage' },
+                { question: 'Bạn hiểu thế nào là cơ chế Caching? Hãy nêu cách bạn áp dụng Redis để tối ưu hiệu năng hệ thống.', type: 'Technical', topic: 'Performance Optimization' },
+                { question: 'Mô tả một lần bạn xảy ra bất đồng ý kiến về mặt kỹ thuật với thành viên khác trong team. Bạn đã giải quyết thế nào?', type: 'Behavioral', topic: 'Conflict Resolution' },
+                { question: 'Hãy giải thích khái niệm Dependency Injection và lợi ích của nó trong phát triển phần mềm.', type: 'Technical', topic: 'Core Programming Basics' },
+                { question: 'Làm thế nào để bạn đảm bảo an toàn bảo mật cho các ứng dụng web chống lại các cuộc tấn công như SQL Injection và XSS?', type: 'Technical', topic: 'Security & Best Practices' }
             ],
             Marketing: [
                 { question: 'Hãy mô tả một chiến dịch marketing thành công bạn từng thiết kế hoặc tham gia.', type: 'Behavioral', topic: 'Campaign Management' },
@@ -120,6 +125,11 @@ class InterviewService {
                 { question: 'Làm thế nào bạn xác định và phân tích target audience cho một sản phẩm mới?', type: 'Technical', topic: 'Market Research' },
                 { question: 'Bạn đã từng xử lý phản hồi tiêu cực từ khách hàng trên mạng xã hội chưa? Kể lại.', type: 'Behavioral', topic: 'Crisis Management' },
                 { question: 'Hãy giải thích sự khác biệt giữa SEO và SEM, và khi nào nên dùng cái nào.', type: 'Technical', topic: 'SEO/SEM' },
+                { question: 'Hãy mô tả quy trình bạn lên kế hoạch nội dung (Content Plan) cho một sản phẩm trong vòng 3 tháng.', type: 'Technical', topic: 'Content Strategy' },
+                { question: 'Bạn tối ưu hóa tỷ lệ chuyển đổi (Conversion Rate) trên trang web bán hàng bằng những phương pháp nào?', type: 'Technical', topic: 'Conversion Optimization' },
+                { question: 'Kể về một chiến dịch marketing thất bại bạn từng tham gia. Bạn đã rút ra bài học gì?', type: 'Behavioral', topic: 'Learning from Failure' },
+                { question: 'Làm thế nào bạn sử dụng công cụ Google Analytics để theo dõi hành vi người dùng trên website?', type: 'Technical', topic: 'Tools & Platforms' },
+                { question: 'Mô tả cách bạn phân bổ ngân sách marketing giữa các kênh Paid Ads, SEO, và Social Media.', type: 'Technical', topic: 'Budget Allocation' }
             ],
             Sales: [
                 { question: 'Kể về lần bạn vượt chỉ tiêu doanh số. Bạn đã làm gì khác biệt?', type: 'Behavioral', topic: 'Sales Achievement' },
@@ -127,6 +137,11 @@ class InterviewService {
                 { question: 'Hãy mô tả quy trình bán hàng B2B mà bạn thấy hiệu quả nhất.', type: 'Technical', topic: 'Sales Process' },
                 { question: 'Bạn sử dụng CRM như thế nào để quản lý pipeline và dự báo doanh thu?', type: 'Technical', topic: 'CRM' },
                 { question: 'Kể về một khách hàng khó tính nhất và cách bạn xây dựng mối quan hệ với họ.', type: 'Behavioral', topic: 'Relationship Building' },
+                { question: 'Làm thế nào bạn tiếp cận một khách hàng lạnh (Cold Lead) để giới thiệu sản phẩm?', type: 'Technical', topic: 'Lead Generation' },
+                { question: 'Theo bạn, yếu tố quan trọng nhất để duy trì mối quan hệ bền vững với một khách hàng lớn (Key Account) là gì?', type: 'Technical', topic: 'Account Management' },
+                { question: 'Kể về một lần bạn không đạt được thỏa thuận bán hàng dù đã rất nỗ lực. Bài học rút ra là gì?', type: 'Behavioral', topic: 'Objection Handling' },
+                { question: 'Bạn làm gì khi phát hiện đối thủ cạnh tranh đang giảm giá sâu để cướp khách hàng của bạn?', type: 'Technical', topic: 'Market Strategy' },
+                { question: 'Hãy giải thích cách bạn xử lý khi khách hàng phàn nàn rằng giá sản phẩm của bạn quá cao so với giá trị nhận được.', type: 'Technical', topic: 'Negotiation' }
             ],
             HR: [
                 { question: 'Bạn tiếp cận thế nào khi cần tuyển dụng cho một vị trí khó tìm ứng viên phù hợp?', type: 'Technical', topic: 'Recruitment' },
@@ -134,6 +149,11 @@ class InterviewService {
                 { question: 'Bạn thiết kế chương trình onboarding cho nhân viên mới như thế nào?', type: 'Technical', topic: 'Onboarding' },
                 { question: 'Làm thế nào để đo lường mức độ gắn kết (engagement) của nhân viên?', type: 'Technical', topic: 'Employee Engagement' },
                 { question: 'Kể về một quyết định khó khăn trong quản lý nhân sự bạn đã phải đưa ra.', type: 'Behavioral', topic: 'Decision Making' },
+                { question: 'Làm thế nào bạn giải quyết trường hợp một nhân viên có năng suất làm việc giảm sút đột ngột?', type: 'Technical', topic: 'Performance Management' },
+                { question: 'Quy trình xây dựng thương hiệu nhà tuyển dụng (Employer Branding) của bạn gồm những bước nào?', type: 'Technical', topic: 'Employer Branding' },
+                { question: 'Kể về một lần bạn tuyển dụng sai người. Bạn đã xử lý hậu quả như thế nào?', type: 'Behavioral', topic: 'Recruitment Failure' },
+                { question: 'Bạn đánh giá và cập nhật chính sách phúc lợi (C&B) của công ty dựa trên những tiêu chí nào?', type: 'Technical', topic: 'Compensation & Benefits' },
+                { question: 'Làm thế nào để tổ chức một buổi đánh giá hiệu suất (Performance Review) công bằng và hiệu quả?', type: 'Technical', topic: 'Performance Evaluation' }
             ],
             Finance: [
                 { question: 'Hãy giải thích sự khác biệt giữa P&L Statement và Balance Sheet.', type: 'Technical', topic: 'Financial Statements' },
@@ -141,6 +161,11 @@ class InterviewService {
                 { question: 'Kể về một lần bạn phát hiện ra sai sót trong báo cáo tài chính. Bạn xử lý thế nào?', type: 'Behavioral', topic: 'Accuracy' },
                 { question: 'Bạn sử dụng công cụ nào để phân tích rủi ro tài chính?', type: 'Technical', topic: 'Risk Analysis' },
                 { question: 'Hãy mô tả quy trình lập ngân sách hàng năm bạn đã tham gia.', type: 'Technical', topic: 'Budgeting' },
+                { question: 'Làm thế nào bạn đánh giá sức khỏe tài chính của một doanh nghiệp đối tác trước khi ký hợp đồng lớn?', type: 'Technical', topic: 'Partnership Evaluation' },
+                { question: 'Hãy giải thích khái niệm Working Capital (Vốn lưu động) và cách tối ưu hóa nó.', type: 'Technical', topic: 'Capital Optimization' },
+                { question: 'Mô tả cách bạn phân tích ROI (Tỷ suất hoàn vốn) của một dự án đầu tư mới của công ty.', type: 'Technical', topic: 'Investment Analysis' },
+                { question: 'Kể về một lần bạn phải thuyết phục ban lãnh đạo cắt giảm chi phí ở một bộ phận. Bạn làm thế nào?', type: 'Behavioral', topic: 'Cost Optimization' },
+                { question: 'Bạn hiểu thế nào là dòng tiền tự do (Free Cash Flow) và tầm quan trọng của nó đối với doanh nghiệp?', type: 'Technical', topic: 'Cash Flow Management' }
             ],
             General: [
                 { question: 'Hãy giới thiệu về bản thân và lý do bạn ứng tuyển vào vị trí này.', type: 'Behavioral', topic: 'Self Introduction' },
@@ -148,6 +173,11 @@ class InterviewService {
                 { question: 'Mô tả một tình huống bạn phải làm việc dưới áp lực cao. Kết quả ra sao?', type: 'Behavioral', topic: 'Pressure Management' },
                 { question: 'Bạn có kế hoạch phát triển nghề nghiệp trong 3-5 năm tới như thế nào?', type: 'Behavioral', topic: 'Career Goals' },
                 { question: 'Kể về một lần bạn thất bại và bài học bạn rút ra được từ trải nghiệm đó.', type: 'Behavioral', topic: 'Learning from Failure' },
+                { question: 'Làm thế nào để bạn sắp xếp thứ tự ưu tiên khi có nhiều công việc khẩn cấp cùng lúc?', type: 'Behavioral', topic: 'Time Management' },
+                { question: 'Mô tả một lần bạn phải học một kỹ năng mới hoàn toàn để hoàn thành công việc.', type: 'Behavioral', topic: 'Adaptability' },
+                { question: 'Bạn làm thế nào để giải quyết sự bất đồng ý kiến trong một buổi thảo luận nhóm?', type: 'Behavioral', topic: 'Team Collaboration' },
+                { question: 'Hãy kể về một mục tiêu lớn nhất bạn từng đặt ra cho bản thân và hành trình bạn đạt được nó.', type: 'Behavioral', topic: 'Goal Achievement' },
+                { question: 'Tại sao bạn lại quyết định ứng tuyển vào công ty chúng tôi thay vì các công ty khác?', type: 'Behavioral', topic: 'Company Fit' }
             ],
         };
 
