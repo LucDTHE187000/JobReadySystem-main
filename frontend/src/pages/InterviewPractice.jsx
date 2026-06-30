@@ -29,7 +29,7 @@ const inputClass =
 export default function InterviewPractice() {
     const { user, refreshUser } = useAuth();
     const credits = user?.credits ?? 0;
-    const sessionCost = 15;
+    const sessionCost = 20;
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         jobTitle: '',
