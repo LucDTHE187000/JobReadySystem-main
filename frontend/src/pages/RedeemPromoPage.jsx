@@ -346,7 +346,7 @@ export default function RedeemPromoPage() {
 
                 {/* Khối bọc Vòng quay xoay tròn */}
                 <div
-                  className={`w-64 h-64 rounded-full border-4 border-[#0A2463] shadow-2xl overflow-hidden bg-white ${hasAlreadyClaimed() ? 'filter grayscale opacity-40' : ''}`}
+                  className={`w-64 h-64 rounded-full border-4 border-[#0A2463] shadow-2xl overflow-hidden bg-white ${hasAlreadyClaimed() ? 'cursor-not-allowed' : ''}`}
                   style={{
                     transform: `rotate(${wheelRotation}deg)`,
                     transition: isSpinning ? 'transform 6000ms cubic-bezier(0.1, 0.85, 0.15, 1)' : 'none'
@@ -356,7 +356,7 @@ export default function RedeemPromoPage() {
                     ref={canvasRef}
                     width={256}
                     height={256}
-                    className="w-full h-full"
+                    className={`w-full h-full ${hasAlreadyClaimed() ? 'cursor-not-allowed' : ''}`}
                   />
                 </div>
 
