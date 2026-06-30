@@ -4,34 +4,41 @@ import { ScrollReveal } from './ScrollAnimations';
 
 export default function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState({
-    days: 3,
+    days: 0,
     hours: 0,
     minutes: 0,
     seconds: 0,
   });
   const [isExpired, setIsExpired] = useState(false);
+  const [activePhase, setActivePhase] = useState(1); // 1: Offline, 2: Online
+
+  // Target timestamps in UTC+7 (Vietnam Time)
+  const targetOffline = new Date('2026-07-02T09:00:00+07:00').getTime();
+  const targetOnline = new Date('2026-07-05T09:00:00+07:00').getTime();
 
   useEffect(() => {
-    // Để giữ tính nhất quán khi tải lại trang, lưu thời điểm đích vào localStorage
-    const STORAGE_KEY = 'jobready_workshop_countdown_target';
-    let targetTime = localStorage.getItem(STORAGE_KEY);
-    let targetTimestamp = targetTime ? parseInt(targetTime, 10) : 0;
-
-    // Nếu chưa có mốc thời gian hoặc mốc thời gian đã trôi qua, đặt lại là 3 ngày từ hiện tại
-    if (!targetTimestamp || isNaN(targetTimestamp) || targetTimestamp <= Date.now()) {
-      const threeDaysInMs = 3 * 24 * 60 * 60 * 1000;
-      targetTimestamp = Date.now() + threeDaysInMs;
-      localStorage.setItem(STORAGE_KEY, targetTimestamp.toString());
-    }
-
     const calculateTime = () => {
-      const difference = targetTimestamp - Date.now();
+      const now = Date.now();
+      let targetTimestamp = targetOffline;
+      let phase = 1;
+
+      // Nếu đã vượt qua thời gian Offline, chuyển sang đếm ngược Online (cách đó 3 ngày)
+      if (now >= targetOffline) {
+        targetTimestamp = targetOnline;
+        phase = 2;
+      }
+
+      const difference = targetTimestamp - now;
 
       if (difference <= 0) {
         setIsExpired(true);
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        setActivePhase(2);
         return true;
       }
+
+      setIsExpired(false);
+      setActivePhase(phase);
 
       const days = Math.floor(difference / (1000 * 60 * 60 * 24));
       const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
@@ -42,15 +49,12 @@ export default function CountdownTimer() {
       return false;
     };
 
-    // Chạy lần đầu tiên
+    // Tính toán ngay lần đầu mount
     calculateTime();
 
-    // Thiết lập interval chạy mỗi giây
+    // Chạy đếm ngược mỗi giây
     const timer = setInterval(() => {
-      const expired = calculateTime();
-      if (expired) {
-        clearInterval(timer);
-      }
+      calculateTime();
     }, 1000);
 
     return () => clearInterval(timer);
@@ -73,15 +77,17 @@ export default function CountdownTimer() {
               {/* Badge */}
               <span className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-[#F5C518]/15 text-[#F5C518] border border-[#F5C518]/25 text-xs font-black rounded-full mb-6 uppercase tracking-widest animate-pulse">
                 <Calendar size={12} />
-                Sự kiện Workshop Truyền thông
+                {activePhase === 1 ? 'Sự kiện Workshop Offline' : 'Sự kiện Workshop Online'}
               </span>
 
               {/* Header */}
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl text-white mb-3 font-black tracking-tight leading-tight">
-                ĐẾM NGƯỢC DIỄN RA <span className="text-gradient-gold"> WORKSHOP</span>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl text-white mb-3 font-black tracking-tight leading-tight uppercase">
+                ĐẾM NGƯỢC DIỄN RA <span className="text-gradient-gold">{activePhase === 1 ? 'WORKSHOP OFFLINE' : 'WORKSHOP ONLINE'}</span>
               </h2>
               <p className="text-white/60 text-xs sm:text-sm max-w-xl mx-auto mb-8 font-medium font-sans leading-relaxed">
-                Đăng ký tài khoản và tham gia trực tiếp tại buổi truyền thông để nhận ngay quà tặng credit miễn phí trải nghiệm chấm CV và phỏng vấn thử AI.
+                {activePhase === 1 
+                  ? 'Đăng ký tài khoản và tham gia trực tiếp tại buổi truyền thông offline để nhận ngay quà tặng credit miễn phí trải nghiệm chấm CV và phỏng vấn thử AI.'
+                  : 'Đăng ký tài khoản và tham gia trực tuyến buổi truyền thông online để nhận ngay quà tặng credit miễn phí trải nghiệm chấm CV và phỏng vấn thử AI.'}
               </p>
 
               {/* Countdown Numbers Grid */}
@@ -111,8 +117,10 @@ export default function CountdownTimer() {
                 <Bell size={14} className="text-[#F5C518] animate-bounce" />
                 <span>
                   {isExpired 
-                    ? 'Sự kiện đang diễn ra! Hãy tham gia ngay.' 
-                    : 'Tham Gia Workshop để nhận mã ưu đãi độc quyền từ JobReady.'}
+                    ? 'Sự kiện đã kết thúc! Cảm ơn bạn đã đồng hành cùng JobReady.' 
+                    : activePhase === 1 
+                      ? 'Tham gia buổi Offline để nhận mã ưu đãi độc quyền trực tiếp từ BTC.'
+                      : 'Tham gia livestream sự kiện để nhận mã ưu đãi độc quyền từ JobReady.'}
                 </span>
               </div>
             </div>

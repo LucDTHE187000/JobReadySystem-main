@@ -280,6 +280,13 @@ export class AuthService {
         const user = await UserModel.findById(userId)
             .select("-password -otp -otpExpires");
         if (!user) throw new Error("User not found");
+
+        // Tự động tạo mã giới thiệu nếu tài khoản cũ chưa có
+        if (!user.referralCode && user.role === "JOB_SEEKER") {
+            user.referralCode = "JR-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+            await user.save();
+        }
+
         return user;
     }
 

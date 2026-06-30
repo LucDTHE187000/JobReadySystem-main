@@ -2,7 +2,7 @@ import { API_URL } from '@/config';
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, ArrowRight, BrainCircuit, FileText, TrendingUp, AlertTriangle } from 'lucide-react';
 import axios from 'axios';
 import GoogleLoginButton from '../components/ui/GoogleLoginButton';
@@ -24,6 +24,10 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const { signIn, user } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const queryParams = new URLSearchParams(location.search);
+    const redirectUrl = queryParams.get('redirect') || '/';
 
     // OTP states
     const [showOtpField, setShowOtpField] = useState(false);
@@ -46,9 +50,9 @@ export default function Login() {
     // Redirect already-authenticated users
     useEffect(() => {
         if (user) {
-            navigate('/', { replace: true });
+            navigate(redirectUrl, { replace: true });
         }
-    }, [user, navigate]);
+    }, [user, navigate, redirectUrl]);
 
     // Parse email, password and unverified parameters on mount
     useEffect(() => {
@@ -230,7 +234,7 @@ export default function Login() {
             setLoading(false);
         } else {
             setLoading(false);
-            navigate('/', { replace: true });
+            navigate(redirectUrl, { replace: true });
         }
     };
 

@@ -528,7 +528,9 @@ router.get("/system-settings", async (req, res) => {
     const promoSetting = await SystemSettingModel.findOne({ key: "promo_redemption_enabled" });
     const promoRedemptionEnabled = promoSetting ? promoSetting.value === true : true;
 
-    return res.status(200).json({ campaignMode, promoRedemptionEnabled });
+    const activePromoCode = Object.keys(PROMO_CODES)[0] || "";
+
+    return res.status(200).json({ campaignMode, promoRedemptionEnabled, activePromoCode });
   } catch (error) {
     console.error("Get system settings error:", error);
     return res.status(500).json({ message: "Không thể lấy cấu hình hệ thống" });

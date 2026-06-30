@@ -1,11 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import SeekerLayout from '../components/layout/SeekerLayout';
 import { Copy, Gift, Users, CheckCircle, ArrowRight } from 'lucide-react';
 
 export default function ReferralsPage() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [copiedField, setCopiedField] = useState('');
+
+  useEffect(() => {
+    if (refreshUser) {
+      refreshUser();
+    }
+  }, []);
 
   const referralCode = user?.referralCode || '';
   const referralLink = referralCode 

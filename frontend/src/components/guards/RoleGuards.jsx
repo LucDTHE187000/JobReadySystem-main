@@ -1,9 +1,10 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { isEmployerRole, isAdminRole, isLocalDev } from '../../utils/roles';
 
 export function ProtectedRoute({ children }) {
     const { user, loading } = useAuth();
+    const location = useLocation();
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[#F4F6FB]">
@@ -11,13 +12,17 @@ export function ProtectedRoute({ children }) {
             </div>
         );
     }
-    if (!user) return <Navigate to="/login" replace />;
+    if (!user) {
+        const redirectPath = encodeURIComponent(location.pathname + location.search);
+        return <Navigate to={`/login?redirect=${redirectPath}`} replace />;
+    }
     return children;
 }
 
 /** Chỉ dành cho Admin — redirect về / nếu không phải ADMIN */
 export function AdminRoute({ children }) {
     const { user, loading } = useAuth();
+    const location = useLocation();
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[#F4F6FB]">
@@ -25,7 +30,10 @@ export function AdminRoute({ children }) {
             </div>
         );
     }
-    if (!user) return <Navigate to="/login" replace />;
+    if (!user) {
+        const redirectPath = encodeURIComponent(location.pathname + location.search);
+        return <Navigate to={`/login?redirect=${redirectPath}`} replace />;
+    }
     if (!isAdminRole(user.role)) return <Navigate to="/" replace />;
     return children;
 }
@@ -33,6 +41,7 @@ export function AdminRoute({ children }) {
 /** Chỉ ứng viên — redirect employer về trang chủ (trừ localhost dev có thể vào employer) */
 export function JobSeekerRoute({ children }) {
     const { user, loading } = useAuth();
+    const location = useLocation();
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[#F4F6FB]">
@@ -40,7 +49,10 @@ export function JobSeekerRoute({ children }) {
             </div>
         );
     }
-    if (!user) return <Navigate to="/login" replace />;
+    if (!user) {
+        const redirectPath = encodeURIComponent(location.pathname + location.search);
+        return <Navigate to={`/login?redirect=${redirectPath}`} replace />;
+    }
     // Admin và Employer không được vào route của Job Seeker
     if (isAdminRole(user.role)) return <Navigate to="/admin/dashboard" replace />;
     if (isEmployerRole(user.role) && !isLocalDev()) {
@@ -52,6 +64,7 @@ export function JobSeekerRoute({ children }) {
 /** Employer dashboard — chỉ localhost hoặc role employer */
 export function EmployerRoute({ children }) {
     const { user, loading } = useAuth();
+    const location = useLocation();
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[#F4F6FB]">
@@ -59,7 +72,10 @@ export function EmployerRoute({ children }) {
             </div>
         );
     }
-    if (!user) return <Navigate to="/login" replace />;
+    if (!user) {
+        const redirectPath = encodeURIComponent(location.pathname + location.search);
+        return <Navigate to={`/login?redirect=${redirectPath}`} replace />;
+    }
     // Admin không dùng employer routes — redirect về admin dashboard
     if (isAdminRole(user.role)) return <Navigate to="/admin/dashboard" replace />;
     if (!isLocalDev() && !isEmployerRole(user.role)) {

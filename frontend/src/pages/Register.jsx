@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Briefcase, User, Eye, EyeOff, ArrowRight, AlertTriangle, Target, Bot, BarChart3 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import GoogleLoginButton from '../components/ui/GoogleLoginButton';
 
 const REGISTER_IMAGE = '/images/Register_side.png';
@@ -27,13 +27,17 @@ export default function Register() {
     const [loading, setLoading] = useState(false);
     const { signUp, user } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const queryParams = new URLSearchParams(location.search);
+    const redirectUrl = queryParams.get('redirect') || '/';
 
     // Redirect already-authenticated users
     useEffect(() => {
         if (user) {
-            navigate('/', { replace: true });
+            navigate(redirectUrl, { replace: true });
         }
-    }, [user, navigate]);
+    }, [user, navigate, redirectUrl]);
 
     // Tự động điền mã giới thiệu (ref) hoặc mã khuyến mãi (promo) từ URL link chia sẻ
     useEffect(() => {
