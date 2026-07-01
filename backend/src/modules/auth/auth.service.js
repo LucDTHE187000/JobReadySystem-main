@@ -39,7 +39,7 @@ export class AuthService {
             const { SystemSettingModel } = await import("../system/systemSetting.model.js");
             const campaignSetting = await SystemSettingModel.findOne({ key: "campaign_mode" });
             if (campaignSetting && campaignSetting.value === true) {
-                defaultSignupCredits = 150; // 60 + 90
+                defaultSignupCredits = 80; // 60 + 20
                 hasReceivedCampaignSignupBonus = true;
             }
         } catch (err) {
@@ -468,7 +468,7 @@ export class AuthService {
                 const { SystemSettingModel } = await import("../system/systemSetting.model.js");
                 const campaignSetting = await SystemSettingModel.findOne({ key: "campaign_mode" });
                 if (campaignSetting && campaignSetting.value === true) {
-                    defaultSignupCredits = 150; // 60 + 90
+                    defaultSignupCredits = 80; // 60 + 20
                     hasReceivedCampaignSignupBonus = true;
                 }
             } catch (err) {

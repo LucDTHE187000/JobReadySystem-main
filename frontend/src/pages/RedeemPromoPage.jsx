@@ -33,7 +33,7 @@ export default function RedeemPromoPage() {
   const [hasSpun, setHasSpun] = useState(false);
   const [spinTargetName, setSpinTargetName] = useState('');
 
-  const segments = ['30 Credits', '50 Credits', '70 Credits', '90 Credits', '120 Credits', '150 Credits'];
+  const segments = ['10 Credits', '15 Credits', '20 Credits', '30 Credits', '50 Credits', '100 Credits'];
   const colors = ['#0A2463', '#3F51B5', '#6366F1', '#8B5CF6', '#EC4899', '#D97706'];
 
   // Fetch settings on mount
@@ -222,17 +222,17 @@ export default function RedeemPromoPage() {
     setPromoError('');
     setPromoSuccess('');
 
-    // Segment index 3 (90 Credits) cần dừng ở vị trí mũi tên phía trên (270 độ)
-    // Công thức: 9 vòng quay (360 * 9) + lệch 60 độ để căn chỉnh phân vùng + lệch ngẫu nhiên nhỏ
+    // Segment index 2 (20 Credits) cần dừng ở vị trí mũi tên phía trên (270 độ)
+    // Công thức: 9 vòng quay (360 * 9) + lệch 120 độ để căn chỉnh phân vùng + lệch ngẫu nhiên nhỏ
     const variance = Math.floor(Math.random() * 24) - 12; // Góc lệch tự nhiên ±12 độ
-    const totalRotation = 360 * 9 + 60 + variance;
+    const totalRotation = 360 * 9 + 120 + variance;
     
     setWheelRotation(totalRotation);
 
     // Chờ hiệu ứng chuyển động xoay hoàn thành (6 giây)
     setTimeout(() => {
       setIsSpinning(false);
-      setSpinTargetName('90 Credits');
+      setSpinTargetName('20 Credits');
       // Tự động gọi API nhận quà để gửi mã xác thực OTP về Email
       handleClaimPromo();
     }, 6000);
@@ -373,16 +373,7 @@ export default function RedeemPromoPage() {
 
               {/* Thông báo kết quả và Validation */}
               <div className="w-full max-w-md space-y-4">
-                {hasAlreadyClaimed() ? (
-                  <div className="space-y-3">
-                    <div className="py-3.5 bg-slate-100 border border-slate-200 text-slate-500 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 shadow-inner">
-                      <CheckCircle className="h-5 w-5 text-emerald-500" /> Bạn đã tham gia vòng quay sự kiện này rồi
-                    </div>
-                    <p className="text-xs text-red-500/80 font-semibold bg-red-50 border border-red-100 rounded-xl py-2 px-3">
-                      ⚠ Mỗi tài khoản chỉ được hưởng duy nhất 1 lần ưu đãi từ sự kiện hoặc ưu đãi khi đăng ký tài khoản.
-                    </p>
-                  </div>
-                ) : (
+                {!hasAlreadyClaimed() && (
                   <div className="space-y-2">
                     <p className="text-xs text-slate-500 italic font-medium">
                       {isSpinning ? 'Vòng quay đang xoay, hãy chờ xem quà gì nhé...' : 'Nhấn nút QUAY ở trung tâm để rút thưởng!'}

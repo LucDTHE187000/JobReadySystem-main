@@ -9,7 +9,7 @@ export const CREDIT_COSTS = {
 export const DEFAULT_CREDITS = 60;
 
 export const PROMO_CODES = {
-    "GIFT_79": { credits: 90, name: "Voucher Sự Kiện GIFT_79 (Trị giá 79.000₫)" }
+    "GIFT_20": { credits: 20, name: "Voucher Sự Kiện GIFT_20" }
 };
 
 export async function deductCredits(userId, amount, UserModel) {

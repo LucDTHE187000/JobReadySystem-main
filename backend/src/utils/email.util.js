@@ -126,7 +126,7 @@ export const sendOTPEmail = async (to, otp, name = "User") => {
  * @param {string} promoName - Promo code name
  * @returns {Promise<Object>} Send result
  */
-export const sendPromoVerificationEmail = async (to, otp, name = "User", promoName = "GIFT_79") => {
+export const sendPromoVerificationEmail = async (to, otp, name = "User", promoName = "GIFT_20") => {
     const hasResendConfig = !!process.env.RESEND_API_KEY;
     const isDevModeOnly = process.env.EMAIL_DEV_MODE === "true" || !hasResendConfig;
 
@@ -173,7 +173,7 @@ export const sendPromoVerificationEmail = async (to, otp, name = "User", promoNa
                         </div>
                         <div class="content">
                             <h2>Xin chào ${name}!</h2>
-                            <p>Bạn đã yêu cầu đổi mã ưu đãi sự kiện <strong>${promoName}</strong> để nhận thêm 90 credits miễn phí.</p>
+                            <p>Bạn đã yêu cầu đổi mã ưu đãi sự kiện <strong>${promoName}</strong> để nhận thêm 20 credits miễn phí.</p>
                             <p>Vui lòng nhập mã xác thực OTP dưới đây vào trang sự kiện để hoàn tất:</p>
                             
                             <div class="otp-box">
@@ -193,7 +193,7 @@ export const sendPromoVerificationEmail = async (to, otp, name = "User", promoNa
             text: `
                 Xin chào ${name}!
                 
-                Bạn đã yêu cầu đổi mã ưu đãi sự kiện ${promoName} để nhận thêm 90 credits miễn phí.
+                Bạn đã yêu cầu đổi mã ưu đãi sự kiện ${promoName} để nhận thêm 20 credits miễn phí.
                 Vui lòng nhập mã xác thực OTP dưới đây vào trang sự kiện để hoàn tất:
                 
                 ${otp}

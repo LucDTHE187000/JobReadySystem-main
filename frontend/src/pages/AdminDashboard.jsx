@@ -1415,7 +1415,7 @@ function SystemSettingsTab() {
                             )}
                         </h3>
                         <p className="text-slate-500 text-sm max-w-2xl font-medium">
-                            Khi chế độ này **BẬT**, tất cả tài khoản ứng viên mới đăng ký (qua email thông thường hoặc đăng nhập Google) sẽ được tặng **150 credits** (60 mặc định + 90 ưu đãi) thay vì mặc định 60 credits.
+                            Khi chế độ này **BẬT**, tất cả tài khoản ứng viên mới đăng ký (qua email thông thường hoặc đăng nhập Google) sẽ được tặng **80 credits** (60 mặc định + 20 ưu đãi) thay vì mặc định 60 credits.
                             Thích hợp kích hoạt trong các buổi offline/online workshop để thu hút người dùng đăng ký trải nghiệm.
                         </p>
                     </div>
@@ -1456,7 +1456,7 @@ function SystemSettingsTab() {
                             )}
                         </h3>
                         <p className="text-slate-500 text-sm max-w-2xl font-medium">
-                            Khi bật, người dùng có thể nhập mã sự kiện truyền thông (và xác thực qua Email OTP của họ) để nhận thêm 90 credits. 
+                            Khi bật, người dùng có thể nhập mã sự kiện truyền thông (và xác thực qua Email OTP của họ) để nhận thêm 20 credits. 
                             Khi tắt, hệ thống sẽ chặn tất cả yêu cầu đổi mã sự kiện để tránh rò rỉ mã giữa các ngày truyền thông.
                         </p>
                     </div>
@@ -1498,8 +1498,8 @@ function SystemSettingsTab() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 shadow-sm">
                             <p className="text-xs text-slate-450 uppercase font-black tracking-wider mb-1">Số dư đăng ký tài khoản</p>
-                            <p className="text-2xl font-black text-[#0A2463]">{campaignMode ? "150 Credits" : "60 Credits"}</p>
-                            <p className="text-xs text-slate-500 mt-1">Gồm 60 mặc định & {campaignMode ? "thêm 90 credits ưu đãi sự kiện" : "không có ưu đãi"}</p>
+                            <p className="text-2xl font-black text-[#0A2463]">{campaignMode ? "80 Credits" : "60 Credits"}</p>
+                            <p className="text-xs text-slate-500 mt-1">Gồm 60 mặc định & {campaignMode ? "thêm 20 credits ưu đãi sự kiện" : "không có ưu đãi"}</p>
                         </div>
                         <div className="bg-slate-50 p-4 rounded-xl border border-slate-105 shadow-sm">
                             <p className="text-xs text-slate-450 uppercase font-black tracking-wider mb-1">Trạng thái đổi mã ưu đãi</p>

@@ -13,7 +13,7 @@ export default function CountdownTimer() {
   const [activePhase, setActivePhase] = useState(1); // 1: Offline, 2: Online
 
   // Target timestamps in UTC+7 (Vietnam Time)
-  const targetOffline = new Date('2026-07-02T09:00:00+07:00').getTime();
+  const targetOffline = new Date('2026-07-02T10:00:00+07:00').getTime();
   const targetOnline = new Date('2026-07-05T09:00:00+07:00').getTime();
 
   useEffect(() => {
