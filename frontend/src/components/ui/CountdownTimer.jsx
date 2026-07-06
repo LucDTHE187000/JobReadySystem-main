@@ -10,11 +10,12 @@ export default function CountdownTimer() {
     seconds: 0,
   });
   const [isExpired, setIsExpired] = useState(false);
-  const [activePhase, setActivePhase] = useState(1); // 1: Offline, 2: Online
+  const [activePhase, setActivePhase] = useState(1); // 1: Offline, 2: Online, 3: Graduation
 
   // Target timestamps in UTC+7 (Vietnam Time)
   const targetOffline = new Date('2026-07-02T12:00:00+07:00').getTime();
-  const targetOnline = new Date('2026-07-05T09:00:00+07:00').getTime();
+  const targetOnline = new Date('2026-07-07T21:00:00+07:00').getTime();
+  const targetGraduation = new Date('2026-07-17T21:00:00+07:00').getTime();
 
   useEffect(() => {
     const calculateTime = () => {
@@ -22,18 +23,20 @@ export default function CountdownTimer() {
       let targetTimestamp = targetOffline;
       let phase = 1;
 
-      // Nếu đã vượt qua thời gian Offline, chuyển sang đếm ngược Online (cách đó 3 ngày)
-      if (now >= targetOffline) {
+      if (now >= targetOffline && now < targetOnline) {
         targetTimestamp = targetOnline;
         phase = 2;
+      } else if (now >= targetOnline) {
+        targetTimestamp = targetGraduation;
+        phase = 3;
       }
 
       const difference = targetTimestamp - now;
 
-      if (difference <= 0) {
+      if (difference <= 0 && phase === 3) {
         setIsExpired(true);
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        setActivePhase(2);
+        setActivePhase(3);
         return true;
       }
 
@@ -77,17 +80,29 @@ export default function CountdownTimer() {
               {/* Badge */}
               <span className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-[#F5C518]/15 text-[#F5C518] border border-[#F5C518]/25 text-xs font-black rounded-full mb-6 uppercase tracking-widest animate-pulse">
                 <Calendar size={12} />
-                {activePhase === 1 ? 'Sự kiện Workshop Offline' : 'Sự kiện Truyền thông Online'}
+                {activePhase === 1 
+                  ? 'Sự kiện Workshop Offline' 
+                  : activePhase === 2 
+                    ? 'Sự kiện Truyền thông Online' 
+                    : 'Ưu đãi Mùa Tốt Nghiệp'}
               </span>
 
               {/* Header */}
               <h2 className="text-2xl sm:text-3xl lg:text-4xl text-white mb-3 font-black tracking-tight leading-tight uppercase">
-                ĐẾM NGƯỢC DIỄN RA <span className="text-gradient-gold">{activePhase === 1 ? 'WORKSHOP OFFLINE' : 'TRUYỀN THÔNG ONLINE'}</span>
+                ĐẾM NGƯỢC DIỄN RA <span className="text-gradient-gold">
+                  {activePhase === 1 
+                    ? 'WORKSHOP OFFLINE' 
+                    : activePhase === 2 
+                      ? 'TRUYỀN THÔNG ONLINE' 
+                      : 'ƯU ĐÃI MÙA TỐT NGHIỆP'}
+                </span>
               </h2>
               <p className="text-white/60 text-xs sm:text-sm max-w-xl mx-auto mb-8 font-medium font-sans leading-relaxed">
                 {activePhase === 1 
                   ? 'Đăng ký tài khoản và tham gia trực tiếp tại buổi truyền thông offline để nhận ngay quà tặng credit miễn phí trải nghiệm chấm CV và phỏng vấn thử AI.'
-                  : 'Đăng ký tài khoản và theo dõi các hoạt động truyền thông trên Facebook để nhận ngay quà tặng credit miễn phí trải nghiệm chấm CV và phỏng vấn thử AI.'}
+                  : activePhase === 2 
+                    ? 'Đăng ký tài khoản và theo dõi các hoạt động truyền thông trên Facebook để nhận ngay quà tặng credit miễn phí trải nghiệm chấm CV và phỏng vấn thử AI.'
+                    : 'Đăng ký tài khoản và nhận ngay ưu đãi credit trải nghiệm mùa tốt nghiệp để tối ưu hóa CV và luyện phỏng vấn thử AI cùng JobReady.'}
               </p>
 
               {/* Countdown Numbers Grid */}
@@ -120,7 +135,9 @@ export default function CountdownTimer() {
                     ? 'Sự kiện đã kết thúc! Cảm ơn bạn đã đồng hành cùng JobReady.' 
                     : activePhase === 1 
                       ? 'Tham gia buổi Offline để nhận mã ưu đãi độc quyền trực tiếp từ BTC.'
-                      : 'Theo dõi fanpage Facebook để nhận mã ưu đãi độc quyền từ JobReady.'}
+                      : activePhase === 2 
+                        ? 'Theo dõi fanpage Facebook để nhận mã ưu đãi độc quyền từ JobReady.'
+                        : 'Đăng ký tài khoản nhận ngay 60 credits trải nghiệm các tính năng cốt lõi.'}
                 </span>
               </div>
             </div>

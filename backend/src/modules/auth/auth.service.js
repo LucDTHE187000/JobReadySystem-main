@@ -38,12 +38,13 @@ export class AuthService {
         try {
             const { SystemSettingModel } = await import("../system/systemSetting.model.js");
             const campaignSetting = await SystemSettingModel.findOne({ key: "campaign_mode" });
-            if (campaignSetting && campaignSetting.value === true) {
+            const graduationSetting = await SystemSettingModel.findOne({ key: "graduation_mode" });
+            if ((campaignSetting && campaignSetting.value === true) || (graduationSetting && graduationSetting.value === true)) {
                 defaultSignupCredits = 80; // 60 + 20
                 hasReceivedCampaignSignupBonus = true;
             }
         } catch (err) {
-            console.error("Failed to read campaign setting in registration:", err);
+            console.error("Failed to read campaign/graduation settings in registration:", err);
         }
 
         // Kiểm tra và áp dụng mã giới thiệu bạn bè
@@ -467,12 +468,13 @@ export class AuthService {
             try {
                 const { SystemSettingModel } = await import("../system/systemSetting.model.js");
                 const campaignSetting = await SystemSettingModel.findOne({ key: "campaign_mode" });
-                if (campaignSetting && campaignSetting.value === true) {
+                const graduationSetting = await SystemSettingModel.findOne({ key: "graduation_mode" });
+                if ((campaignSetting && campaignSetting.value === true) || (graduationSetting && graduationSetting.value === true)) {
                     defaultSignupCredits = 80; // 60 + 20
                     hasReceivedCampaignSignupBonus = true;
                 }
             } catch (err) {
-                console.error("Failed to read campaign setting in googleLogin:", err);
+                console.error("Failed to read campaign/graduation settings in googleLogin:", err);
             }
 
             let initialCredits = userRole === "JOB_SEEKER" ? defaultSignupCredits : 0;

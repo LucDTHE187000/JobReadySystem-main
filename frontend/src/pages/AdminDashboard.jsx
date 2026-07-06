@@ -1346,6 +1346,7 @@ function FeedbackTab() {
 function SystemSettingsTab() {
     const [campaignMode, setCampaignMode] = useState(false);
     const [promoRedemptionEnabled, setPromoRedemptionEnabled] = useState(false);
+    const [graduationMode, setGraduationMode] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState("");
@@ -1356,6 +1357,7 @@ function SystemSettingsTab() {
             .then(r => {
                 setCampaignMode(r.data.campaignMode);
                 setPromoRedemptionEnabled(r.data.promoRedemptionEnabled);
+                setGraduationMode(r.data.graduationMode || false);
             })
             .catch(err => {
                 console.error(err);
@@ -1371,7 +1373,8 @@ function SystemSettingsTab() {
         try {
             const payload = {
                 campaignMode: key === 'campaignMode' ? newValue : campaignMode,
-                promoRedemptionEnabled: key === 'promoRedemptionEnabled' ? newValue : promoRedemptionEnabled
+                promoRedemptionEnabled: key === 'promoRedemptionEnabled' ? newValue : promoRedemptionEnabled,
+                graduationMode: key === 'graduationMode' ? newValue : graduationMode
             };
             const response = await axios.post(
                 `${API_URL}/api/payment/system-settings`,
@@ -1380,6 +1383,7 @@ function SystemSettingsTab() {
             );
             setCampaignMode(response.data.campaignMode);
             setPromoRedemptionEnabled(response.data.promoRedemptionEnabled);
+            setGraduationMode(response.data.graduationMode || false);
             setMessage(response.data.message || "Cập nhật cấu hình thành công!");
         } catch (err) {
             console.error(err);
@@ -1481,6 +1485,47 @@ function SystemSettingsTab() {
                     </div>
                 </div>
 
+                {/* Switch 3: Graduation Mode */}
+                <div className="flex items-start justify-between border-b border-slate-100 pb-5">
+                    <div className="space-y-1">
+                        <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
+                            <span>Ưu đãi mùa tốt nghiệp (Graduation Mode)</span>
+                            {graduationMode ? (
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 uppercase tracking-wider animate-pulse">
+                                    Đang bật
+                                </span>
+                            ) : (
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 uppercase tracking-wider">
+                                    Mặc định
+                                </span>
+                            )}
+                        </h3>
+                        <p className="text-slate-500 text-sm max-w-2xl font-medium">
+                            Khi chế độ này **BẬT**, tất cả tài khoản ứng viên mới đăng ký sẽ được tặng **80 credits** (60 mặc định + 20 ưu đãi mùa tốt nghiệp) thay vì mặc định 60 credits.
+                            Thích hợp kích hoạt trong mùa tốt nghiệp để khuyến khích sinh viên tối ưu hóa CV và luyện phỏng vấn thử AI.
+                        </p>
+                    </div>
+
+                    <div className="flex items-center">
+                        <button
+                            type="button"
+                            disabled={saving}
+                            onClick={() => handleToggleSetting('graduationMode', !graduationMode)}
+                            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                                graduationMode ? "bg-indigo-600" : "bg-slate-200"
+                            } ${saving ? "opacity-50 pointer-events-none" : ""}`}
+                        >
+                            <span className="sr-only">Toggle Graduation Mode</span>
+                            <span
+                                aria-hidden="true"
+                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                    graduationMode ? "translate-x-5" : "translate-x-0"
+                                }`}
+                            />
+                        </button>
+                    </div>
+                </div>
+
                 {message && (
                     <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 text-sm text-emerald-700 font-semibold shadow-sm flex items-center gap-2 animate-fade-in">
                         <CheckCircle2 size={18} /> {message}
@@ -1498,8 +1543,8 @@ function SystemSettingsTab() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 shadow-sm">
                             <p className="text-xs text-slate-450 uppercase font-black tracking-wider mb-1">Số dư đăng ký tài khoản</p>
-                            <p className="text-2xl font-black text-[#0A2463]">{campaignMode ? "80 Credits" : "60 Credits"}</p>
-                            <p className="text-xs text-slate-500 mt-1">Gồm 60 mặc định & {campaignMode ? "thêm 20 credits ưu đãi sự kiện" : "không có ưu đãi"}</p>
+                            <p className="text-2xl font-black text-[#0A2463]">{(campaignMode || graduationMode) ? "80 Credits" : "60 Credits"}</p>
+                            <p className="text-xs text-slate-500 mt-1">Gồm 60 mặc định & {(campaignMode || graduationMode) ? `thêm 20 credits ưu đãi ${campaignMode ? "sự kiện" : "tốt nghiệp"}` : "không có ưu đãi"}</p>
                         </div>
                         <div className="bg-slate-50 p-4 rounded-xl border border-slate-105 shadow-sm">
                             <p className="text-xs text-slate-450 uppercase font-black tracking-wider mb-1">Trạng thái đổi mã ưu đãi</p>

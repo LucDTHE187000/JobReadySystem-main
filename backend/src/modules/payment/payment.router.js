@@ -528,9 +528,12 @@ router.get("/system-settings", async (req, res) => {
     const promoSetting = await SystemSettingModel.findOne({ key: "promo_redemption_enabled" });
     const promoRedemptionEnabled = promoSetting ? promoSetting.value === true : true;
 
+    const graduationSetting = await SystemSettingModel.findOne({ key: "graduation_mode" });
+    const graduationMode = graduationSetting ? graduationSetting.value === true : false;
+
     const activePromoCode = Object.keys(PROMO_CODES)[0] || "";
 
-    return res.status(200).json({ campaignMode, promoRedemptionEnabled, activePromoCode });
+    return res.status(200).json({ campaignMode, promoRedemptionEnabled, graduationMode, activePromoCode });
   } catch (error) {
     console.error("Get system settings error:", error);
     return res.status(500).json({ message: "Không thể lấy cấu hình hệ thống" });
@@ -543,7 +546,7 @@ router.post("/system-settings", authMiddleware, async (req, res) => {
       return res.status(403).json({ message: "Bạn không có quyền thay đổi cấu hình này" });
     }
 
-    const { campaignMode, promoRedemptionEnabled } = req.body;
+    const { campaignMode, promoRedemptionEnabled, graduationMode } = req.body;
 
     if (campaignMode !== undefined) {
       await SystemSettingModel.findOneAndUpdate(
@@ -561,17 +564,29 @@ router.post("/system-settings", authMiddleware, async (req, res) => {
       );
     }
 
+    if (graduationMode !== undefined) {
+      await SystemSettingModel.findOneAndUpdate(
+        { key: "graduation_mode" },
+        { value: !!graduationMode },
+        { upsert: true }
+      );
+    }
+
     const campaignSetting = await SystemSettingModel.findOne({ key: "campaign_mode" });
     const finalCampaignMode = campaignSetting ? campaignSetting.value === true : false;
 
     const promoSetting = await SystemSettingModel.findOne({ key: "promo_redemption_enabled" });
     const finalPromoRedemptionEnabled = promoSetting ? promoSetting.value === true : true;
 
+    const graduationSetting = await SystemSettingModel.findOne({ key: "graduation_mode" });
+    const finalGraduationMode = graduationSetting ? graduationSetting.value === true : false;
+
     return res.status(200).json({
       success: true,
       message: "Cập nhật cấu hình hệ thống thành công!",
       campaignMode: finalCampaignMode,
-      promoRedemptionEnabled: finalPromoRedemptionEnabled
+      promoRedemptionEnabled: finalPromoRedemptionEnabled,
+      graduationMode: finalGraduationMode
     });
   } catch (error) {
     console.error("Update system settings error:", error);
