@@ -114,7 +114,7 @@ function ProgressStepper({ status }) {
 function ApplicationCard({ app }) {
     const job = app.jobId || {};
     const recruiter = job.recruiterId || {};
-    const companyName = recruiter.companyName || recruiter.name || 'Công ty';
+    const companyName = job.agencyCompanyName || recruiter.companyName || recruiter.name || 'Công ty';
     const cfg = STATUS_CONFIG[app.status] || STATUS_CONFIG.pending;
     const city = job.location?.city || '';
 
@@ -421,7 +421,7 @@ export default function MyApplications() {
                         ) : (
                             <div className="grid gap-4">
                                 {savedJobs.map(job => {
-                                    const companyName = job.recruiterId?.companyName || job.recruiterId?.name || 'Công ty';
+                                    const companyName = job.agencyCompanyName || job.recruiterId?.companyName || job.recruiterId?.name || 'Công ty';
                                     const city = job.location?.city || '';
                                     return (
                                         <div key={job._id} className="bg-white border border-slate-300 backdrop-blur-md rounded-2xl p-5 hover:bg-slate-50 transition-all text-slate-900 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">

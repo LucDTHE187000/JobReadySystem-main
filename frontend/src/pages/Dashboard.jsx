@@ -56,6 +56,7 @@ export default function Dashboard() {
         { label: 'Chờ phỏng vấn', value: '—', icon: Calendar, change: '' },
         { label: 'Tỷ lệ chấp nhận', value: '—', icon: TrendingUp, change: '' },
     ]);
+    const [pendingCount, setPendingCount] = useState(0);
 
     useEffect(() => {
         const loadStats = async () => {
@@ -65,7 +66,7 @@ export default function Dashboard() {
                 const headers = { Authorization: `Bearer ${token}` };
 
                 const [jobsRes, appsRes] = await Promise.all([
-                    fetch(`${API_URL}/api/jobs/my`, { headers }),
+                    fetch(`${API_URL}/api/jobs/job-application`, { headers }),
                     fetch(`${API_URL}/api/applications/company/applicants`, { headers }),
                 ]);
                 const jobsData = jobsRes.ok ? await jobsRes.json() : null;
@@ -78,6 +79,7 @@ export default function Dashboard() {
                 const acceptedCount = applicants.filter(a => a.status === 'accepted').length;
                 const acceptRate = totalApplicants > 0 ? ((acceptedCount / totalApplicants) * 100).toFixed(1) + '%' : '0%';
 
+                setPendingCount(applicants.filter(a => a.status === 'pending').length);
                 setStats([
                     { label: 'Việc làm của bạn', value: totalJobs.toString(), icon: FileText, change: '' },
                     { label: 'Tổng ứng viên', value: totalApplicants.toString(), icon: Users, change: '' },
@@ -89,7 +91,7 @@ export default function Dashboard() {
             }
         };
         loadStats();
-    }, []);
+    }, [activeMenu]);
 
     const [notifications, setNotifications] = useState([]);
     const [campaigns, setCampaigns] = useState([]);
@@ -374,7 +376,7 @@ export default function Dashboard() {
 
                         <div className="bg-white/60 backdrop-blur-md p-6 rounded-2xl border border-white/50 shadow-xl shadow-slate-900/5 inline-block w-full sm:w-auto">
                             <h1 className="text-2xl lg:text-3xl text-slate-800 font-bold tracking-tight mb-1">CHÀO MỪNG TRỞ LẠI!</h1>
-                            <p className="text-sm text-slate-600 font-medium">Hôm nay có 45 ứng viên mới đang chờ bạn xem xét</p>
+                            <p className="text-sm text-slate-600 font-medium">Hôm nay có {pendingCount} ứng viên mới đang chờ bạn xem xét</p>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">

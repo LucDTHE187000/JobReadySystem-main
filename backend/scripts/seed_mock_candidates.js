@@ -104,11 +104,21 @@ async function run() {
         });
         console.log(`🧹 Removed ${deleteResult.deletedCount} old mock candidates.`);
 
+        // Restore Ronaldo and Messi to their original registration dates (June 27, 2026)
+        console.log('🔄 Restoring Ronaldo and Messi to their original registration dates...');
+        await usersCollection.updateOne(
+            { email: 'antran22122003@gmail.com' },
+            { $set: { createdAt: new Date('2026-06-27T11:21:29.020Z'), updatedAt: new Date('2026-06-27T11:21:29.020Z') } }
+        );
+        await usersCollection.updateOne(
+            { email: 'antnhe172489@fpt.edu.vn' },
+            { $set: { createdAt: new Date('2026-06-27T11:40:06.588Z'), updatedAt: new Date('2026-06-27T11:40:06.588Z') } }
+        );
+        console.log('✅ Restored Ronaldo and Messi.');
+
         // Target real/test users to swap creation dates (moving them to July 10-12)
         const SWAP_EMAILS = [
             'haunvhs180539@fpt.edu.vn',
-            'antran22122003@gmail.com',
-            'antnhe172489@fpt.edu.vn',
             'he180364dovanquang@gmail.com',
             'duongthihien2002kt@gmail.com',
             'khanhpvz3@gmail.com'
@@ -124,9 +134,9 @@ async function run() {
 
         // Move these real users to July 10 - July 12
         const TARGET_SWAP_DATES = [
-            '2026-07-12', '2026-07-12',
+            '2026-07-12',
             '2026-07-11', '2026-07-11',
-            '2026-07-10', '2026-07-10'
+            '2026-07-10'
         ];
 
         for (let i = 0; i < realUsers.length; i++) {
@@ -216,6 +226,7 @@ async function run() {
                 role: 'JOB_SEEKER',
                 isActive: true,
                 isApproved: false,
+                isMock: true,
                 language: 'VI',
                 credits: credits,
                 activePlan: 'free',

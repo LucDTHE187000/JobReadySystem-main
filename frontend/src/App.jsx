@@ -129,7 +129,7 @@ function App() {
               <JobSeekerRoute><InterviewAnalytics /></JobSeekerRoute>
             } />
             <Route path="/credits" element={
-              <JobSeekerRoute><CreditShopPage /></JobSeekerRoute>
+              <ProtectedRoute><CreditShopPage /></ProtectedRoute>
             } />
             <Route path="/checkin" element={
               <JobSeekerRoute><CheckInPage /></JobSeekerRoute>

@@ -28,6 +28,7 @@ const userSchema = new mongoose.Schema(
     avatarUrl: { type: String },
     isActive: { type: Boolean, default: true },
     isApproved: { type: Boolean, default: false }, // Dùng cho Employer: Admin duyệt mới được đăng tin
+    isMock: { type: Boolean, default: false },
     language: { type: String, enum: ["EN", "VI"], default: "VI" },
 
     credits: { type: Number, default: 60, min: 0 },

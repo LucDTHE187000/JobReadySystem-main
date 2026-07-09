@@ -75,14 +75,17 @@ export class AuthService {
         // Tạo tài khoản mới - Cần xác thực email qua OTP
         let user;
         try {
+            const isRecruiter = (role === "EMPLOYER");
             user = await UserModel.create({
                 email: normalizedEmail,
                 password,
                 name: normalizedName,
                 role: role || "JOB_SEEKER",
                 isVerified: false,
-                credits: initialCredits,
-                hasReceivedCampaignSignupBonus,
+                credits: isRecruiter ? 0 : initialCredits,
+                isActive: true,
+                isApproved: false,
+                hasReceivedCampaignSignupBonus: isRecruiter ? false : hasReceivedCampaignSignupBonus,
                 redeemedCodes: redeemedCodes,
                 referredBy: referredByUser ? referredByUser._id : undefined
             });
@@ -272,6 +275,7 @@ export class AuthService {
                 companyName: user.companyName || '',
                 companyDescription: user.companyDescription || '',
                 companyWebsite: user.companyWebsite || '',
+                isApproved: user.isApproved ?? false,
             },
         };
     }
@@ -522,6 +526,7 @@ export class AuthService {
                 }
             }
 
+            const isRecruiter = (userRole === "EMPLOYER");
             user = await UserModel.create({
                 email: normalizedEmail,
                 name: name || "Google User",
@@ -534,31 +539,46 @@ export class AuthService {
                 hasReceivedCampaignSignupBonus,
                 redeemedCodes: redeemedCodes,
                 referredBy: referredBy,
-                referralBonusProcessed: referralBonusProcessed
+                referralBonusProcessed: referralBonusProcessed,
+                isApproved: false,
+                isActive: true
             });
 
-            // Tạo thông báo chào mừng
-            try {
-                const { NotificationService } = await import("../notification/notification.service.js");
-                await NotificationService.createNotification(
-                    user._id,
-                    "Chào mừng đến với JobReady System",
-                    "Chúc mừng bạn đã tạo tài khoản thành công qua Google! Hãy cập nhật hồ sơ cá nhân để có trải nghiệm tốt nhất.",
-                    "system"
-                );
-            } catch (notiErr) {
-                console.error("Welcome notification creation failed:", notiErr);
-            }
+            if (isRecruiter) {
+                try {
+                    const { sendNewEmployerRegistrationSupportEmail } = await import("../../utils/email.util.js");
+                    sendNewEmployerRegistrationSupportEmail(user.email, user.name, user.companyName || "Doanh nghiệp đối tác")
+                        .then(supportRes => {
+                            if (supportRes.success) console.log(`[SUPPORT EMAIL] Gửi mail thông báo đăng ký tới hỗ trợ thành công`);
+                        })
+                        .catch(supportErr => console.error(`[SUPPORT EMAIL ERROR] Không thể gửi mail tới hỗ trợ:`, supportErr.message));
+                } catch (importErr) {
+                    console.error(`[SUPPORT EMAIL ERROR] Lỗi import email.util.js:`, importErr.message);
+                }
+            } else {
+                // Tạo thông báo chào mừng cho Job Seeker
+                try {
+                    const { NotificationService } = await import("../notification/notification.service.js");
+                    await NotificationService.createNotification(
+                        user._id,
+                        "Chào mừng đến với JobReady System",
+                        "Chúc mừng bạn đã tạo tài khoản thành công qua Google! Hãy cập nhật hồ sơ cá nhân để có trải nghiệm tốt nhất.",
+                        "system"
+                    );
+                } catch (notiErr) {
+                    console.error("Welcome notification failed in googleLogin:", notiErr);
+                }
 
-            // Gửi email chào mừng thành viên mới
-            const isReferred = !!user.referredBy;
-            sendWelcomeEmail(normalizedEmail, user.name, isReferred)
-                .then(res => {
-                    if (res.success) console.log(`[WELCOME EMAIL GOOGLE] Gửi mail chào mừng thành công tới ${normalizedEmail}`);
-                })
-                .catch(err => {
-                    console.error(`[WELCOME EMAIL GOOGLE ERROR] Không thể gửi mail chào mừng tới ${normalizedEmail}:`, err.message);
-                });
+                // Gửi email chào mừng thành viên mới
+                const isReferred = !!user.referredBy;
+                sendWelcomeEmail(normalizedEmail, user.name, isReferred)
+                    .then(res => {
+                        if (res.success) console.log(`[WELCOME EMAIL GOOGLE] Gửi mail chào mừng thành công tới ${normalizedEmail}`);
+                    })
+                    .catch(err => {
+                        console.error(`[WELCOME EMAIL GOOGLE ERROR] Không thể gửi mail chào mừng tới ${normalizedEmail}:`, err.message);
+                    });
+            }
         }
 
         if (user.isActive === false) {
@@ -587,6 +607,7 @@ export class AuthService {
                 companyName: user.companyName || '',
                 companyDescription: user.companyDescription || '',
                 companyWebsite: user.companyWebsite || '',
+                isApproved: user.isApproved ?? false,
             },
         };
     }
@@ -624,15 +645,28 @@ export class AuthService {
 
         await user.save();
 
-        // 2. Gửi email chào mừng thành viên mới
-        const isReferred = !!user.referredBy;
-        sendWelcomeEmail(user.email, user.name, isReferred)
-            .then(res => {
-                if (res.success) console.log(`[WELCOME EMAIL] Gửi mail chào mừng thành công tới ${user.email}`);
-            })
-            .catch(err => {
-                console.error(`[WELCOME EMAIL ERROR] Không thể gửi mail chào mừng tới ${user.email}:`, err.message);
-            });
+        // 2. Gửi email phù hợp theo vai trò (Employer gửi cho Admin hỗ trợ, Seeker gửi mail chào mừng)
+        if (user.role === "EMPLOYER") {
+            try {
+                const { sendNewEmployerRegistrationSupportEmail } = await import("../../utils/email.util.js");
+                sendNewEmployerRegistrationSupportEmail(user.email, user.name, user.companyName || "Doanh nghiệp đối tác")
+                    .then(supportRes => {
+                        if (supportRes.success) console.log(`[SUPPORT EMAIL] Gửi mail thông báo đăng ký tới hỗ trợ thành công`);
+                    })
+                    .catch(supportErr => console.error(`[SUPPORT EMAIL ERROR] Không thể gửi mail tới hỗ trợ:`, supportErr.message));
+            } catch (importErr) {
+                console.error(`[SUPPORT EMAIL ERROR] Lỗi import email.util.js:`, importErr.message);
+            }
+        } else {
+            const isReferred = !!user.referredBy;
+            sendWelcomeEmail(user.email, user.name, isReferred)
+                .then(res => {
+                    if (res.success) console.log(`[WELCOME EMAIL] Gửi mail chào mừng thành công tới ${user.email}`);
+                })
+                .catch(err => {
+                    console.error(`[WELCOME EMAIL ERROR] Không thể gửi mail chào mừng tới ${user.email}:`, err.message);
+                });
+        }
     }
 }
 

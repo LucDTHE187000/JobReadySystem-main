@@ -105,7 +105,7 @@ function JobCard({ job, onToggleSave, saved }) {
     const navigate = useNavigate();
     const { user } = useAuth();
     const recruiter = job.recruiterId || {};
-    const companyName = recruiter.companyName || recruiter.name || 'Công ty';
+    const companyName = job.agencyCompanyName || recruiter.companyName || recruiter.name || 'Công ty';
     const avatar = recruiter.avatarUrl || recruiter.avatar || null;
 
     return (
@@ -211,7 +211,7 @@ function JobCard({ job, onToggleSave, saved }) {
                                     navigate(`/jobs/${job._id}`);
                                 }
                             }}
-                            className="text-sm font-medium px-3.5 py-1.5 rounded-lg transition-colors flex-shrink-0 text-[#0A2463] bg-[#F5C518] hover:bg-[#D4A800]"
+                            className="text-sm font-medium px-3.5 py-1.5 rounded-lg transition-colors flex-shrink-0 text-[#0A2463] bg-[#F5C518] hover:bg-[#D4A800] ml-auto"
                         >
                             {job.externalUrl ? 'Ứng tuyển ngoài' : 'Ứng tuyển ngay'}
                         </button>
@@ -1263,7 +1263,6 @@ export default function JobSearch() {
                             </div>
                         )}
 
-                        <Pagination page={page} totalPages={totalPages} onPageChange={handlePageChange} />
                     </div>
                 </div>
             </div>

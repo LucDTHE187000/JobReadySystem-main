@@ -1,10 +1,11 @@
 import { API_URL } from '@/config';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import SeekerLayout from '../components/layout/SeekerLayout';
-import { ArrowRight, CheckCircle, Clock3, Copy } from 'lucide-react';
+import SideBar from '../components/SideBar';
+import { ArrowRight, CheckCircle, Clock3, Copy, DollarSign } from 'lucide-react';
 
 const PACKAGES = [
   {
@@ -39,7 +40,7 @@ function formatCurrency(value) {
 
 // ─── Vẽ QR từ chuỗi text (VietQR string từ PayOS) ─────────────────────────
 // Dùng Google Charts QR API — không cần npm install gì thêm
-function QRCodeImage({ value, size = 280 }) {
+const QRCodeImage = memo(function QRCodeImage({ value, size = 280 }) {
   if (!value) return null;
 
   // Nếu đã là URL ảnh (http / data:) thì render thẳng
@@ -71,8 +72,54 @@ function QRCodeImage({ value, size = 280 }) {
       }}
     />
   );
-}
-// ──────────────────────────────────────────────────────────────────────────
+});
+// ─── Khai báo LayoutWrapper bên ngoài để tránh unmount/remount khi re-render ───
+const LayoutWrapper = ({ children, user, sidebarOpen, setSidebarOpen, navigate }) => {
+  if (user?.role === "EMPLOYER") {
+    return (
+      <div 
+        className="min-h-screen flex bg-cover bg-center bg-no-repeat bg-fixed relative"
+        style={{ backgroundImage: `url('/background3.jpg')` }}
+      >
+        <div className="absolute inset-0 bg-slate-950/30 backdrop-blur-[1px] pointer-events-none" />
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+        <div className="relative z-10 flex w-full">
+          <SideBar
+            sidebarOpen={sidebarOpen}
+            setSidebarOpen={setSidebarOpen}
+            profile={user}
+          />
+          <main className="flex-1 overflow-auto w-full relative">
+            <header className="sticky top-0 z-20 bg-white/70 border-b border-white/45 backdrop-blur-md px-4 lg:px-8 py-4 flex items-center justify-between gap-4 shadow-sm">
+              <div className="flex items-center gap-4 flex-1">
+                <h1 className="text-xl font-bold text-slate-800">Nạp credit tuyển dụng</h1>
+              </div>
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="px-4 py-2 bg-white/80 border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold rounded-xl shadow-sm transition-all text-sm"
+              >
+                Quay lại Dashboard
+              </button>
+            </header>
+            <div className="p-4 lg:p-8">
+              {children}
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <SeekerLayout title="Nạp credit" breadcrumb="Credit › PayOS QR">
+      {children}
+    </SeekerLayout>
+  );
+};
 
 export default function CreditShopPage() {
   const { user, refreshUser } = useAuth();
@@ -337,8 +384,15 @@ export default function CreditShopPage() {
   const paymentDescription = payment?.description || `Gói ${payment?.packageName} ${payment?.creditAmount?.toLocaleString()} credit`;
   const paymentOwner = payment?.buyerName || 'DUONG TRONG LUC';
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
-    <SeekerLayout title="Nạp credit" breadcrumb="Credit › PayOS QR">
+    <LayoutWrapper
+      user={user}
+      sidebarOpen={sidebarOpen}
+      setSidebarOpen={setSidebarOpen}
+      navigate={navigate}
+    >
       <div className="max-w-5xl mx-auto space-y-10">
         {!payment && !loading && (
           <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
@@ -605,6 +659,6 @@ export default function CreditShopPage() {
           </section>
         )}
       </div>
-    </SeekerLayout>
+    </LayoutWrapper>
   );
 }

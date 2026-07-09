@@ -5,6 +5,7 @@ import { deductCredits, CREDIT_COSTS } from "../../utils/credit.util.js";
 import { UserModel } from "../users/user.model.js";
 import geminiService from "../../config/gemini.service.js";
 import InterviewSession from "../interview/interview.model.js";
+import { sendApplicationNotificationEmail, sendApplicationConfirmationEmail } from "../../utils/email.util.js";
 
 /* ========================= */
 /* Tạo Job */
@@ -21,6 +22,17 @@ const createJob = async (req, res) => {
       return res.status(403).json({
         message: "Tài khoản của bạn chưa được Admin phê duyệt. Vui lòng liên hệ Admin hoặc đợi duyệt thông tin doanh nghiệp trước khi đăng tin tuyển dụng.",
       });
+    }
+
+    // 🔥 Khấu trừ 20 credits đối với Nhà tuyển dụng khi đăng tin
+    if (userObj.role === "EMPLOYER") {
+      const balance = userObj.credits ?? 0;
+      if (balance < 20) {
+        return res.status(400).json({
+          message: `Tài khoản của bạn không đủ credit để đăng tin. Phí đăng tin là 20 credits, số dư hiện tại của bạn là ${balance} credits.`
+        });
+      }
+      await deductCredits(req.user.userId, 20, UserModel);
     }
 
     const job = await Job.create({
@@ -107,6 +119,47 @@ const applyJob = async (req, res) => {
       );
     } catch (notiErr) {
       console.error("Failed to create application notifications:", notiErr);
+    }
+
+    // Gửi email thông báo đến nhà tuyển dụng quản lý job
+    try {
+      const recruiter = await UserModel.findById(job.recruiterId).lean();
+      const applicant = await UserModel.findById(jobseekerId).lean();
+
+      // Email thông báo → Nhà tuyển dụng
+      if (recruiter?.email) {
+        await sendApplicationNotificationEmail({
+          recruiterEmail: recruiter.email,
+          recruiterName: recruiter.name || recruiter.companyName,
+          jobTitle: job.title,
+          applicantName: applicant?.name,
+          applicantEmail: applicant?.email,
+          agencyCompany: job.agencyCompanyName || null,
+          dashboardUrl: `${process.env.FRONTEND_URL || 'https://jobready.io.vn'}/dashboard`,
+        });
+      }
+
+      // Email xác nhận → Ứng viên
+      if (applicant?.email) {
+        const displayCompany = job.agencyCompanyName
+          || recruiter?.companyName
+          || recruiter?.name
+          || 'Nhà tuyển dụng';
+
+        sendApplicationConfirmationEmail({
+          applicantEmail: applicant.email,
+          applicantName: applicant.name,
+          jobTitle: job.title,
+          companyName: displayCompany,
+          jobLocation: job.location?.city || '',
+          jobType: job.jobType || '',
+          jobsUrl: `${process.env.FRONTEND_URL || 'https://jobready.io.vn'}/jobs`,
+        }).then(r => {
+          if (r.success) console.log(`✅ Confirmation email sent to ${applicant.email}`);
+        }).catch(err => console.error('Confirmation email error:', err));
+      }
+    } catch (emailErr) {
+      console.error("Failed to send application email notification:", emailErr);
     }
 
     res.status(201).json({

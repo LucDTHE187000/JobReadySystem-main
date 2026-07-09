@@ -145,6 +145,7 @@ async function runMigrationAndSeed() {
                 isVerified: true,
                 isActive: true,
                 isApproved: true,
+                isMock: true,
                 phone: '',
                 address: '',
                 credits: 6500,

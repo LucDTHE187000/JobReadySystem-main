@@ -943,3 +943,509 @@ export const sendWelcomeEmail = async (to, name = "User", isReferred = false) =>
         return { success: false, error: error.message };
     }
 };
+
+/**
+ * Send Employer Approval email
+ * @param {string} to - Recipient email
+ * @param {string} name - Recipient name
+ * @param {string} companyName - Company name
+ * @returns {Promise<Object>} Send result
+ */
+export const sendEmployerApprovalEmail = async (to, name, companyName) => {
+    const hasResendConfig = !!process.env.RESEND_API_KEY;
+    const isDevModeOnly = process.env.EMAIL_DEV_MODE === "true" || !hasResendConfig;
+
+    if (isDevModeOnly) {
+        console.log("\n" + "=".repeat(60));
+        console.log("📧 [DEV MODE] Employer Approval Email (Not sent)");
+        console.log("=".repeat(60));
+        console.log(`To: ${to}`);
+        console.log(`Name: ${name}`);
+        console.log(`Company Name: ${companyName}`);
+        console.log("=".repeat(60) + "\n");
+        return { success: true, messageId: "dev-mode", devMode: true };
+    }
+
+    try {
+        const resendInstance = getResendInstance();
+        const sender = getSender();
+
+        const mailOptions = {
+            from: `JobReady Partner <${sender}>`,
+            to: to,
+            subject: `[JobReady] Chúc mừng! Tài khoản Nhà tuyển dụng ${companyName} đã được phê duyệt`,
+            html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background: linear-gradient(135deg, #0A2463 0%, #1A3B8B 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; border: 1px solid #ddd; border-top: none; }
+                        .welcome-box { background: white; border-left: 4px solid #F5C518; padding: 15px; margin: 20px 0; border-radius: 4px; }
+                        .button { display: inline-block; background-color: #F5C518; color: #0A2463 !important; text-decoration: none; padding: 12px 25px; font-weight: bold; border-radius: 5px; margin-top: 15px; }
+                        .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>Chào mừng Đối tác Doanh nghiệp</h1>
+                        </div>
+                        <div class="content">
+                            <h2>Kính chào anh/chị ${name},</h2>
+                            <p>Đại diện của <strong>${companyName}</strong>,</p>
+                            
+                            <p>Chúng tôi rất vui mừng thông báo rằng yêu cầu hợp tác và đăng ký tài khoản Nhà tuyển dụng của quý doanh nghiệp tại hệ thống <strong>JobReady</strong> đã được ban quản trị kiểm duyệt và phê duyệt thành công.</p>
+                            
+                            <div class="welcome-box">
+                                <p><strong>Trạng thái:</strong> Đang hoạt động (Verified Partner)</p>
+                                <p><strong>Quyền lợi kích hoạt:</strong></p>
+                                <ul>
+                                    <li>Được phép đăng tin tuyển dụng không giới hạn trên Jobboard.</li>
+                                    <li>Nhận hồ sơ ứng tuyển trực tuyến từ hàng ngàn ứng viên tiềm năng.</li>
+                                    <li>Được tặng 200 credits để đăng tin tuyển dụng và trải nghiệm các tính năng cốt lõi.</li>
+                                </ul>
+                            </div>
+                            
+                            <p>Quý doanh nghiệp có thể đăng nhập vào hệ thống ngay bây giờ để tiến hành đăng tin tuyển dụng và tìm kiếm nhân sự:</p>
+                            
+                            <div style="text-align: center;">
+                                <a href="https://jobready.com/login" class="button">Đăng nhập JobReady</a>
+                            </div>
+                            
+                            <p style="margin-top: 20px; font-size: 13px; color: #555;">Nếu quý doanh nghiệp có bất kỳ thắc mắc hoặc cần hỗ trợ thêm trong quá trình tuyển dụng, vui lòng phản hồi email này hoặc liên hệ hotline chăm sóc đối tác: 0987-654-321.</p>
+                        </div>
+                        <div class="footer">
+                            <p>Trân trọng,<br><strong>Ban quản trị JobReady System</strong></p>
+                            <p>&copy; ${new Date().getFullYear()} JobReady. All rights reserved.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `
+        };
+
+        const { data, error } = await resendInstance.emails.send(mailOptions);
+
+        if (error) {
+            console.error("Resend API error sending approval email:", error);
+            return { success: false, error: error.message || JSON.stringify(error) };
+        }
+
+        return { success: true, messageId: data.id };
+    } catch (err) {
+        console.error("Failed to send employer approval email:", err);
+        return { success: false, error: err.message };
+    }
+};
+
+/**
+ * Send New Employer Registration support notification email
+ * @param {string} email - Recruiter email
+ * @param {string} name - Recruiter name
+ * @param {string} companyName - Company name
+ * @returns {Promise<Object>} Send result
+ */
+export const sendNewEmployerRegistrationSupportEmail = async (email, name, companyName) => {
+    const hasResendConfig = !!process.env.RESEND_API_KEY;
+    const isDevModeOnly = process.env.EMAIL_DEV_MODE === "true" || !hasResendConfig;
+    const supportEmail = "he187000duongtrongluc@gmail.com";
+
+    if (isDevModeOnly) {
+        console.log("\n" + "=".repeat(60));
+        console.log("📧 [DEV MODE] New Recruiter Registration Notification to Support Email (Not sent)");
+        console.log("=".repeat(60));
+        console.log(`Support Email: ${supportEmail}`);
+        console.log(`Recruiter Email: ${email}`);
+        console.log(`Recruiter Name: ${name}`);
+        console.log(`Company Name: ${companyName}`);
+        console.log("=".repeat(60) + "\n");
+        return { success: true, messageId: "dev-mode", devMode: true };
+    }
+
+    try {
+        const resendInstance = getResendInstance();
+        const sender = getSender();
+
+        const mailOptions = {
+            from: `JobReady System <${sender}>`,
+            to: supportEmail,
+            subject: `[JobReady Admin] Thông báo: Yêu cầu đăng ký tài khoản tuyển dụng mới từ ${companyName}`,
+            html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background-color: #0A2463; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+                        .content { background-color: #f9f9f9; padding: 20px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 8px 8px; }
+                        .info-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                        .info-table td { padding: 10px; border-bottom: 1px solid #eee; }
+                        .info-table td.label { font-weight: bold; width: 180px; color: #555; }
+                        .button { display: inline-block; background-color: #F5C518; color: #0A2463 !important; text-decoration: none; padding: 10px 20px; font-weight: bold; border-radius: 4px; margin-top: 20px; }
+                        .footer { text-align: center; margin-top: 20px; color: #777; font-size: 11px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h2>Yêu Cầu Phê Duyệt Nhà Tuyển Dụng Mới</h2>
+                        </div>
+                        <div class="content">
+                            <p>Xin chào Admin,</p>
+                            <p>Hệ thống JobReady vừa ghi nhận một tài khoản Nhà tuyển dụng mới đăng ký và xác thực email thành công. Vui lòng kiểm tra và tiến hành đối chiếu thông tin pháp lý (Mã số thuế, Giấy ĐKKD) của doanh nghiệp trước khi phê duyệt hoạt động.</p>
+                            
+                            <table class="info-table">
+                                <tr>
+                                    <td class="label">Tên người đại diện:</td>
+                                    <td>${name}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Email đăng ký:</td>
+                                    <td>${email}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Tên doanh nghiệp:</td>
+                                    <td>${companyName}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Mã số thuế / Xác thực:</td>
+                                    <td><em>Yêu cầu doanh nghiệp cung cấp qua email hợp tác</em></td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Trạng thái:</td>
+                                    <td style="color: #d97706; font-weight: bold;">Chờ kiểm duyệt (0 credits)</td>
+                                </tr>
+                            </table>
+                            
+                            <div style="text-align: center;">
+                                <a href="https://jobready.com/admin" class="button">Truy cập Trang Quản Trị</a>
+                            </div>
+                        </div>
+                        <div class="footer">
+                            <p>Đây là email thông báo tự động từ hệ thống JobReady. Vui lòng không trả lời trực tiếp email này.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `
+        };
+
+        const { data, error } = await resendInstance.emails.send(mailOptions);
+
+        if (error) {
+            console.error("Resend API error sending support registration email:", error);
+            return { success: false, error: error.message || JSON.stringify(error) };
+        }
+
+        return { success: true, messageId: data.id };
+    } catch (err) {
+        console.error("Failed to send support registration email:", err);
+        return { success: false, error: err.message };
+    }
+};
+
+/**
+ * Gửi email thông báo đến nhà tuyển dụng khi có ứng viên nộp hồ sơ
+ * @param {Object} opts
+ * @param {string} opts.recruiterEmail    - Email nhà tuyển dụng nhận thông báo
+ * @param {string} opts.recruiterName     - Tên nhà tuyển dụng / công ty
+ * @param {string} opts.jobTitle          - Tên vị trí tuyển dụng
+ * @param {string} opts.applicantName     - Tên ứng viên
+ * @param {string} opts.applicantEmail    - Email ứng viên
+ * @param {string} [opts.agencyCompany]   - Tên công ty agency (nếu job là loại agency)
+ * @param {string} [opts.dashboardUrl]    - Link dashboard nhà tuyển dụng
+ */
+export const sendApplicationNotificationEmail = async ({
+    recruiterEmail,
+    recruiterName,
+    jobTitle,
+    applicantName,
+    applicantEmail,
+    agencyCompany = null,
+    dashboardUrl = 'https://jobready.io.vn/dashboard',
+}) => {
+    if (!recruiterEmail) return { success: false, error: 'No recruiter email' };
+
+    const hasResendConfig = !!process.env.RESEND_API_KEY;
+    const isDevModeOnly = process.env.EMAIL_DEV_MODE === 'true' || !hasResendConfig;
+
+    if (isDevModeOnly) {
+        console.log('\n' + '='.repeat(60));
+        console.log('📧 [DEV MODE] Application Notification Email (Not sent)');
+        console.log('='.repeat(60));
+        console.log(`To Recruiter: ${recruiterEmail}`);
+        console.log(`Job: ${jobTitle}`);
+        console.log(`Applicant: ${applicantName} <${applicantEmail}>`);
+        if (agencyCompany) console.log(`Agency Company: ${agencyCompany}`);
+        console.log('='.repeat(60) + '\n');
+        return { success: true, messageId: 'dev-mode', devMode: true };
+    }
+
+    try {
+        const resendInstance = getResendInstance();
+        const sender = getSender();
+
+        const companyLabel = agencyCompany
+            ? `<b>${agencyCompany}</b> <span style="color:#6b7280;font-size:12px;">(qua JobReady Agency)</span>`
+            : 'hệ thống JobReady';
+
+        const html = `
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="utf-8"></head>
+        <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
+            <div style="max-width:600px;margin:30px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+                <!-- Header -->
+                <div style="background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);padding:36px 36px 28px;">
+                    <div style="display:inline-block;background:rgba(255,255,255,0.15);border-radius:8px;padding:6px 14px;margin-bottom:14px;">
+                        <span style="color:#e0e7ff;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">📬 Ứng tuyển mới</span>
+                    </div>
+                    <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700;line-height:1.3;">Có ứng viên vừa nộp hồ sơ!</h1>
+                    <p style="color:#c7d2fe;margin:8px 0 0;font-size:13px;">Thông báo tự động từ hệ thống JobReady</p>
+                </div>
+
+                <!-- Body -->
+                <div style="padding:32px 36px;">
+                    <p style="color:#374151;font-size:15px;margin:0 0 20px;">
+                        Xin chào <b>${recruiterName || recruiterEmail}</b>,
+                    </p>
+                    <p style="color:#374151;font-size:15px;margin:0 0 24px;">
+                        Một ứng viên vừa ứng tuyển vào vị trí đăng tại ${companyLabel}.
+                    </p>
+
+                    <!-- Info Card -->
+                    <div style="background:#f5f3ff;border-left:4px solid #7c3aed;border-radius:10px;padding:20px 24px;margin-bottom:28px;">
+                        <table style="width:100%;border-collapse:collapse;">
+                            <tr>
+                                <td style="padding:7px 0;color:#6b7280;font-size:13px;width:150px;">📋 Vị trí ứng tuyển</td>
+                                <td style="padding:7px 0;color:#111827;font-weight:700;font-size:14px;">${jobTitle}</td>
+                            </tr>
+                            ${agencyCompany ? `
+                            <tr>
+                                <td style="padding:7px 0;color:#6b7280;font-size:13px;">🏢 Công ty</td>
+                                <td style="padding:7px 0;color:#111827;font-size:14px;">${agencyCompany}</td>
+                            </tr>` : ''}
+                            <tr>
+                                <td style="padding:7px 0;color:#6b7280;font-size:13px;">👤 Ứng viên</td>
+                                <td style="padding:7px 0;color:#111827;font-size:14px;">${applicantName || 'Không có tên'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:7px 0;color:#6b7280;font-size:13px;">✉️ Email</td>
+                                <td style="padding:7px 0;font-size:14px;"><a href="mailto:${applicantEmail}" style="color:#7c3aed;text-decoration:none;">${applicantEmail || '—'}</a></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:7px 0;color:#6b7280;font-size:13px;">🕐 Thời gian</td>
+                                <td style="padding:7px 0;color:#111827;font-size:14px;">${new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- CTA -->
+                    <div style="text-align:center;margin-bottom:28px;">
+                        <a href="${dashboardUrl}"
+                           style="display:inline-block;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;
+                                  text-decoration:none;padding:14px 32px;border-radius:10px;font-weight:700;font-size:15px;">
+                            Xem hồ sơ ứng viên →
+                        </a>
+                    </div>
+
+                    <p style="color:#9ca3af;font-size:12px;text-align:center;margin:0;">
+                        Email này được gửi tự động từ hệ thống JobReady · Vui lòng không trả lời email này.
+                    </p>
+                </div>
+
+                <!-- Footer -->
+                <div style="background:#f8fafc;border-top:1px solid #e5e7eb;padding:16px 36px;text-align:center;">
+                    <p style="color:#9ca3af;font-size:12px;margin:0;">
+                        © ${new Date().getFullYear()} JobReady System · <a href="https://jobready.io.vn" style="color:#7c3aed;text-decoration:none;">jobready.io.vn</a>
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        `;
+
+        const mailOptions = {
+            from: `JobReady Thông báo <${sender}>`,
+            to: recruiterEmail,
+            subject: `[JobReady] Ứng viên mới nộp hồ sơ: "${jobTitle}"`,
+            html,
+            text: `Xin chào ${recruiterName || recruiterEmail},\n\nỨng viên "${applicantName}" (${applicantEmail}) vừa nộp hồ sơ ứng tuyển vị trí "${jobTitle}"${agencyCompany ? ` tại ${agencyCompany}` : ''}.\n\nXem chi tiết tại: ${dashboardUrl}\n\n© ${new Date().getFullYear()} JobReady System.`
+        };
+
+        const { data, error } = await resendInstance.emails.send(mailOptions);
+
+        if (error) {
+            throw new Error(error.message || JSON.stringify(error));
+        }
+
+        console.log(`📬 Application notification email sent to ${recruiterEmail}. ID: ${data.id}`);
+        return { success: true, messageId: data.id };
+    } catch (err) {
+        console.error(`❌ Failed to send application notification email to ${recruiterEmail}:`, err.message);
+        return { success: false, error: err.message };
+    }
+};
+
+/**
+ * Gửi email xác nhận ứng tuyển cho ứng viên (job seeker)
+ * @param {Object} opts
+ * @param {string} opts.applicantEmail   - Email ứng viên
+ * @param {string} opts.applicantName    - Tên ứng viên
+ * @param {string} opts.jobTitle         - Tên vị trí ứng tuyển
+ * @param {string} [opts.companyName]    - Tên công ty
+ * @param {string} [opts.jobLocation]    - Địa điểm làm việc
+ * @param {string} [opts.jobType]        - Loại hình công việc
+ * @param {string} [opts.jobsUrl]        - Link trang tìm việc để xem thêm
+ */
+export const sendApplicationConfirmationEmail = async ({
+    applicantEmail,
+    applicantName,
+    jobTitle,
+    companyName = 'Nhà tuyển dụng',
+    jobLocation = '',
+    jobType = '',
+    jobsUrl = 'https://jobready.io.vn/jobs',
+}) => {
+    if (!applicantEmail) return { success: false, error: 'No applicant email' };
+
+    const hasResendConfig = !!process.env.RESEND_API_KEY;
+    const isDevModeOnly = process.env.EMAIL_DEV_MODE === 'true' || !hasResendConfig;
+
+    if (isDevModeOnly) {
+        console.log('\n' + '='.repeat(60));
+        console.log('📧 [DEV MODE] Application Confirmation Email (Not sent)');
+        console.log('='.repeat(60));
+        console.log(`To Applicant: ${applicantEmail}`);
+        console.log(`Job: ${jobTitle} @ ${companyName}`);
+        console.log('='.repeat(60) + '\n');
+        return { success: true, messageId: 'dev-mode', devMode: true };
+    }
+
+    try {
+        const resendInstance = getResendInstance();
+        const sender = getSender();
+
+        const locationText = jobLocation ? `<tr>
+                                <td style="padding:7px 0;color:#6b7280;font-size:13px;width:150px;">📍 Địa điểm</td>
+                                <td style="padding:7px 0;color:#111827;font-size:14px;">${jobLocation}</td>
+                            </tr>` : '';
+
+        const jobTypeText = jobType ? `<tr>
+                                <td style="padding:7px 0;color:#6b7280;font-size:13px;">⏱️ Hình thức</td>
+                                <td style="padding:7px 0;color:#111827;font-size:14px;">${jobType === 'full-time' ? 'Toàn thời gian' : jobType === 'part-time' ? 'Bán thời gian' : jobType === 'remote' ? 'Làm từ xa' : jobType === 'internship' ? 'Thực tập' : jobType}</td>
+                            </tr>` : '';
+
+        const html = `
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="utf-8"></head>
+        <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
+            <div style="max-width:600px;margin:30px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+
+                <!-- Header -->
+                <div style="background:linear-gradient(135deg,#0A2463 0%,#1e40af 100%);padding:36px 36px 28px;">
+                    <div style="display:inline-block;background:rgba(245,197,24,0.2);border:1px solid rgba(245,197,24,0.4);border-radius:8px;padding:6px 14px;margin-bottom:14px;">
+                        <span style="color:#F5C518;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">✅ Ứng tuyển thành công</span>
+                    </div>
+                    <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700;line-height:1.3;">Hồ sơ đã được gửi đi!</h1>
+                    <p style="color:#93c5fd;margin:8px 0 0;font-size:13px;">Thông báo xác nhận từ hệ thống JobReady</p>
+                </div>
+
+                <!-- Body -->
+                <div style="padding:32px 36px;">
+                    <p style="color:#374151;font-size:15px;margin:0 0 8px;">
+                        Xin chào <b>${applicantName || 'bạn'}</b> 👋
+                    </p>
+                    <p style="color:#374151;font-size:15px;margin:0 0 24px;">
+                        JobReady xác nhận hồ sơ của bạn đã được gửi thành công! Nhà tuyển dụng sẽ xem xét và liên hệ với bạn trong thời gian sớm nhất.
+                    </p>
+
+                    <!-- Job Info Card -->
+                    <div style="background:#eff6ff;border-left:4px solid #0A2463;border-radius:10px;padding:20px 24px;margin-bottom:24px;">
+                        <p style="color:#0A2463;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin:0 0 12px;">Chi tiết vị trí ứng tuyển</p>
+                        <table style="width:100%;border-collapse:collapse;">
+                            <tr>
+                                <td style="padding:7px 0;color:#6b7280;font-size:13px;width:150px;">💼 Vị trí</td>
+                                <td style="padding:7px 0;color:#111827;font-weight:700;font-size:14px;">${jobTitle}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:7px 0;color:#6b7280;font-size:13px;">🏢 Công ty</td>
+                                <td style="padding:7px 0;color:#111827;font-size:14px;">${companyName}</td>
+                            </tr>
+                            ${locationText}
+                            ${jobTypeText}
+                            <tr>
+                                <td style="padding:7px 0;color:#6b7280;font-size:13px;">📅 Ngày nộp</td>
+                                <td style="padding:7px 0;color:#111827;font-size:14px;">${new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Ho_Chi_Minh' })}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:7px 0;color:#6b7280;font-size:13px;">📌 Trạng thái</td>
+                                <td style="padding:7px 0;font-size:14px;"><span style="background:#dbeafe;color:#1e40af;font-weight:700;padding:2px 10px;border-radius:20px;font-size:12px;">Đang xem xét</span></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- What's next -->
+                    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:18px 20px;margin-bottom:28px;">
+                        <p style="color:#15803d;font-size:13px;font-weight:700;margin:0 0 10px;">📋 Các bước tiếp theo</p>
+                        <ol style="color:#166534;font-size:13px;margin:0;padding-left:18px;line-height:1.8;">
+                            <li>Nhà tuyển dụng sẽ xem xét hồ sơ của bạn</li>
+                            <li>Nếu phù hợp, bạn sẽ nhận được lời mời phỏng vấn</li>
+                            <li>Theo dõi trạng thái hồ sơ tại mục <b>"Đơn ứng tuyển"</b> trên JobReady</li>
+                        </ol>
+                    </div>
+
+                    <!-- CTA -->
+                    <div style="text-align:center;margin-bottom:28px;">
+                        <a href="${jobsUrl}"
+                           style="display:inline-block;background:linear-gradient(135deg,#0A2463,#1e40af);color:#fff;
+                                  text-decoration:none;padding:14px 32px;border-radius:10px;font-weight:700;font-size:15px;">
+                            Khám phá thêm việc làm →
+                        </a>
+                    </div>
+
+                    <p style="color:#9ca3af;font-size:12px;text-align:center;margin:0;">
+                        Email này được gửi tự động từ hệ thống JobReady · Vui lòng không trả lời email này.
+                    </p>
+                </div>
+
+                <!-- Footer -->
+                <div style="background:#f8fafc;border-top:1px solid #e5e7eb;padding:16px 36px;text-align:center;">
+                    <p style="color:#9ca3af;font-size:12px;margin:0;">
+                        © ${new Date().getFullYear()} JobReady System ·
+                        <a href="https://jobready.io.vn" style="color:#0A2463;text-decoration:none;">jobready.io.vn</a>
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        `;
+
+        const mailOptions = {
+            from: `JobReady <${sender}>`,
+            to: applicantEmail,
+            subject: `[JobReady] Hồ sơ ứng tuyển "${jobTitle}" tại ${companyName} đã được gửi!`,
+            html,
+            text: `Xin chào ${applicantName},\n\nHồ sơ ứng tuyển của bạn cho vị trí "${jobTitle}" tại ${companyName} đã được gửi thành công vào lúc ${new Date().toLocaleString('vi-VN')}.\n\nNhà tuyển dụng sẽ xem xét và liên hệ với bạn trong thời gian sớm nhất.\n\nKhám phá thêm việc làm tại: ${jobsUrl}\n\n© ${new Date().getFullYear()} JobReady System.`
+        };
+
+        const { data, error } = await resendInstance.emails.send(mailOptions);
+
+        if (error) {
+            throw new Error(error.message || JSON.stringify(error));
+        }
+
+        console.log(`📬 Application confirmation email sent to ${applicantEmail}. ID: ${data.id}`);
+        return { success: true, messageId: data.id };
+    } catch (err) {
+        console.error(`❌ Failed to send application confirmation email to ${applicantEmail}:`, err.message);
+        return { success: false, error: err.message };
+    }
+};

@@ -135,7 +135,17 @@ function CreateJob() {
       }
     } catch (err) {
       console.error(err);
-      alert(err.message);
+      if (err.message && (err.message.includes("không đủ credit") || err.message.includes("credit"))) {
+        const confirmBuy = window.confirm(
+          "Tài khoản của bạn không đủ credit để đăng tin (Phí đăng tin là 20 credits).\n\nBạn có muốn di chuyển đến trang nạp thêm credit ngay bây giờ không?"
+        );
+        if (confirmBuy) {
+          navigate("/credits");
+          return;
+        }
+      } else {
+        alert(err.message);
+      }
     } finally {
       setLoading(false);
     }

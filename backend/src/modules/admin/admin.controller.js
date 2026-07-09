@@ -123,17 +123,38 @@ export class AdminController {
             const existing = await UserModel.findOne({ _id: userId, role: "EMPLOYER" });
             if (!existing) return res.status(404).json({ message: "Nhà tuyển dụng không tồn tại" });
 
+            const updateData = {
+                isApproved: isApproved,
+                isActive: isApproved
+            };
+            if (isApproved) {
+                updateData.credits = 200;
+            }
+
             // Dùng findByIdAndUpdate để đảm bảo cập nhật atomic, tránh schema cache
             const updated = await UserModel.findByIdAndUpdate(
                 userId,
-                {
-                    $set: {
-                        isApproved: isApproved,
-                        isActive: isApproved,
-                    }
-                },
+                { $set: updateData },
                 { new: true, runValidators: false }
             );
+
+            if (updated && isApproved) {
+                // Gửi email thông báo phê duyệt chạy ngầm (không block request)
+                try {
+                    const { sendEmployerApprovalEmail } = await import("../../utils/email.util.js");
+                    sendEmployerApprovalEmail(updated.email, updated.name, updated.companyName || "Doanh nghiệp đối tác")
+                        .then(emailRes => {
+                            if (emailRes.success) {
+                                console.log(`[APPROVAL EMAIL] Sent success email to ${updated.email}`);
+                            } else {
+                                console.warn(`[APPROVAL EMAIL] Failed to send to ${updated.email}:`, emailRes.error);
+                            }
+                        })
+                        .catch(err => console.error("[APPROVAL EMAIL] Async send error:", err));
+                } catch (importErr) {
+                    console.error("[APPROVAL EMAIL] Import error:", importErr);
+                }
+            }
 
             return res.status(200).json({
                 message: isApproved ? "Đã duyệt nhà tuyển dụng" : "Đã từ chối nhà tuyển dụng",

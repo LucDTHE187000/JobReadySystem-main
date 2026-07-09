@@ -45,6 +45,12 @@ const JobSchema = new mongoose.Schema(
       default: "JobReady",
     },
 
+    // Tên công ty gốc khi job được tạo kiểu agency (recruiterId là người quản lý, không phải chủ job)
+    agencyCompanyName: {
+      type: String,
+      default: "",
+    },
+
     status: {
       type: String,
       enum: ["open", "closed", "pending"],
